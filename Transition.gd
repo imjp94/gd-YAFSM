@@ -2,7 +2,7 @@ extends Resource
 
 export(String) var from
 export(String) var to
-export(Array) var conditions
+export(Array, Resource) var conditions
 export(Array, Resource) var transitions setget set_transitions
 
 var from_state_dict = {}
@@ -18,10 +18,12 @@ func transit(params={}):
 		return to
 
 	for condition in conditions:
-		var param = params.get(condition.name)
-		if param:
-			# TODO: Add ConditionMode for comparation
-			if param == condition.value:
+		var value = params.get(condition.name)
+		if value:
+			if "value" in condition:
+				if condition.compare(value):
+					return to
+			else: # Condition without value property is a trigger
 				return to
 
 func update_from_state_dict():
