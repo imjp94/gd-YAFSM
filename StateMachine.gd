@@ -27,7 +27,7 @@ func _ready():
 	if Engine.editor_hint:
 		return
 
-	_push_state("Default")
+	_push_state(transition.get_entry().to)
 
 func _process(delta):
 	if Engine.editor_hint:
