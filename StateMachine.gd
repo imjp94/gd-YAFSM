@@ -7,6 +7,7 @@ signal state_exited(from, to, push)
 signal state_update(state, delta)
 
 export(Resource) var transition
+export(Dictionary) var parameters = {}
 
 enum RESET_EVENT_TRIGGER {
 	NONE = -1,
@@ -77,7 +78,7 @@ func _transition():
 		return
 	
 	for t in transitions:
-		var next_state = t.to
+		var next_state = t.transit(parameters)
 		if not next_state:
 			continue
 			
