@@ -73,7 +73,7 @@ func _update(delta):
 	emit_signal("state_update", get_current_state(), delta)
 
 func _transition():
-	var transitions = transition.from_state_dict[get_current_state()]
+	var transitions = transition.get_current_transitions(get_current_state())
 	if not transitions:
 		return
 	

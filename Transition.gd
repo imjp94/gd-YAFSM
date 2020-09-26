@@ -51,6 +51,9 @@ func update_from_state_dict():
 			continue
 		pair.append(transition)
 
+func get_current_transitions(current_state):
+	return from_state_dict[current_state]
+
 func get_entry():
 	return get_entries()[0] # TODO: Should no assume one entry
 
