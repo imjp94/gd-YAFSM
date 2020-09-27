@@ -41,8 +41,15 @@ func _on_node_selected(node):
 func _on_node_unselected(node):
 	selected_nodes.erase(node.name)
 
-func _on_node_renamed(node):
-	node.title = node.name # Respect the name in scene tree
+func _on_node_name_changed(old, new):
+	# Manually handle re-connections after rename
+	for connection in get_connection_list():
+		if connection.from == old:
+			disconnect_node(connection.from, connection.from_port, connection.to, connection.to_port)
+			connect_node(new, connection.from_port, connection.to, connection.to_port)
+		elif connection.to == old:
+			disconnect_node(connection.from, connection.from_port, connection.to, connection.to_port)
+			connect_node(connection.from, connection.from_port, new, connection.to_port)
 
 func _on_popup_request(position):
 	ContextMenu.rect_position = get_viewport().get_mouse_position()
@@ -56,7 +63,7 @@ func _on_ContextMenu_index_pressed(index):
 			_on_new_node_added(node)
 
 func _on_new_node_added(node):
-	node.connect("renamed", self, "_on_node_renamed", [node])
+	node.connect("name_changed", self, "_on_node_name_changed")
 	node.name = "State"
 	node.offset = get_local_mouse_position() + scroll_offset
 
