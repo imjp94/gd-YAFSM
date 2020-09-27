@@ -41,6 +41,9 @@ func _on_node_selected(node):
 func _on_node_unselected(node):
 	selected_nodes.erase(node.name)
 
+func _on_node_renamed(node):
+	node.title = node.name # Respect the name in scene tree
+
 func _on_popup_request(position):
 	ContextMenu.rect_position = get_viewport().get_mouse_position()
 	ContextMenu.popup()
@@ -48,13 +51,14 @@ func _on_popup_request(position):
 func _on_ContextMenu_index_pressed(index):
 	match index: # TODO: Proper way to handle menu items
 		0: # Add State
-			var graph_node = CustomGraphNode.instance()
-			add_child(graph_node)
-			_on_new_graph_node_added(graph_node)
+			var node = CustomGraphNode.instance()
+			add_child(node)
+			_on_new_node_added(node)
 
-func _on_new_graph_node_added(graph_node):
-	# TODO: Sync state name with node name
-	graph_node.offset = get_local_mouse_position() + scroll_offset
+func _on_new_node_added(node):
+	node.connect("renamed", self, "_on_node_renamed", [node])
+	node.name = "State"
+	node.offset = get_local_mouse_position() + scroll_offset
 
 func remove_node_connections(node_name):
 	for connection in get_connection_list():
