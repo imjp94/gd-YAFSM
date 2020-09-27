@@ -63,4 +63,4 @@ func _on_new_node_added(node):
 func remove_node_connections(node_name):
 	for connection in get_connection_list():
 		if connection.from == node_name or connection.to == node_name:
-			disconnect_node(connection.from, 0, connection.to, 0)
+			disconnect_node(connection.from, connection.from_port, connection.to, connection.to_port)
