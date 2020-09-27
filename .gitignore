@@ -1,8 +1,7 @@
 build/
 assets/*
 addons/*
-!addons/ui_design_tool
-addons/ui_design_tool/user_pref.cfg
+!addons/imjp94.YAFSM
 
 # Godot-specific ignores
 .import/

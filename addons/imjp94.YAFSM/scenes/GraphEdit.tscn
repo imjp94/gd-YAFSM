@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/imjp94.YAFSM/scenes/GraphEdit.gd" type="Script" id=1]
+[ext_resource path="res://addons/imjp94.YAFSM/scenes/GraphContextMenu.tscn" type="PackedScene" id=2]
+
+[node name="GraphEdit" type="GraphEdit"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_min_size = Vector2( 0, 200 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ContextMenu" parent="." instance=ExtResource( 2 )]
+items = [ "Add State", null, 0, false, false, 0, 0, null, "", false ]

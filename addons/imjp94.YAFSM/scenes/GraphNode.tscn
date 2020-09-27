@@ -1,0 +1,40 @@
+[gd_scene format=2]
+
+[node name="GraphNode" type="GraphNode"]
+margin_right = 73.0
+margin_bottom = 44.0
+title = "State"
+slot/0/left_enabled = true
+slot/0/left_type = 0
+slot/0/left_color = Color( 1, 0, 0, 1 )
+slot/0/right_enabled = true
+slot/0/right_type = 1
+slot/0/right_color = Color( 1, 1, 1, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="IO" type="MarginContainer" parent="."]
+margin_left = 16.0
+margin_top = 24.0
+margin_right = 57.0
+margin_bottom = 38.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="IO"]
+margin_right = 41.0
+margin_bottom = 14.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="In" type="Label" parent="IO/HBoxContainer"]
+margin_right = 13.0
+margin_bottom = 14.0
+custom_colors/font_color = Color( 1, 0, 0, 1 )
+text = "In"
+
+[node name="Out" type="Label" parent="IO/HBoxContainer"]
+margin_left = 17.0
+margin_right = 41.0
+margin_bottom = 14.0
+size_flags_horizontal = 10
+text = "Out"

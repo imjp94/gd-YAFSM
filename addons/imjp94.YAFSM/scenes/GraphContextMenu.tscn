@@ -1,0 +1,6 @@
+[gd_scene format=2]
+
+[node name="ContextMenu" type="PopupMenu"]
+margin_right = 20.0
+margin_bottom = 20.0
+items = [ "Add State", null, 0, false, false, 0, 0, null, "", false ]

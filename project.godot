@@ -18,6 +18,10 @@ _global_script_class_icons={
 config/name="YAFSM"
 config/icon="res://icon.png"
 
+[editor_plugins]
+
+enabled=PoolStringArray( "imjp94.YAFSM" )
+
 [rendering]
 
 environment/default_environment="res://default_env.tres"
