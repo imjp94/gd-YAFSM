@@ -40,7 +40,12 @@ func remove_state(state):
 
 func add_transition(from_state, transition):
 	var state = states.get(from_state)
-	if not state:
+	if state:
+		for t in state.transitions:
+			if t.equals(transition):
+				push_warning("Transition(%s, %s)) already exist in state %s" % [transition.from, transition.to, from_state])
+				return
+	else:
 		state = add_state(from_state)
 	state.transitions.append(transition)
 
@@ -88,6 +93,14 @@ func get_entries():
 	
 func get_exits():
 	return states[EXIT_KEY].transitions
+
+func equals(obj):
+	if obj == null:
+		return false
+	if not ("from" in obj and "to" in obj):
+		return false
+
+	return from == obj.from and to == obj.to
 
 # Data struct for State, remember to duplicate(true) for deep copy as it contains array
 const STATE_STRUCT = {
