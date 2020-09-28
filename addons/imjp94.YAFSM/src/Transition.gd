@@ -52,7 +52,7 @@ func change_state_name(from, to):
 			state.name = to
 			states[to] = state
 			states.erase(from)
-		for transition in state.transitions:
+		for transition in state.transitions.values():
 			if is_name_changing_state:
 				if transition.from == from:
 					transition.from = to
@@ -62,7 +62,7 @@ func change_state_name(from, to):
 	return true
 
 func get_current_transitions(current_state):
-	return states[current_state].transitions
+	return states[current_state].transitions.values()
 
 func get_entry():
 	return get_entries()[0] # TODO: Should no assume one entry
