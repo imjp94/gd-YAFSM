@@ -1,29 +1,27 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://addons/imjp94.YAFSM/scenes/GraphNode.tscn" type="PackedScene" id=1]
+[ext_resource path="res://addons/imjp94.YAFSM/scenes/BaseGraphNode.tscn" type="PackedScene" id=1]
 
 [node name="Entry" instance=ExtResource( 1 )]
+margin_right = 64.0
 title = "Entry"
 slot/0/left_enabled = false
 
-[node name="Name" parent="." index="0"]
-visible = false
-text = "Entry"
-editable = false
-
-[node name="IO" parent="." index="1"]
-margin_top = 49.0
-margin_right = 74.0
-margin_bottom = 49.0
+[node name="IO" parent="." index="0"]
+margin_right = 48.0
 
 [node name="HBoxContainer" parent="IO" index="0"]
-margin_right = 58.0
-margin_bottom = 0.0
+margin_right = 28.0
 
 [node name="In" parent="IO/HBoxContainer" index="0"]
 visible = false
 
 [node name="Out" parent="IO/HBoxContainer" index="1"]
-visible = false
-margin_left = 34.0
-margin_right = 58.0
+margin_left = 0.0
+margin_right = 24.0
+
+[node name="MarginContainer" parent="." index="1"]
+margin_right = 48.0
+
+[node name="Transitions" parent="MarginContainer" index="0"]
+margin_right = 28.0

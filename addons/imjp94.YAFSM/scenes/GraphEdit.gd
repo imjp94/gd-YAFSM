@@ -97,7 +97,8 @@ func _on_ContextMenu_index_pressed(index):
 			add_node(node, Transition.EXIT_KEY, local_mouse_pos)
 
 func _on_new_node_added(node, node_name=DEFAULT_NODE_NAME, offset=DEFAULT_NODE_OFFSET):
-	node.connect("name_changed", self, "_on_node_name_changed")
+	if node.has_signal("name_changed"): # BaseGraphNode doesn't have name_changed signal
+		node.connect("name_changed", self, "_on_node_name_changed")
 	node.offset = offset
 	node.name = node_name
 	focused_transition.add_state(node.name, node.state)

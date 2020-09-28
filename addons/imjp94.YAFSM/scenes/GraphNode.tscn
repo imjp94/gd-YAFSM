@@ -1,56 +1,29 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://addons/imjp94.YAFSM/scenes/GraphNode.gd" type="Script" id=1]
+[ext_resource path="res://addons/imjp94.YAFSM/scenes/BaseGraphNode.tscn" type="PackedScene" id=2]
 
-[node name="GraphNode" type="GraphNode"]
-margin_right = 73.0
-margin_bottom = 44.0
-title = "State"
-slot/0/left_enabled = true
-slot/0/left_type = 0
-slot/0/left_color = Color( 1, 0, 0, 1 )
-slot/0/right_enabled = true
-slot/0/right_type = 1
-slot/0/right_color = Color( 1, 1, 1, 1 )
-slot/1/left_enabled = false
-slot/1/left_type = 0
-slot/1/left_color = Color( 1, 1, 1, 1 )
-slot/1/right_enabled = false
-slot/1/right_type = 0
-slot/1/right_color = Color( 1, 1, 1, 1 )
+[node name="GraphNode" instance=ExtResource( 2 )]
+margin_bottom = 94.0
+slot/2/left_enabled = false
+slot/2/left_type = 0
+slot/2/left_color = Color( 1, 1, 1, 1 )
+slot/2/right_enabled = false
+slot/2/right_type = 0
+slot/2/right_color = Color( 1, 1, 1, 1 )
 script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
-[node name="Name" type="LineEdit" parent="."]
+[node name="Name" type="LineEdit" parent="." index="0"]
 margin_left = 16.0
 margin_top = 24.0
-margin_right = 74.0
+margin_right = 119.0
 margin_bottom = 48.0
 text = "Name"
 
-[node name="IO" type="MarginContainer" parent="."]
-margin_left = 16.0
-margin_top = 24.0
-margin_right = 57.0
-margin_bottom = 38.0
+[node name="IO" parent="." index="1"]
+margin_top = 49.0
+margin_bottom = 71.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="IO"]
-margin_right = 41.0
-margin_bottom = 14.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="In" type="Label" parent="IO/HBoxContainer"]
-margin_right = 13.0
-margin_bottom = 14.0
-custom_colors/font_color = Color( 1, 0, 0, 1 )
-text = "In"
-
-[node name="Out" type="Label" parent="IO/HBoxContainer"]
-margin_left = 17.0
-margin_right = 41.0
-margin_bottom = 14.0
-size_flags_horizontal = 10
-text = "Out"
+[node name="MarginContainer" parent="." index="2"]
+margin_top = 72.0
+margin_bottom = 88.0
