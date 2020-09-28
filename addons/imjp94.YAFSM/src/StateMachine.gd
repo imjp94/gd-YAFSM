@@ -76,12 +76,12 @@ func _transition():
 	var transitions = transition.get_current_transitions(get_current_state())
 	if not transitions:
 		return
-	
-	for t in transitions:
+
+	for t in transitions.values():
 		var next_state = t.transit(parameters)
 		if not next_state:
 			continue
-			
+
 		if state_stack.has(next_state):
 			reset(state_stack.find(next_state))
 		else:

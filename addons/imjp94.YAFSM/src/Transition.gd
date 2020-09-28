@@ -1,5 +1,6 @@
 tool
 extends Resource
+const State = preload("State.gd")
 
 const ENTRY_KEY = "Entry"
 const EXIT_KEY = "Exit"
@@ -27,37 +28,17 @@ func transit(params={}):
 			else: # Condition without value property is a trigger
 				return to
 
-func add_state(state, state_struct=null):
-	if state in states:
+func add_state(state):
+	if not state:
+		return null
+	if state.name in states:
 		return null
 
-	var new_state = state_struct if state_struct else STATE_STRUCT.duplicate(true)
-	states[state] = new_state
-	return new_state
+	states[state.name] = state
+	return state
 
 func remove_state(state):
 	return states.erase(state)
-
-func add_transition(from_state, transition):
-	var state = states.get(from_state)
-	if state:
-		for t in state.transitions:
-			if t.equals(transition):
-				push_warning("Transition(%s, %s)) already exist in state %s" % [transition.from, transition.to, from_state])
-				return
-	else:
-		state = add_state(from_state)
-	state.transitions.append(transition)
-
-func remove_transition(from_state, to_state):
-	if not (from_state in states):
-		return false
-
-	var state = states[from_state]
-	for transition in state.transitions:
-		if transition.from == from_state and transition.to == to_state:
-			state.transitions.erase(transition)
-			return true
 
 # Change existing state key in states(Dictionary), return true if success
 func change_state_name(from, to):
@@ -68,6 +49,7 @@ func change_state_name(from, to):
 		var state = states[state_key]
 		var is_name_changing_state = state_key == from
 		if is_name_changing_state:
+			state.name = to
 			states[to] = state
 			states.erase(from)
 		for transition in state.transitions:
@@ -89,10 +71,10 @@ func get_exit():
 	return get_exits()[0] # TODO: Should no assume one exit
 
 func get_entries():
-	return states[ENTRY_KEY].transitions
+	return states[ENTRY_KEY].transitions.values()
 	
 func get_exits():
-	return states[EXIT_KEY].transitions
+	return states[EXIT_KEY].transitions.values()
 
 func equals(obj):
 	if obj == null:
@@ -101,9 +83,3 @@ func equals(obj):
 		return false
 
 	return from == obj.from and to == obj.to
-
-# Data struct for State, remember to duplicate(true) for deep copy as it contains array
-const STATE_STRUCT = {
-	"offset": Vector2.ZERO, # GraphNode.offset 
-	"transitions": []
-}

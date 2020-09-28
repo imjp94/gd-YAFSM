@@ -1,13 +1,11 @@
 tool
 extends GraphNode
 const Transition = preload("../src/Transition.gd")
+const State = preload("../src/State.gd")
 
 
-var state setget set_state
+var state = State.new() setget set_state
 
-
-func _init():
-	state = Transition.STATE_STRUCT.duplicate(true)
 
 func _ready():
 	connect("offset_changed", self, "_on_offset_changed")

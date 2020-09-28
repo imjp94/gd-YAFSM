@@ -1,6 +1,7 @@
 tool
 extends EditorPlugin
 const StateMachine = preload("src/StateMachine.gd")
+const State = preload("src/State.gd")
 const Transition = preload("src/Transition.gd")
 const Condition = preload("src/Condition.gd")
 const ValueCondition = preload("src/ValueCondition.gd")
@@ -18,6 +19,7 @@ func _enter_tree():
 	var node_icon = editor_base_control.get_icon("Node", "EditorIcons")
 	var resource_icon = editor_base_control.get_icon("ResourcePreloader", "EditorIcons")
 	add_custom_type("StateMachine", "Node", StateMachine, node_icon)
+	add_custom_type("State", "Resource", State, resource_icon)
 	add_custom_type("Transition", "Resource", Transition, resource_icon)
 	add_custom_type("Condition", "Resource", Condition, resource_icon)
 	add_custom_type("ValueCondition", "Resource", ValueCondition, resource_icon)

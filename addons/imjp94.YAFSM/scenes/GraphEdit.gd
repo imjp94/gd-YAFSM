@@ -1,6 +1,7 @@
 tool
 extends GraphEdit
 const Transition = preload("../src/Transition.gd")
+const State = preload("../src/State.gd")
 const CustomGraphNode = preload("GraphNode.tscn")
 const EntryGraphNode = preload("EntryGraphNode.tscn")
 const ExitGraphNode = preload("ExitGraphNode.tscn")
@@ -42,11 +43,17 @@ func _on_connect_node(from, from_slot, to, to_slot):
 	var new_transition = Transition.new()
 	new_transition.from = from
 	new_transition.to = to
-	focused_transition.add_transition(from, new_transition)
+	var state = focused_transition.states.get(from)
+	if not state:
+		state = State.new(from)
+		focused_transition.add_state(state)
+	state.add_transition(new_transition)
 
 # Always called after disconnect_node() to update data of focused_transition
 func _on_disconnect_node(from, from_slot, to, to_slot):
-	focused_transition.remove_transition(from, to)
+	var state = focused_transition.states.get(from)
+	if state:
+		state.remove_transition(to)
 
 func _on_delete_nodes_request():
 	for node in selected_nodes.values():
@@ -101,7 +108,8 @@ func _on_new_node_added(node, node_name=DEFAULT_NODE_NAME, offset=DEFAULT_NODE_O
 		node.connect("name_changed", self, "_on_node_name_changed")
 	node.offset = offset
 	node.name = node_name
-	focused_transition.add_state(node.name, node.state)
+	node.state.name = node.name
+	focused_transition.add_state(node.state)
 
 func _on_focused_object_changed(new_obj):
 	if new_obj == null:
@@ -139,7 +147,7 @@ func draw_graph():
 
 		new_node.state = state
 		add_node(new_node, state_key, state.offset)
-		for transition in state.transitions:
+		for transition in state.transitions.values():
 			# Reflecting state node, so call connect_node instead
 			connect_node(transition.from, 0, transition.to, 0) # TODO: Save port index to state
 
