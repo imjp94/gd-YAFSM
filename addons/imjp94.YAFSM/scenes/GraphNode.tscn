@@ -4,6 +4,7 @@
 [ext_resource path="res://addons/imjp94.YAFSM/scenes/BaseGraphNode.tscn" type="PackedScene" id=2]
 
 [node name="GraphNode" instance=ExtResource( 2 )]
+margin_right = 90.0
 margin_bottom = 94.0
 slot/2/left_enabled = false
 slot/2/left_type = 0
