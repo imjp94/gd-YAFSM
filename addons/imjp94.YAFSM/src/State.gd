@@ -2,7 +2,7 @@ tool
 extends Resource
 
 signal transition_added(transition)
-signal transition_removed()
+signal transition_removed(to_state)
 
 export(String) var name = ""
 export(Dictionary) var transitions = {}
@@ -31,4 +31,4 @@ func add_transition(transition):
 func remove_transition(to_state):
 	if to_state in transitions:
 		transitions.erase(to_state)
-		emit_signal("transition_removed")
+		emit_signal("transition_removed", to_state)

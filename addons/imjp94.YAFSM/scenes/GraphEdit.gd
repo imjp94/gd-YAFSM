@@ -40,10 +40,14 @@ func _on_disconnection_request(from, from_slot, to, to_slot):
 
 # Always called after connect_node() to update data of focused_transition
 func _on_connect_node(from, from_slot, to, to_slot):
+	var state = focused_transition.states.get(from)
+	if state:
+		if to in state.transitions: # Transition existed, mainly to silent warning from State.add_transition
+			return
+
 	var new_transition = Transition.new()
 	new_transition.from = from
 	new_transition.to = to
-	var state = focused_transition.states.get(from)
 	if not state:
 		state = State.new(from)
 		focused_transition.add_state(state)
@@ -69,6 +73,7 @@ func _on_node_unselected(node):
 	selected_nodes.erase(node.name)
 
 func _on_node_name_changed(old, new):
+	focused_transition.change_state_name(old, new)
 	# Manually handle re-connections after rename
 	for connection in get_connection_list():
 		if connection.from == old:
@@ -77,8 +82,6 @@ func _on_node_name_changed(old, new):
 		elif connection.to == old:
 			disconnect_state_node(connection.from, connection.from_port, connection.to, connection.to_port)
 			connect_state_node(connection.from, connection.from_port, new, connection.to_port)
-
-	focused_transition.change_state_name(old, new)
 
 func _on_popup_request(position):
 	ContextMenu.rect_position = get_viewport().get_mouse_position()
@@ -150,6 +153,7 @@ func draw_graph():
 		for transition in state.transitions.values():
 			# Reflecting state node, so call connect_node instead
 			connect_node(transition.from, 0, transition.to, 0) # TODO: Save port index to state
+			new_node._on_state_transition_added(transition)
 
 func clear_graph():
 	clear_connections()
