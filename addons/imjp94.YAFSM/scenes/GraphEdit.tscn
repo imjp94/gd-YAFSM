@@ -13,4 +13,3 @@ __meta__ = {
 }
 
 [node name="ContextMenu" parent="." instance=ExtResource( 2 )]
-items = [ "Add State", null, 0, false, false, 0, 0, null, "", false ]

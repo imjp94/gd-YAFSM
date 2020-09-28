@@ -3,4 +3,4 @@
 [node name="ContextMenu" type="PopupMenu"]
 margin_right = 20.0
 margin_bottom = 20.0
-items = [ "Add State", null, 0, false, false, 0, 0, null, "", false ]
+items = [ "Add State", null, 0, false, false, 0, 0, null, "", false, "Add Entry", null, 0, false, false, 1, 0, null, "", false, "Add Exit", null, 0, false, false, 2, 0, null, "", false ]

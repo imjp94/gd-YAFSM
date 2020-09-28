@@ -6,7 +6,7 @@ signal name_changed(old, new)
 
 onready var Name = $Name
 
-var state
+var state setget set_state
 
 
 func _init():
@@ -41,3 +41,7 @@ func change_name(new_name):
 	var old = name
 	name = new_name
 	emit_signal("name_changed", old, name)
+
+func set_state(s):
+	state = s
+	offset = state.offset

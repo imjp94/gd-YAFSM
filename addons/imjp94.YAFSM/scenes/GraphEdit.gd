@@ -1,8 +1,9 @@
 tool
 extends GraphEdit
 const Transition = preload("../src/Transition.gd")
-const GraphContextMenu = preload("GraphContextMenu.tscn")
 const CustomGraphNode = preload("GraphNode.tscn")
+const EntryGraphNode = preload("EntryGraphNode.tscn")
+const ExitGraphNode = preload("ExitGraphNode.tscn")
 
 const DEFAULT_NODE_NAME = "State"
 const DEFAULT_NODE_OFFSET = Vector2.ZERO
@@ -77,10 +78,23 @@ func _on_popup_request(position):
 	ContextMenu.popup()
 
 func _on_ContextMenu_index_pressed(index):
+	var local_mouse_pos = get_local_mouse_position() + scroll_offset
 	match index: # TODO: Proper way to handle menu items
 		0: # Add State
 			var node = CustomGraphNode.instance()
-			add_node(node, DEFAULT_NODE_NAME, get_local_mouse_position() + scroll_offset)
+			add_node(node, DEFAULT_NODE_NAME, local_mouse_pos)
+		1: # Add Entry
+			if Transition.ENTRY_KEY in focused_transition.states:
+				push_warning("Entry node already exist")
+				return
+			var node = EntryGraphNode.instance()
+			add_node(node, Transition.ENTRY_KEY, local_mouse_pos)
+		2: # Add Exit
+			if Transition.EXIT_KEY in focused_transition.states:
+				push_warning("Exit node already exist")
+				return
+			var node = ExitGraphNode.instance()
+			add_node(node, Transition.EXIT_KEY, local_mouse_pos)
 
 func _on_new_node_added(node, node_name=DEFAULT_NODE_NAME, offset=DEFAULT_NODE_OFFSET):
 	node.connect("name_changed", self, "_on_node_name_changed")
@@ -111,8 +125,17 @@ func disconnect_state_node(from, from_slot, to, to_slot):
 
 func draw_graph():
 	for state_key in focused_transition.states.keys():
+		var is_entry = state_key == Transition.ENTRY_KEY
+		var is_exit = state_key == Transition.EXIT_KEY
 		var state = focused_transition.states[state_key]
-		var new_node = CustomGraphNode.instance()
+		var new_node
+		if is_entry:
+			new_node = EntryGraphNode.instance()
+		elif is_exit:
+			new_node = ExitGraphNode.instance()
+		else:
+			new_node = CustomGraphNode.instance()
+
 		new_node.state = state
 		add_node(new_node, state_key, state.offset)
 		for transition in state.transitions:
