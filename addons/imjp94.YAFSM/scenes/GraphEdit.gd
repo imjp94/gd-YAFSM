@@ -1,9 +1,16 @@
 tool
 extends GraphEdit
+const Transition = preload("../src/Transition.gd")
 const GraphContextMenu = preload("GraphContextMenu.tscn")
 const CustomGraphNode = preload("GraphNode.tscn")
 
+const DEFAULT_NODE_NAME = "State"
+const DEFAULT_NODE_OFFSET = Vector2.ZERO
+
 onready var ContextMenu = $ContextMenu
+
+var focused_object setget set_focused_object
+var focused_transition setget set_focused_transition
 
 var selected_nodes = {}
 
@@ -24,15 +31,27 @@ func _ready():
 	ContextMenu.connect("index_pressed", self, "_on_ContextMenu_index_pressed")
 
 func _on_connection_request(from, from_slot, to, to_slot):
-	connect_node(from, from_slot, to, to_slot)
+	connect_state_node(from, from_slot, to, to_slot)
 
 func _on_disconnection_request(from, from_slot, to, to_slot):
-	disconnect_node(from, from_slot, to, to_slot)
+	disconnect_state_node(from, from_slot, to, to_slot)
+
+# Always called after connect_node() to update data of focused_transition
+func _on_connect_node(from, from_slot, to, to_slot):
+	var new_transition = Transition.new()
+	new_transition.from = from
+	new_transition.to = to
+	focused_transition.add_transition(from, new_transition)
+
+# Always called after disconnect_node() to update data of focused_transition
+func _on_disconnect_node(from, from_slot, to, to_slot):
+	focused_transition.remove_transition(from, to)
 
 func _on_delete_nodes_request():
 	for node in selected_nodes.values():
 		remove_node_connections(node.name)
 		remove_child(node)
+		focused_transition.remove_state(node.name)
 	selected_nodes.clear()
 
 func _on_node_selected(node):
@@ -45,11 +64,13 @@ func _on_node_name_changed(old, new):
 	# Manually handle re-connections after rename
 	for connection in get_connection_list():
 		if connection.from == old:
-			disconnect_node(connection.from, connection.from_port, connection.to, connection.to_port)
-			connect_node(new, connection.from_port, connection.to, connection.to_port)
+			disconnect_state_node(connection.from, connection.from_port, connection.to, connection.to_port)
+			connect_state_node(new, connection.from_port, connection.to, connection.to_port)
 		elif connection.to == old:
-			disconnect_node(connection.from, connection.from_port, connection.to, connection.to_port)
-			connect_node(connection.from, connection.from_port, new, connection.to_port)
+			disconnect_state_node(connection.from, connection.from_port, connection.to, connection.to_port)
+			connect_state_node(connection.from, connection.from_port, new, connection.to_port)
+
+	focused_transition.change_state_name(old, new)
 
 func _on_popup_request(position):
 	ContextMenu.rect_position = get_viewport().get_mouse_position()
@@ -59,15 +80,66 @@ func _on_ContextMenu_index_pressed(index):
 	match index: # TODO: Proper way to handle menu items
 		0: # Add State
 			var node = CustomGraphNode.instance()
-			add_child(node)
-			_on_new_node_added(node)
+			add_node(node, DEFAULT_NODE_NAME, get_local_mouse_position() + scroll_offset)
 
-func _on_new_node_added(node):
+func _on_new_node_added(node, node_name=DEFAULT_NODE_NAME, offset=DEFAULT_NODE_OFFSET):
 	node.connect("name_changed", self, "_on_node_name_changed")
-	node.name = "State"
-	node.offset = get_local_mouse_position() + scroll_offset
+	node.offset = offset
+	node.name = node_name
+	focused_transition.add_state(node.name, node.state)
+
+func _on_focused_object_changed(new_obj):
+	if new_obj == null:
+		set_focused_object(null)
+	if new_obj is Transition:
+		set_focused_transition(new_obj)
+
+func _on_focused_transition_changed(new_transition):
+	if new_transition:
+		clear_graph()
+		draw_graph()
+	else:
+		clear_graph()
+
+func connect_state_node(from, from_slot, to, to_slot):
+	connect_node(from, from_slot, to, to_slot)
+	_on_connect_node(from, from_slot, to, to_slot)
+
+func disconnect_state_node(from, from_slot, to, to_slot):
+	disconnect_node(from, from_slot, to, to_slot)
+	_on_disconnect_node(from, from_slot, to, to_slot)
+
+func draw_graph():
+	for state_key in focused_transition.states.keys():
+		var state = focused_transition.states[state_key]
+		var new_node = CustomGraphNode.instance()
+		new_node.state = state
+		add_node(new_node, state_key, state.offset)
+		for transition in state.transitions:
+			# Reflecting state node, so call connect_node instead
+			connect_node(transition.from, 0, transition.to, 0) # TODO: Save port index to state
+
+func clear_graph():
+	clear_connections()
+	for child in get_children():
+		if child is GraphNode:
+			remove_child(child)
+
+func add_node(node, node_name=DEFAULT_NODE_NAME, offset=Vector2.ZERO):
+	add_child(node)
+	_on_new_node_added(node, node_name, offset)
 
 func remove_node_connections(node_name):
 	for connection in get_connection_list():
 		if connection.from == node_name or connection.to == node_name:
-			disconnect_node(connection.from, connection.from_port, connection.to, connection.to_port)
+			disconnect_state_node(connection.from, connection.from_port, connection.to, connection.to_port)
+
+func set_focused_object(obj):
+	if focused_object != obj:
+		focused_object = obj
+		_on_focused_object_changed(obj)
+
+func set_focused_transition(transition):
+	if focused_transition != transition:
+		focused_transition = transition
+		_on_focused_transition_changed(transition)

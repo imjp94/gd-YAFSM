@@ -31,3 +31,18 @@ func _enter_tree():
 func _exit_tree():
 	if graph_editor:
 		graph_editor.queue_free()
+
+func handles(object):
+	if object is Transition:
+		make_visible(true)
+		return true
+	make_visible(false)
+	return false
+
+func edit(object):
+	if graph_editor:
+		graph_editor.focused_object = object
+
+func make_visible(visible):
+	if graph_editor:
+		graph_editor.visible = visible

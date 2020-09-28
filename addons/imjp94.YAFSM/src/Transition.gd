@@ -28,7 +28,7 @@ func transit(params={}):
 				return to
 
 func add_state(state, state_struct=null):
-	if states.has(state):
+	if state in states:
 		return null
 
 	var new_state = state_struct if state_struct else STATE_STRUCT.duplicate(true)
