@@ -39,6 +39,11 @@ func _on_Name_focus_exited():
 # Change name through Name ui, but always respect the naming system of scene tree
 func change_name(new_name):
 	var old = name
+	if new_name.nocasecmp_to(Transition.ENTRY_KEY) == 0 or new_name.nocasecmp_to(Transition.EXIT_KEY) == 0:
+		push_warning("Failed to change state name to %s/%s keyword" % [Transition.ENTRY_KEY, Transition.EXIT_KEY])
+		Name.text = old
+		return
+
 	name = new_name
 	emit_signal("name_changed", old, name)
 
