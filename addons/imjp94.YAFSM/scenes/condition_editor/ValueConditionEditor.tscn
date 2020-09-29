@@ -9,14 +9,18 @@ script = ExtResource( 2 )
 [node name="ComparationOption" type="OptionButton" parent="." index="1"]
 margin_left = 62.0
 margin_top = 2.0
-margin_right = 125.0
+margin_right = 107.0
 margin_bottom = 22.0
 size_flags_vertical = 4
-text = "Equal"
-items = [ "Equal", null, false, 0, null, "Greater", null, false, 1, null, "Lesser", null, false, 2, null ]
+text = "=="
+items = [ "==", null, false, 0, null, ">", null, false, 1, null, "<", null, false, 2, null ]
 selected = 0
 
 [node name="MarginContainer" type="MarginContainer" parent="." index="2"]
-margin_left = 129.0
-margin_right = 129.0
+margin_left = 111.0
+margin_right = 111.0
 margin_bottom = 24.0
+
+[node name="Remove" parent="." index="3"]
+margin_left = 133.0
+margin_right = 163.0

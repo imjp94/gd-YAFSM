@@ -2,6 +2,7 @@ tool
 extends HBoxContainer
 
 onready var Name = $Name
+onready var Remove = $Remove
 
 var condition setget set_condition
 

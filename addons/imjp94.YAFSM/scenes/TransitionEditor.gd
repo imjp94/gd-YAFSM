@@ -14,7 +14,6 @@ const FloatConditionEditor = preload("condition_editor/FloatConditionEditor.tscn
 onready var To = $Header/To
 onready var Add = $Header/HBoxContainer/Add
 onready var AddPopupMenu = $Header/HBoxContainer/Add/PopupMenu
-onready var Remove = $Header/HBoxContainer/Remove
 onready var Conditions = $Conditions
 
 var transition setget set_transition
@@ -23,7 +22,6 @@ var transition setget set_transition
 func _ready():
 	Add.connect("pressed", self, "_on_Add_pressed")
 	AddPopupMenu.connect("index_pressed", self, "_on_AddPopupMenu_index_pressed")
-	Remove.connect("pressed", self, "_on_Remove_pressed")
 
 func _on_Add_pressed():
 	Utils.popup_on_target(AddPopupMenu, Add)
@@ -47,13 +45,14 @@ func _on_AddPopupMenu_index_pressed(index):
 		_:
 			push_error("Unexpected index(%d) from PopupMenu" % index)
 	
-	$Conditions.add_child(editor)
+	add_condition_editor(editor, condition)
 	condition.name = "Param"
-	editor.condition = condition
 	transition.conditions.append(condition)
 
-func _on_Remove_pressed():
-	print(get_focus_owner().name)
+func _on_ConditionEditorRemove_pressed(editor):
+	transition.conditions.erase(editor.condition)
+	$Conditions.remove_child(editor)
+	editor.queue_free()
 
 func _on_transition_changed(new_transition):
 	To.text = transition.to
@@ -67,8 +66,15 @@ func _on_transition_changed(new_transition):
 			editor = FloatConditionEditor.instance()
 		else:
 			editor = ConditionEditor.instance()
-		Conditions.add_child(editor)
-		editor.condition = condition
+		add_condition_editor(editor, condition)
+
+func _on_condition_editor_added(editor):
+	editor.Remove.connect("pressed", self, "_on_ConditionEditorRemove_pressed", [editor])
+
+func add_condition_editor(editor, condition):
+	Conditions.add_child(editor)
+	_on_condition_editor_added(editor)
+	editor.condition = condition
 
 func set_transition(t):
 	if transition != t:

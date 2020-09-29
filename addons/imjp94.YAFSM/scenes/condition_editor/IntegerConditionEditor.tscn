@@ -7,7 +7,6 @@
 script = ExtResource( 2 )
 
 [node name="ComparationOption" parent="." index="1"]
-items = [ "Equal", null, false, 0, null, "Greater", null, false, 1, null, "Lesser", null, false, 2, null ]
 
 [node name="MarginContainer" parent="." index="2"]
 margin_right = 187.0
