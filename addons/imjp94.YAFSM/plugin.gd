@@ -47,4 +47,7 @@ func edit(object):
 
 func make_visible(visible):
 	if graph_editor:
-		graph_editor.visible = visible
+		if visible:
+			make_bottom_panel_item_visible(graph_editor)
+		else:
+			hide_bottom_panel()
