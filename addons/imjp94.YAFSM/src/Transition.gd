@@ -19,14 +19,17 @@ func transit(params={}):
 	if not conditions:
 		return to
 
+	var can_transit = false
 	for condition in conditions:
 		var value = params.get(condition.name)
 		if value:
 			if "value" in condition:
-				if condition.compare(value):
-					return to
+				can_transit = can_transit and condition.compare(value)
 			else: # Condition without value property is a trigger
-				return to
+				can_transit = can_transit and condition.compare(value)
+	if can_transit:
+		return to
+	return null
 
 func add_state(state):
 	if not state:
