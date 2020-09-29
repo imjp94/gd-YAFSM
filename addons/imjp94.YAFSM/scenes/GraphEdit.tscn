@@ -13,3 +13,24 @@ __meta__ = {
 }
 
 [node name="ContextMenu" parent="." instance=ExtResource( 2 )]
+items = [ "Add State", null, 0, false, false, 0, 0, null, "", false, "Add Entry", null, 0, false, false, 1, 0, null, "", false, "Add Exit", null, 0, false, false, 2, 0, null, "", false ]
+
+[node name="Overlay" type="MarginContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+custom_constants/margin_right = 8
+custom_constants/margin_top = 8
+custom_constants/margin_left = 8
+custom_constants/margin_bottom = 8
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Log" type="Label" parent="Overlay"]
+margin_left = 8.0
+margin_top = 578.0
+margin_right = 8.0
+margin_bottom = 592.0
+size_flags_horizontal = 2
+size_flags_vertical = 10

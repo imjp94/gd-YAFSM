@@ -53,3 +53,9 @@ func get_entries():
 	
 func get_exits():
 	return states[State.EXIT_KEY].transitions.values()
+
+func has_entry():
+	return State.ENTRY_KEY in states
+
+func has_exit():
+	return State.EXIT_KEY in states

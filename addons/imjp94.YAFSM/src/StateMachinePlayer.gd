@@ -19,7 +19,10 @@ var current_state setget , get_current_state
 var state_stack = []
 
 func _get_configuration_warning():
-	if not state_machine:
+	if state_machine:
+		if not state_machine.has_entry():
+			return "State Machine will not function properly without Entry node"
+	else:
 		return "State Machine Player is not going anywhere without default State Machine"
 	return ""
 
