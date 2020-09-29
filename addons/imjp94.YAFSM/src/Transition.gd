@@ -4,12 +4,13 @@ const State = preload("State.gd")
 
 export(String) var from
 export(String) var to
-export(Dictionary) var conditions = {}
+export(Dictionary) var conditions
 
 
-func _init(p_from="", p_to=""):
+func _init(p_from="", p_to="", p_conditions={}):
 	from = p_from
 	to = p_to
+	conditions = p_conditions
 
 func transit(params={}):
 	var can_transit = true
