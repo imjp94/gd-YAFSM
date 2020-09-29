@@ -83,7 +83,7 @@ func _transition():
 func reset(to=0, event=RESET_EVENT_TRIGGER.LAST_TO_DEST):
 	assert(to > -1)
 	var last_index = state_stack.size() - 1
-	var first_state = null
+	var first_state = ""
 	var num_to_pop = last_index - to
 
 	if num_to_pop > 0:
@@ -110,10 +110,10 @@ func reset(to=0, event=RESET_EVENT_TRIGGER.LAST_TO_DEST):
 		assert(num_to_pop >= 0)
 
 func get_current_state():
-	return state_stack.back() if not state_stack.empty() else null
+	return state_stack.back() if not state_stack.empty() else ""
 
 func get_previous_state():
-	return state_stack[state_stack.size() - 2] if state_stack.size() > 1 else null
+	return state_stack[state_stack.size() - 2] if state_stack.size() > 1 else ""
 
 func get_class():
 	return "StateMachine"
