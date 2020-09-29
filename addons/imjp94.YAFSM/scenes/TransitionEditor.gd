@@ -44,19 +44,18 @@ func _on_AddPopupMenu_index_pressed(index):
 			condition = FloatCondition.new()
 		_:
 			push_error("Unexpected index(%d) from PopupMenu" % index)
-	
+
+	condition.name = transition.get_unique_name("Param")
 	add_condition_editor(editor, condition)
-	condition.name = "Param"
-	transition.conditions.append(condition)
 
 func _on_ConditionEditorRemove_pressed(editor):
-	transition.conditions.erase(editor.condition)
+	transition.remove_condition(editor.condition.name)
 	$Conditions.remove_child(editor)
 	editor.queue_free()
 
 func _on_transition_changed(new_transition):
 	To.text = transition.to
-	for condition in transition.conditions:
+	for condition in transition.conditions.values():
 		var editor
 		if condition is BooleanCondition:
 			editor = BoolConditionEditor.instance()
@@ -75,6 +74,7 @@ func add_condition_editor(editor, condition):
 	Conditions.add_child(editor)
 	_on_condition_editor_added(editor)
 	editor.condition = condition
+	transition.add_condition(condition)
 
 func set_transition(t):
 	if transition != t:

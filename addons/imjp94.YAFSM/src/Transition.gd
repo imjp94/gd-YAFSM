@@ -4,7 +4,7 @@ const State = preload("State.gd")
 
 export(String) var from
 export(String) var to
-export(Array, Resource) var conditions
+export(Dictionary) var conditions = {}
 
 
 func _init(p_from="", p_to=""):
@@ -13,7 +13,7 @@ func _init(p_from="", p_to=""):
 
 func transit(params={}):
 	var can_transit = true
-	for condition in conditions:
+	for condition in conditions.values():
 		var value = params.get(condition.name)
 		if value:
 			if "value" in condition:
@@ -23,6 +23,33 @@ func transit(params={}):
 	if can_transit:
 		return to
 	return null
+
+func add_condition(condition):
+	if condition.name in conditions:
+		return false
+
+	conditions[condition.name] = condition
+
+func remove_condition(name):
+	return conditions.erase(name)
+
+func change_condition_name(from, to):
+	if not (from in conditions) or to in conditions:
+		return false
+
+	var condition = conditions[from]
+	condition.name = to
+	conditions.erase(from)
+	conditions[to] = condition
+	return true
+
+func get_unique_name(name):
+	var new_name = name
+	var i = 1
+	while new_name in conditions:
+		new_name = name + str(i)
+		i += 1
+	return new_name
 
 func equals(obj):
 	if obj == null:

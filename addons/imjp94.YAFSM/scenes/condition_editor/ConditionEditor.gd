@@ -12,16 +12,22 @@ func _ready():
 	Name.connect("focus_exited", self, "_on_Name_focus_exited")
 
 func _on_Name_text_entered(new_text):
-	if name == new_text: # Avoid infinite loop
+	if condition.name == new_text: # Avoid infinite loop
 		return
 
-	condition.name = new_text
+	change_name(condition.name, new_text)
 
 func _on_Name_focus_exited():
-	if name == Name.text:
+	if condition.name == Name.text:
 		return
 
-	condition.name = Name.text
+	change_name(condition.name, Name.text)
+
+func change_name(from, to):
+	var transition = get_parent().get_parent().transition # TODO: Better way to get Transition object
+	if not transition.change_condition_name(from, to):
+		Name.text = from
+		push_warning("Change Condition name from (%s) to (%s) failed, name existed" % [from, to])
 
 func _on_condition_changed(new_condition):
 	if new_condition:
