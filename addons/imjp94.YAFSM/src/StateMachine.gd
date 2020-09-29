@@ -6,7 +6,7 @@ signal state_entered(from, to, push)
 signal state_exited(from, to, push)
 signal state_update(state, delta)
 
-export(Resource) var transition
+export(Resource) var state
 export(Dictionary) var parameters = {}
 
 enum RESET_EVENT_TRIGGER {
@@ -19,15 +19,15 @@ var current_state setget , get_current_state
 var state_stack = []
 
 func _get_configuration_warning():
-	if not transition:
-		return "State Machine is not going anywhere without default transition"
+	if not state:
+		return "State Machine is not going anywhere without default state"
 	return ""
 
 func _ready():
 	if Engine.editor_hint:
 		return
 
-	_push_state(transition.get_entry().to)
+	_push_state(state.get_entry().to)
 
 func _process(delta):
 	if Engine.editor_hint:
@@ -73,7 +73,7 @@ func _update(delta):
 	emit_signal("state_update", get_current_state(), delta)
 
 func _transition():
-	var transitions = transition.get_current_transitions(get_current_state())
+	var transitions = state.states[get_current_state()].transitions.values()
 	if not transitions:
 		return
 

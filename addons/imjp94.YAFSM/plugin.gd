@@ -35,7 +35,7 @@ func _exit_tree():
 		graph_editor.queue_free()
 
 func handles(object):
-	if object is Transition:
+	if object is State:
 		make_visible(true)
 		return true
 	make_visible(false)
