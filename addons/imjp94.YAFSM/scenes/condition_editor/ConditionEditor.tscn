@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://addons/imjp94.YAFSM/scenes/condition_editor/ConditionEditor.gd" type="Script" id=1]
+
+[node name="ConditionEditor" type="HBoxContainer"]
+margin_right = 58.0
+margin_bottom = 24.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Name" type="LineEdit" parent="."]
+margin_right = 58.0
+margin_bottom = 24.0
+size_flags_vertical = 4
+text = "Param"

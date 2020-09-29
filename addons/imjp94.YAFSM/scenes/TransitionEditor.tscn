@@ -37,6 +37,14 @@ margin_bottom = 24.0
 icon = ExtResource( 1 )
 flat = true
 
+[node name="PopupMenu" type="PopupMenu" parent="Header/HBoxContainer/Add"]
+margin_right = 20.0
+margin_bottom = 20.0
+items = [ "Trigger", null, 0, false, false, 0, 0, null, "", false, "Boolean", null, 0, false, false, 1, 0, null, "", false, "Integer", null, 0, false, false, 2, 0, null, "", false, "Float", null, 0, false, false, 3, 0, null, "", false ]
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="Remove" type="Button" parent="Header/HBoxContainer"]
 margin_left = 34.0
 margin_right = 64.0
