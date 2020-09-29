@@ -7,7 +7,7 @@ signal state_exited(from, to, push)
 signal state_update(state, delta)
 
 export(Resource) var state_machine
-export(Dictionary) var parameters = {}
+export(Dictionary) var parameters
 
 enum RESET_EVENT_TRIGGER {
 	NONE = -1,
@@ -17,6 +17,10 @@ enum RESET_EVENT_TRIGGER {
 
 var current_state setget , get_current_state
 var state_stack = []
+
+
+func _init(p_parameters={}):
+	parameters = p_parameters
 
 func _get_configuration_warning():
 	if state_machine:

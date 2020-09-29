@@ -8,7 +8,7 @@ signal transition_added(transition)
 signal transition_removed(to_state)
 
 export(String) var name = ""
-export(Dictionary) var transitions = {}
+export(Dictionary) var transitions
 export(Vector2) var offset = Vector2.ZERO
 
 

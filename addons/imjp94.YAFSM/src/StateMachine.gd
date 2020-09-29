@@ -2,12 +2,12 @@ tool
 extends "State.gd"
 const State = preload("State.gd")
 
-export(Dictionary) var states = {}
+export(Dictionary) var states
 
 
-func _init(p_name="", p_offset=Vector2.ZERO):
-	name = p_name
-	offset = p_offset
+func _init(p_name="", p_offset=Vector2.ZERO, p_states={}):
+	._init(p_name, p_offset)
+	states = p_states
 
 func add_state(state):
 	if not state:
