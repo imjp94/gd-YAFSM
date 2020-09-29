@@ -28,6 +28,7 @@ func _on_state_transition_removed(to_state):
 	for child in Transitions.get_children():
 		if child.name == to_state:
 			Transitions.remove_child(child)
+			child.queue_free()
 			rect_size = Vector2.ZERO # Reset rect size
 			break
 

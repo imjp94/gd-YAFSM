@@ -160,6 +160,7 @@ func clear_graph():
 	for child in get_children():
 		if child is GraphNode:
 			remove_child(child)
+			child.queue_free()
 
 func add_node(node, node_name=DEFAULT_NODE_NAME, offset=Vector2.ZERO):
 	add_child(node)
