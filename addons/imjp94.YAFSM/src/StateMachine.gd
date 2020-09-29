@@ -73,20 +73,12 @@ func _update(delta):
 	emit_signal("state_update", get_current_state(), delta)
 
 func _transition():
-	var transitions = state.states[get_current_state()].transitions.values()
-	if not transitions:
-		return
-
-	for t in transitions:
-		var next_state = t.transit(parameters)
-		if not next_state:
-			continue
-
+	var next_state = state.states[get_current_state()].transit(parameters)
+	if next_state:
 		if state_stack.has(next_state):
 			reset(state_stack.find(next_state))
 		else:
 			_push_state(next_state)
-		return
 
 func reset(to=0, event=RESET_EVENT_TRIGGER.LAST_TO_DEST):
 	assert(to > -1)
