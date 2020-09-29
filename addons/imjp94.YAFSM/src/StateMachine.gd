@@ -77,7 +77,7 @@ func _transition():
 	if not transitions:
 		return
 
-	for t in transitions.values():
+	for t in transitions:
 		var next_state = t.transit(parameters)
 		if not next_state:
 			continue
