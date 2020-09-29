@@ -6,7 +6,7 @@ signal state_entered(from, to, push)
 signal state_exited(from, to, push)
 signal state_update(state, delta)
 
-export(Resource) var state
+export(Resource) var state_machine
 export(Dictionary) var parameters = {}
 
 enum RESET_EVENT_TRIGGER {
@@ -19,15 +19,15 @@ var current_state setget , get_current_state
 var state_stack = []
 
 func _get_configuration_warning():
-	if not state:
-		return "State Machine is not going anywhere without default state"
+	if not state_machine:
+		return "State Machine Player is not going anywhere without default State Machine"
 	return ""
 
 func _ready():
 	if Engine.editor_hint:
 		return
 
-	_push_state(state.get_entry().to)
+	_push_state(state_machine.get_entry().to)
 
 func _process(delta):
 	if Engine.editor_hint:
@@ -73,7 +73,7 @@ func _update(delta):
 	emit_signal("state_update", get_current_state(), delta)
 
 func _transition():
-	var next_state = state.states[get_current_state()].transit(parameters)
+	var next_state = state_machine.states[get_current_state()].transit(parameters)
 	if next_state:
 		if state_stack.has(next_state):
 			reset(state_stack.find(next_state))
@@ -116,7 +116,7 @@ func get_previous_state():
 	return state_stack[state_stack.size() - 2] if state_stack.size() > 1 else ""
 
 func get_class():
-	return "StateMachine"
+	return "StateMachinePlayer"
 
 func is_class(type):
-	return type == "StateMachine" or .is_class(type)
+	return type == "StateMachinePlayer" or .is_class(type)

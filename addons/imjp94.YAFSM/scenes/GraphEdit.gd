@@ -2,6 +2,7 @@ tool
 extends GraphEdit
 const Transition = preload("../src/Transition.gd")
 const State = preload("../src/State.gd")
+const StateMachine = preload("../src/StateMachine.gd")
 const CustomGraphNode = preload("GraphNode.tscn")
 const EntryGraphNode = preload("EntryGraphNode.tscn")
 const ExitGraphNode = preload("ExitGraphNode.tscn")
@@ -12,7 +13,7 @@ const DEFAULT_NODE_OFFSET = Vector2.ZERO
 onready var ContextMenu = $ContextMenu
 
 var focused_object setget set_focused_object
-var focused_state setget set_focused_state
+var focused_state_machine setget set_focused_state_machine
 
 var selected_nodes = {}
 
@@ -38,9 +39,9 @@ func _on_connection_request(from, from_slot, to, to_slot):
 func _on_disconnection_request(from, from_slot, to, to_slot):
 	disconnect_state_node(from, from_slot, to, to_slot)
 
-# Always called after connect_node() to update data of focused_state
+# Always called after connect_node() to update data of focused_state_machine
 func _on_connect_node(from, from_slot, to, to_slot):
-	var state = focused_state.states.get(from)
+	var state = focused_state_machine.states.get(from)
 	if state:
 		if to in state.transitions: # Transition existed, mainly to silent warning from State.add_transition
 			return
@@ -50,12 +51,12 @@ func _on_connect_node(from, from_slot, to, to_slot):
 	new_transition.to = to
 	if not state:
 		state = State.new(from)
-		focused_state.add_state(state)
+		focused_state_machine.add_state(state)
 	state.add_transition(new_transition)
 
-# Always called after disconnect_node() to update data of focused_state
+# Always called after disconnect_node() to update data of focused_state_machine
 func _on_disconnect_node(from, from_slot, to, to_slot):
-	var state = focused_state.states.get(from)
+	var state = focused_state_machine.states.get(from)
 	if state:
 		state.remove_transition(to)
 
@@ -63,7 +64,7 @@ func _on_delete_nodes_request():
 	for node in selected_nodes.values():
 		remove_node_connections(node.name)
 		remove_child(node)
-		focused_state.remove_state(node.name)
+		focused_state_machine.remove_state(node.name)
 	selected_nodes.clear()
 
 func _on_node_selected(node):
@@ -73,7 +74,7 @@ func _on_node_unselected(node):
 	selected_nodes.erase(node.name)
 
 func _on_node_name_changed(old, new):
-	focused_state.change_state_name(old, new)
+	focused_state_machine.change_state_name(old, new)
 	# Manually handle re-connections after rename
 	for connection in get_connection_list():
 		if connection.from == old:
@@ -94,13 +95,13 @@ func _on_ContextMenu_index_pressed(index):
 			var node = CustomGraphNode.instance()
 			add_node(node, DEFAULT_NODE_NAME, local_mouse_pos)
 		1: # Add Entry
-			if State.ENTRY_KEY in focused_state.states:
+			if State.ENTRY_KEY in focused_state_machine.states:
 				push_warning("Entry node already exist")
 				return
 			var node = EntryGraphNode.instance()
 			add_node(node, State.ENTRY_KEY, local_mouse_pos)
 		2: # Add Exit
-			if State.EXIT_KEY in focused_state.states:
+			if State.EXIT_KEY in focused_state_machine.states:
 				push_warning("Exit node already exist")
 				return
 			var node = ExitGraphNode.instance()
@@ -112,16 +113,16 @@ func _on_new_node_added(node, node_name=DEFAULT_NODE_NAME, offset=DEFAULT_NODE_O
 	node.offset = offset
 	node.name = node_name
 	node.state.name = node.name
-	focused_state.add_state(node.state)
+	focused_state_machine.add_state(node.state)
 
 func _on_focused_object_changed(new_obj):
 	if new_obj == null:
 		set_focused_object(null)
-	if new_obj is State:
-		set_focused_state(new_obj)
+	if new_obj is StateMachine:
+		set_focused_state_machine(new_obj)
 
-func _on_focused_state_changed(new_transition):
-	if new_transition:
+func _on_focused_state_machine_changed(new_state_machine):
+	if new_state_machine:
 		clear_graph()
 		draw_graph()
 	else:
@@ -136,10 +137,10 @@ func disconnect_state_node(from, from_slot, to, to_slot):
 	_on_disconnect_node(from, from_slot, to, to_slot)
 
 func draw_graph():
-	for state_key in focused_state.states.keys():
+	for state_key in focused_state_machine.states.keys():
 		var is_entry = state_key == State.ENTRY_KEY
 		var is_exit = state_key == State.EXIT_KEY
-		var state = focused_state.states[state_key]
+		var state = focused_state_machine.states[state_key]
 		var new_node
 		if is_entry:
 			new_node = EntryGraphNode.instance()
@@ -176,7 +177,7 @@ func set_focused_object(obj):
 		focused_object = obj
 		_on_focused_object_changed(obj)
 
-func set_focused_state(state):
-	if focused_state != state:
-		focused_state = state
-		_on_focused_state_changed(state)
+func set_focused_state_machine(state_machine):
+	if focused_state_machine != state_machine:
+		focused_state_machine = state_machine
+		_on_focused_state_machine_changed(state_machine)

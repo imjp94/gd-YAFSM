@@ -1,6 +1,7 @@
 tool
 extends EditorPlugin
 const StateMachinePlayer = preload("src/StateMachinePlayer.gd")
+const StateMachine = preload("src/StateMachine.gd")
 const State = preload("src/State.gd")
 const Transition = preload("src/Transition.gd")
 const Condition = preload("src/Condition.gd")
@@ -19,6 +20,7 @@ func _enter_tree():
 	var node_icon = editor_base_control.get_icon("Node", "EditorIcons")
 	var resource_icon = editor_base_control.get_icon("ResourcePreloader", "EditorIcons")
 	add_custom_type("StateMachinePlayer", "Node", StateMachinePlayer, node_icon)
+	add_custom_type("StateMachine", "Resource", StateMachine, resource_icon)
 	add_custom_type("State", "Resource", State, resource_icon)
 	add_custom_type("Transition", "Resource", Transition, resource_icon)
 	add_custom_type("Condition", "Resource", Condition, resource_icon)
@@ -35,7 +37,7 @@ func _exit_tree():
 		graph_editor.queue_free()
 
 func handles(object):
-	if object is State:
+	if object is StateMachine:
 		make_visible(true)
 		return true
 	make_visible(false)
