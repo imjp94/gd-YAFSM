@@ -6,8 +6,6 @@
 [node name="ValueConditionEditor" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
 
-[node name="ComparationOption" parent="." index="1"]
-
 [node name="MarginContainer" parent="." index="2"]
 margin_right = 187.0
 

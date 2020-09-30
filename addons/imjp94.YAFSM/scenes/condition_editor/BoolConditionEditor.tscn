@@ -10,10 +10,6 @@ script = ExtResource( 2 )
 margin_top = 8.0
 margin_bottom = 32.0
 
-[node name="ComparationOption" parent="." index="1"]
-margin_top = 10.0
-margin_bottom = 30.0
-
 [node name="MarginContainer" parent="." index="2"]
 margin_right = 205.0
 margin_bottom = 40.0
