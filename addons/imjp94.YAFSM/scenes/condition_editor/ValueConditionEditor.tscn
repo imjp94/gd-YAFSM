@@ -6,21 +6,23 @@
 [node name="ValueConditionEditor" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
 
-[node name="ComparationOption" type="OptionButton" parent="." index="1"]
+[node name="Comparation" type="Button" parent="." index="1"]
 margin_left = 62.0
-margin_top = 2.0
-margin_right = 107.0
-margin_bottom = 22.0
-size_flags_vertical = 4
+margin_right = 90.0
+margin_bottom = 24.0
 text = "=="
-items = [ "==", null, false, 0, null, ">", null, false, 1, null, "<", null, false, 2, null ]
-selected = 0
+
+[node name="PopupMenu" type="PopupMenu" parent="Comparation" index="0"]
+margin_right = 20.0
+margin_bottom = 20.0
+items = [ "==", null, 0, false, false, 0, 0, null, "", false, ">", null, 0, false, false, 1, 0, null, "", false, "<", null, 0, false, false, 2, 0, null, "", false ]
 
 [node name="MarginContainer" type="MarginContainer" parent="." index="2"]
-margin_left = 111.0
-margin_right = 111.0
+margin_left = 94.0
+margin_right = 94.0
 margin_bottom = 24.0
 
 [node name="Remove" parent="." index="3"]
-margin_left = 133.0
-margin_right = 163.0
+margin_left = 157.0
+margin_right = 187.0
+hint_tooltip = "Remove Condition"

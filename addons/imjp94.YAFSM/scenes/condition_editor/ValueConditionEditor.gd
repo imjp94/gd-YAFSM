@@ -1,14 +1,20 @@
 tool
 extends "ConditionEditor.gd"
+const Utils = preload("../../scripts/Utils.gd")
 const ValueCondition = preload("../../src/ValueCondition.gd")
 
-onready var ComparationOption = $ComparationOption
+onready var Comparation = $Comparation
+onready var ComparationPopupMenu = $Comparation/PopupMenu
 
 
 func _ready():
-	$ComparationOption.connect("item_selected", self, "_on_ComparationOption_item_selected")
+	Comparation.connect("pressed", self, "_on_Comparation_pressed")
+	ComparationPopupMenu.connect("index_pressed", self, "_on_ComparationPopupMenu_index_changed")
 
-func _on_ComparationOption_item_selected(index):
+func _on_Comparation_pressed():
+	Utils.popup_on_target(ComparationPopupMenu, Comparation)
+
+func _on_ComparationPopupMenu_index_changed(index):
 	match index:
 		0: # Equal
 			condition.comparation = ValueCondition.COMPARATION.EQUAL
@@ -18,14 +24,15 @@ func _on_ComparationOption_item_selected(index):
 			condition.comparation = ValueCondition.COMPARATION.LESSER
 		_:
 			push_error("Unexpected index(%d) from PopupMenu" % index)
+	Comparation.text = ComparationPopupMenu.get_item_text(index)
 
 func _on_condition_changed(new_condition):
 	._on_condition_changed(new_condition)
 	if new_condition:
 		match new_condition.comparation:
 			-1:
-				ComparationOption.selected = 2
+				Comparation.text = ComparationPopupMenu.get_item_text(2)
 			0:
-				ComparationOption.selected = 0
+				Comparation.text = ComparationPopupMenu.get_item_text(0)
 			1:
-				ComparationOption.selected = 1
+				Comparation.text = ComparationPopupMenu.get_item_text(1)
