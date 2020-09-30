@@ -14,6 +14,8 @@ const GraphEditor = preload("scenes/GraphEdit.tscn")
 
 var graph_editor
 
+var focused_object
+
 
 func _enter_tree():
 	var editor_base_control = get_editor_interface().get_base_control()
@@ -30,26 +32,35 @@ func _enter_tree():
 	add_custom_type("FloatCondition", "Resource", FloatCondition, resource_icon)
 
 	graph_editor = GraphEditor.instance()
-	add_control_to_bottom_panel(graph_editor, "YAFSM")
 
 func _exit_tree():
 	if graph_editor:
 		graph_editor.queue_free()
 
 func handles(object):
+	print(object.get_class())
 	if object is StateMachine:
-		make_visible(true)
 		return true
-	make_visible(false)
 	return false
 
 func edit(object):
-	if graph_editor:
-		graph_editor.focused_object = object
+	focused_object = object
 
 func make_visible(visible):
 	if graph_editor:
 		if visible:
-			make_bottom_panel_item_visible(graph_editor)
+			show_graph_editor()
 		else:
-			hide_bottom_panel()
+			hide_graph_editor()
+
+func show_graph_editor():
+	if focused_object and graph_editor:
+		if not graph_editor.is_inside_tree():
+			add_control_to_bottom_panel(graph_editor, "StateMachine")
+		make_bottom_panel_item_visible(graph_editor)
+		graph_editor.focused_object = focused_object
+
+func hide_graph_editor():
+	if graph_editor.is_inside_tree():
+		graph_editor.focused_object = null
+		remove_control_from_bottom_panel(graph_editor)
