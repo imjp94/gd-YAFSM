@@ -10,12 +10,25 @@ const ExitGraphNode = preload("ExitGraphNode.tscn")
 const DEFAULT_NODE_NAME = "State"
 const DEFAULT_NODE_OFFSET = Vector2.ZERO
 
+enum REQUEST {
+	CONNECTION,
+	DISCONNECTION,
+	DELETE,
+	COPY,
+	DUPLICATE,
+	PASTE,
+	POPUP
+}
+
 onready var ContextMenu = $ContextMenu
 
 var focused_object setget set_focused_object
 var focused_state_machine setget set_focused_state_machine
 
 var selected_nodes = {}
+
+var _request_stack = [] # Stack of request waited to be confirmed, currently only handle CONNECTION/DISCONNECTION
+var _requesting_transition # Transition that is on hold before connection request confirmed
 
 
 func _init():
@@ -33,11 +46,41 @@ func _ready():
 	connect("node_unselected", self, "_on_node_unselected")
 	ContextMenu.connect("index_pressed", self, "_on_ContextMenu_index_pressed")
 
+func _gui_input(event):
+	if event is InputEventMouseButton:
+		if (event.button_index == BUTTON_LEFT or event.button_index == BUTTON_RIGHT) and not event.pressed:
+			if not _request_stack.empty():
+				_on_connection_request_confirmed()
+
+# Confirm request when left/right mouse button released, while _request_stack is not empty
+func _on_connection_request_confirmed():
+	for request in _request_stack:
+		var args = request.args
+		if request.type == REQUEST.CONNECTION:
+			connect_state_node(args.from, args.from_slot, args.to, args.to_slot)
+		elif request.type == REQUEST.DISCONNECTION:
+			disconnect_state_node(args.from, args.from_slot, args.to, args.to_slot)
+	_requesting_transition = null
+	_request_stack.clear()
+
 func _on_connection_request(from, from_slot, to, to_slot):
-	connect_state_node(from, from_slot, to, to_slot)
+	connect_node(from, from_slot, to, to_slot) # Visually connect
+	_request_stack.append(Request.new(REQUEST.CONNECTION, {
+		"from": from,
+		"from_slot": from_slot, 
+		"to": to, 
+		"to_slot": to_slot
+	}))
 
 func _on_disconnection_request(from, from_slot, to, to_slot):
-	disconnect_state_node(from, from_slot, to, to_slot)
+	disconnect_node(from, from_slot, to, to_slot) # Visually disconnect
+	_requesting_transition = focused_state_machine.states[from].transitions[to]
+	_request_stack.append(Request.new(REQUEST.DISCONNECTION, {
+		"from": from,
+		"from_slot": from_slot, 
+		"to": to, 
+		"to_slot": to_slot
+	}))
 
 # Always called after connect_node() to update data of focused_state_machine
 func _on_connect_node(from, from_slot, to, to_slot):
@@ -46,7 +89,7 @@ func _on_connect_node(from, from_slot, to, to_slot):
 		if to in state.transitions: # Transition existed, mainly to silent warning from State.add_transition
 			return
 
-	var new_transition = Transition.new()
+	var new_transition = _requesting_transition if _requesting_transition else Transition.new()
 	new_transition.from = from
 	new_transition.to = to
 	if not state:
@@ -181,3 +224,12 @@ func set_focused_state_machine(state_machine):
 	if focused_state_machine != state_machine:
 		focused_state_machine = state_machine
 		_on_focused_state_machine_changed(state_machine)
+
+# Data holder for request emitted by GraphEdit
+class Request:
+	var type
+	var args
+
+	func _init(p_type=-1, p_args={}):
+		type = p_type
+		args = p_args
