@@ -10,6 +10,7 @@ var condition setget set_condition
 func _ready():
 	Name.connect("text_entered", self, "_on_Name_text_entered")
 	Name.connect("focus_exited", self, "_on_Name_focus_exited")
+	Name.connect("text_changed", self, "_on_Name_text_changed")
 
 func _on_Name_text_entered(new_text):
 	if condition.name == new_text: # Avoid infinite loop
@@ -23,6 +24,9 @@ func _on_Name_focus_exited():
 
 	change_name(condition.name, Name.text)
 
+func _on_Name_text_changed(new_text):
+	Name.hint_tooltip = new_text
+
 func change_name(from, to):
 	var transition = get_parent().get_parent().get_parent().transition # TODO: Better way to get Transition object
 	if not transition.change_condition_name(from, to):
@@ -32,6 +36,7 @@ func change_name(from, to):
 func _on_condition_changed(new_condition):
 	if new_condition:
 		Name.text = new_condition.name
+		Name.hint_tooltip = Name.text
 
 func set_condition(c):
 	if condition != c:
