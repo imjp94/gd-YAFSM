@@ -11,6 +11,11 @@ func _ready():
 	Name.connect("text_entered", self, "_on_Name_text_entered")
 	Name.connect("focus_exited", self, "_on_Name_focus_exited")
 
+func _gui_input(event):
+	if event is InputEventMouseButton:
+		if event.button_index == BUTTON_RIGHT:
+			accept_event() # Consume right-click event
+
 func _on_renamed():
 	Name.text = name # Sync Name ui text with Node.name
 
