@@ -24,7 +24,7 @@ func _on_Name_focus_exited():
 	change_name(condition.name, Name.text)
 
 func change_name(from, to):
-	var transition = get_parent().get_parent().transition # TODO: Better way to get Transition object
+	var transition = get_parent().get_parent().get_parent().transition # TODO: Better way to get Transition object
 	if not transition.change_condition_name(from, to):
 		Name.text = from
 		push_warning("Change Condition name from (%s) to (%s) failed, name existed" % [from, to])

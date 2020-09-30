@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://addons/imjp94.YAFSM/assets/icons/add-white-18dp.svg" type="Texture" id=1]
+[ext_resource path="res://addons/imjp94.YAFSM/assets/icons/subdirectory_arrow_right-white-18dp.svg" type="Texture" id=2]
 [ext_resource path="res://addons/imjp94.YAFSM/scenes/TransitionEditor.gd" type="Script" id=3]
+
+[sub_resource type="StyleBoxTexture" id=1]
 
 [node name="TransitionEditor" type="VBoxContainer"]
 margin_left = 4.0
@@ -17,12 +20,23 @@ __meta__ = {
 margin_right = 173.0
 margin_bottom = 24.0
 
-[node name="To" type="Label" parent="Header"]
+[node name="Title" type="HBoxContainer" parent="Header"]
+margin_right = 54.0
+margin_bottom = 24.0
+
+[node name="Icon" type="TextureRect" parent="Header/Title"]
+margin_right = 18.0
+margin_bottom = 24.0
+texture = ExtResource( 2 )
+
+[node name="Label" type="Label" parent="Header/Title"]
+margin_left = 22.0
 margin_top = 5.0
-margin_right = 84.0
+margin_right = 54.0
 margin_bottom = 19.0
 size_flags_horizontal = 3
-text = "To:"
+custom_styles/normal = SubResource( 1 )
+text = "State"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Header"]
 margin_left = 143.0
@@ -33,6 +47,7 @@ size_flags_horizontal = 10
 [node name="Add" type="Button" parent="Header/HBoxContainer"]
 margin_right = 30.0
 margin_bottom = 24.0
+hint_tooltip = "Add Condition"
 icon = ExtResource( 1 )
 flat = true
 
@@ -44,7 +59,17 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Conditions" type="VBoxContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="."]
 margin_top = 28.0
 margin_right = 173.0
-margin_bottom = 28.0
+margin_bottom = 36.0
+custom_constants/margin_right = 4
+custom_constants/margin_top = 4
+custom_constants/margin_left = 16
+custom_constants/margin_bottom = 4
+
+[node name="Conditions" type="VBoxContainer" parent="MarginContainer"]
+margin_left = 16.0
+margin_top = 4.0
+margin_right = 169.0
+margin_bottom = 4.0

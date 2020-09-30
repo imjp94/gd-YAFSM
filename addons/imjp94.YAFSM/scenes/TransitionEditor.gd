@@ -11,10 +11,13 @@ const BoolConditionEditor = preload("condition_editor/BoolConditionEditor.tscn")
 const IntegerConditionEditor = preload("condition_editor/IntegerConditionEditor.tscn")
 const FloatConditionEditor = preload("condition_editor/FloatConditionEditor.tscn")
 
-onready var To = $Header/To
+const TRANSITION_TITLE_TEMPLATE = "%s if:"
+
+onready var Title = $Header/Title
+onready var TitleLabel = $Header/Title/Label
 onready var Add = $Header/HBoxContainer/Add
 onready var AddPopupMenu = $Header/HBoxContainer/Add/PopupMenu
-onready var Conditions = $Conditions
+onready var Conditions = $MarginContainer/Conditions
 
 var transition setget set_transition
 
@@ -50,11 +53,11 @@ func _on_AddPopupMenu_index_pressed(index):
 
 func _on_ConditionEditorRemove_pressed(editor):
 	transition.remove_condition(editor.condition.name)
-	$Conditions.remove_child(editor)
+	Conditions.remove_child(editor)
 	editor.queue_free()
 
 func _on_transition_changed(new_transition):
-	To.text = transition.to
+	TitleLabel.text = TRANSITION_TITLE_TEMPLATE % transition.to
 	for condition in transition.conditions.values():
 		var editor
 		if condition is BooleanCondition:
