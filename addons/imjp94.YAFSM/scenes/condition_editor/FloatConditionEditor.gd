@@ -10,14 +10,16 @@ func _ready():
 
 func _on_FloatValue_text_entered(new_text):
 	change_integer(int(new_text))
+	FloatValue.text = FloatValue.text.pad_decimals(2)
 
 func _on_FloatValue_focus_exited():
 	change_integer(int(FloatValue.text))
+	FloatValue.text = FloatValue.text.pad_decimals(2)
 
 func _on_condition_changed(new_condition):
 	._on_condition_changed(new_condition)
 	if new_condition:
-		FloatValue.text = str(new_condition.value)
+		FloatValue.text = str(new_condition.value).pad_decimals(2)
 
 func change_integer(v):
 	condition.value = v
