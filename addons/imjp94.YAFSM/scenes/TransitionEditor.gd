@@ -55,6 +55,7 @@ func _on_ConditionEditorRemove_pressed(editor):
 	transition.remove_condition(editor.condition.name)
 	Conditions.remove_child(editor)
 	editor.queue_free()
+	get_parent().get_parent().get_parent().rect_size = Vector2.ZERO # TODO: Better way to force GraphNode update rect_size
 
 func _on_transition_changed(new_transition):
 	TitleLabel.text = TRANSITION_TITLE_TEMPLATE % transition.to
