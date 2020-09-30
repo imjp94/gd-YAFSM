@@ -1,15 +1,15 @@
 tool
 extends VBoxContainer
-const Utils = preload("../scripts/Utils.gd")
-const Condition = preload("../src/Condition.gd")
-const ValueCondition = preload("../src/ValueCondition.gd")
-const BooleanCondition = preload("../src/BooleanCondition.gd")
-const IntegerCondition = preload("../src/IntegerCondition.gd")
-const FloatCondition = preload("../src/FloatCondition.gd")
-const ConditionEditor = preload("condition_editor/ConditionEditor.tscn")
-const BoolConditionEditor = preload("condition_editor/BoolConditionEditor.tscn")
-const IntegerConditionEditor = preload("condition_editor/IntegerConditionEditor.tscn")
-const FloatConditionEditor = preload("condition_editor/FloatConditionEditor.tscn")
+const Condition = preload("../../src/Condition.gd")
+const Utils = preload("../../scripts/Utils.gd")
+const ValueCondition = preload("../../src/ValueCondition.gd")
+const BooleanCondition = preload("../../src/BooleanCondition.gd")
+const IntegerCondition = preload("../../src/IntegerCondition.gd")
+const FloatCondition = preload("../../src/FloatCondition.gd")
+const ConditionEditor = preload("../condition_editors/ConditionEditor.tscn")
+const BoolConditionEditor = preload("../condition_editors/BoolConditionEditor.tscn")
+const IntegerConditionEditor = preload("../condition_editors/IntegerConditionEditor.tscn")
+const FloatConditionEditor = preload("../condition_editors/FloatConditionEditor.tscn")
 
 onready var Header = $HeaderContainer/Header
 onready var Title = $HeaderContainer/Header/Title

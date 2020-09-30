@@ -1,5 +1,5 @@
 tool
-extends "BaseGraphNode.gd"
+extends "BaseStateNode.gd"
 
 signal name_changed(old, new)
 

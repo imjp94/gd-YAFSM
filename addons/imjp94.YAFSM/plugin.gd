@@ -10,9 +10,9 @@ const BooleanCondition = preload("src/BooleanCondition.gd")
 const IntegerCondition = preload("src/IntegerCondition.gd")
 const FloatCondition = preload("src/FloatCondition.gd")
 
-const GraphEditor = preload("scenes/GraphEdit.tscn")
+const StateMachineEditor = preload("scenes/StateMachineEditor.tscn")
 
-var graph_editor
+var state_machine_editor
 
 var focused_object
 
@@ -31,11 +31,11 @@ func _enter_tree():
 	add_custom_type("IntegerCondition", "Resource", IntegerCondition, resource_icon)
 	add_custom_type("FloatCondition", "Resource", FloatCondition, resource_icon)
 
-	graph_editor = GraphEditor.instance()
+	state_machine_editor = StateMachineEditor.instance()
 
 func _exit_tree():
-	if graph_editor:
-		graph_editor.queue_free()
+	if state_machine_editor:
+		state_machine_editor.queue_free()
 
 func handles(object):
 	if object is StateMachine:
@@ -46,20 +46,20 @@ func edit(object):
 	focused_object = object
 
 func make_visible(visible):
-	if graph_editor:
+	if state_machine_editor:
 		if visible:
-			show_graph_editor()
+			show_state_machine_editor()
 		else:
-			hide_graph_editor()
+			hide_state_machine_editor()
 
-func show_graph_editor():
-	if focused_object and graph_editor:
-		if not graph_editor.is_inside_tree():
-			add_control_to_bottom_panel(graph_editor, "StateMachine")
-		make_bottom_panel_item_visible(graph_editor)
-		graph_editor.focused_object = focused_object
+func show_state_machine_editor():
+	if focused_object and state_machine_editor:
+		if not state_machine_editor.is_inside_tree():
+			add_control_to_bottom_panel(state_machine_editor, "StateMachine")
+		make_bottom_panel_item_visible(state_machine_editor)
+		state_machine_editor.focused_object = focused_object
 
-func hide_graph_editor():
-	if graph_editor.is_inside_tree():
-		graph_editor.focused_object = null
-		remove_control_from_bottom_panel(graph_editor)
+func hide_state_machine_editor():
+	if state_machine_editor.is_inside_tree():
+		state_machine_editor.focused_object = null
+		remove_control_from_bottom_panel(state_machine_editor)

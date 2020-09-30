@@ -1,7 +1,8 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://addons/imjp94.YAFSM/scenes/condition_editor/ConditionEditor.gd" type="Script" id=1]
+[ext_resource path="res://addons/imjp94.YAFSM/scenes/condition_editors/ConditionEditor.gd" type="Script" id=1]
 [ext_resource path="res://addons/imjp94.YAFSM/assets/icons/close-white-18dp.svg" type="Texture" id=2]
+
 
 [node name="ConditionEditor" type="HBoxContainer"]
 margin_right = 58.0

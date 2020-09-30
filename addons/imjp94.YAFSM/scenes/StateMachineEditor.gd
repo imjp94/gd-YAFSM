@@ -3,9 +3,9 @@ extends GraphEdit
 const Transition = preload("../src/Transition.gd")
 const State = preload("../src/State.gd")
 const StateMachine = preload("../src/StateMachine.gd")
-const CustomGraphNode = preload("GraphNode.tscn")
-const EntryGraphNode = preload("EntryGraphNode.tscn")
-const ExitGraphNode = preload("ExitGraphNode.tscn")
+const StateNode = preload("state_nodes/StateNode.tscn")
+const EntryStateNode = preload("state_nodes/EntryStateNode.tscn")
+const ExitStateNode = preload("state_nodes/ExitStateNode.tscn")
 
 const DEFAULT_NODE_NAME = "State"
 const DEFAULT_NODE_OFFSET = Vector2.ZERO
@@ -141,23 +141,23 @@ func _on_ContextMenu_index_pressed(index):
 	var local_mouse_pos = get_local_mouse_position() + scroll_offset
 	match index: # TODO: Proper way to handle menu items
 		0: # Add State
-			var node = CustomGraphNode.instance()
+			var node = StateNode.instance()
 			add_node(node, DEFAULT_NODE_NAME, local_mouse_pos)
 		1: # Add Entry
 			if State.ENTRY_KEY in focused_state_machine.states:
 				push_warning("Entry node already exist")
 				return
-			var node = EntryGraphNode.instance()
+			var node = EntryStateNode.instance()
 			add_node(node, State.ENTRY_KEY, local_mouse_pos)
 		2: # Add Exit
 			if State.EXIT_KEY in focused_state_machine.states:
 				push_warning("Exit node already exist")
 				return
-			var node = ExitGraphNode.instance()
+			var node = ExitStateNode.instance()
 			add_node(node, State.EXIT_KEY, local_mouse_pos)
 
 func _on_new_node_added(node, node_name=DEFAULT_NODE_NAME, offset=DEFAULT_NODE_OFFSET):
-	if node.has_signal("name_changed"): # BaseGraphNode doesn't have name_changed signal
+	if node.has_signal("name_changed"): # BaseStateNode doesn't have name_changed signal
 		node.connect("name_changed", self, "_on_node_name_changed")
 	node.offset = offset
 	node.name = node_name
@@ -192,11 +192,11 @@ func draw_graph():
 		var state = focused_state_machine.states[state_key]
 		var new_node
 		if is_entry:
-			new_node = EntryGraphNode.instance()
+			new_node = EntryStateNode.instance()
 		elif is_exit:
-			new_node = ExitGraphNode.instance()
+			new_node = ExitStateNode.instance()
 		else:
-			new_node = CustomGraphNode.instance()
+			new_node = StateNode.instance()
 
 		new_node.state = state
 		add_node(new_node, state_key, state.offset)
