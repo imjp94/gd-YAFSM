@@ -38,7 +38,6 @@ func _exit_tree():
 		graph_editor.queue_free()
 
 func handles(object):
-	print(object.get_class())
 	if object is StateMachine:
 		return true
 	return false
