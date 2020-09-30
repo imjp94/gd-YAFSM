@@ -68,6 +68,14 @@ custom_constants/margin_top = 4
 custom_constants/margin_left = 16
 custom_constants/margin_bottom = 4
 
+[node name="Panel" type="Panel" parent="MarginContainer"]
+margin_left = 16.0
+margin_top = 4.0
+margin_right = 169.0
+margin_bottom = 4.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
 [node name="Conditions" type="VBoxContainer" parent="MarginContainer"]
 margin_left = 16.0
 margin_top = 4.0
