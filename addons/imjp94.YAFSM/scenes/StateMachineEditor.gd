@@ -1,8 +1,8 @@
 tool
 extends GraphEdit
-const Transition = preload("../src/Transition.gd")
-const State = preload("../src/State.gd")
-const StateMachine = preload("../src/StateMachine.gd")
+const Transition = preload("../src/transitions/Transition.gd")
+const State = preload("../src/states/State.gd")
+const StateMachine = preload("../src/states/StateMachine.gd")
 const StateNode = preload("state_nodes/StateNode.tscn")
 const EntryStateNode = preload("state_nodes/EntryStateNode.tscn")
 const ExitStateNode = preload("state_nodes/ExitStateNode.tscn")

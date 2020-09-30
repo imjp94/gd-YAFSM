@@ -1,7 +1,7 @@
 tool
 extends GraphNode
-const Transition = preload("../../src/Transition.gd")
-const State = preload("../../src/State.gd")
+const Transition = preload("../../src/transitions/Transition.gd")
+const State = preload("../../src/states/State.gd")
 const TransitionEditor = preload("../transition_editors/TransitionEditor.tscn")
 
 onready var Transitions = $MarginContainer/Transitions

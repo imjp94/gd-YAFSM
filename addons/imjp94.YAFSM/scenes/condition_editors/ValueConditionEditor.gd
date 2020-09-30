@@ -1,7 +1,7 @@
 tool
 extends "ConditionEditor.gd"
 const Utils = preload("../../scripts/Utils.gd")
-const ValueCondition = preload("../../src/ValueCondition.gd")
+const ValueCondition = preload("../../src/conditions/ValueCondition.gd")
 
 onready var Comparation = $Comparation
 onready var ComparationPopupMenu = $Comparation/PopupMenu

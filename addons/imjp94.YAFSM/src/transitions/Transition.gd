@@ -1,6 +1,5 @@
 tool
 extends Resource
-const State = preload("State.gd")
 
 export(String) var from
 export(String) var to

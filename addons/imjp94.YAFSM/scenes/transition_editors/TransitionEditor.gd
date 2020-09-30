@@ -1,11 +1,11 @@
 tool
 extends VBoxContainer
-const Condition = preload("../../src/Condition.gd")
+const Condition = preload("../../src/conditions/Condition.gd")
 const Utils = preload("../../scripts/Utils.gd")
-const ValueCondition = preload("../../src/ValueCondition.gd")
-const BooleanCondition = preload("../../src/BooleanCondition.gd")
-const IntegerCondition = preload("../../src/IntegerCondition.gd")
-const FloatCondition = preload("../../src/FloatCondition.gd")
+const ValueCondition = preload("../../src/conditions/ValueCondition.gd")
+const BooleanCondition = preload("../../src/conditions/BooleanCondition.gd")
+const IntegerCondition = preload("../../src/conditions/IntegerCondition.gd")
+const FloatCondition = preload("../../src/conditions/FloatCondition.gd")
 const ConditionEditor = preload("../condition_editors/ConditionEditor.tscn")
 const BoolConditionEditor = preload("../condition_editors/BoolConditionEditor.tscn")
 const IntegerConditionEditor = preload("../condition_editors/IntegerConditionEditor.tscn")
