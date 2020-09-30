@@ -32,8 +32,7 @@ func _on_Header_gui_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed:
 			toggle_conditions()
-			if not ContentContainer.visible:
-				get_parent().owner.rect_size = Vector2.ZERO
+			get_parent().owner.rect_size = Vector2.ZERO
 
 func _on_Add_pressed():
 	Utils.popup_on_target(AddPopupMenu, Add)
@@ -91,6 +90,7 @@ func add_condition_editor(editor, condition):
 	editor.condition = condition
 	transition.add_condition(condition)
 	update_condition_count()
+	get_parent().owner.rect_size = Vector2.ZERO
 
 func update_title():
 	TitleLabel.text = transition.to
