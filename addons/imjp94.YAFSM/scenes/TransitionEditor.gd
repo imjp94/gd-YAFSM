@@ -11,20 +11,29 @@ const BoolConditionEditor = preload("condition_editor/BoolConditionEditor.tscn")
 const IntegerConditionEditor = preload("condition_editor/IntegerConditionEditor.tscn")
 const FloatConditionEditor = preload("condition_editor/FloatConditionEditor.tscn")
 
-const TRANSITION_TITLE_TEMPLATE = "%s if:"
-
-onready var Title = $Header/Title
-onready var TitleLabel = $Header/Title/Label
-onready var Add = $Header/HBoxContainer/Add
-onready var AddPopupMenu = $Header/HBoxContainer/Add/PopupMenu
+onready var Header = $HeaderContainer/Header
+onready var Title = $HeaderContainer/Header/Title
+onready var TitleLabel = $HeaderContainer/Header/Title/Label
+onready var ConditionCountLabel = $HeaderContainer/Header/ConditionCount/Label
+onready var Add = $HeaderContainer/Header/HBoxContainer/Add
+onready var AddPopupMenu = $HeaderContainer/Header/HBoxContainer/Add/PopupMenu
+onready var ContentContainer = $MarginContainer
 onready var Conditions = $MarginContainer/Conditions
 
 var transition setget set_transition
 
 
 func _ready():
+	Header.connect("gui_input", self, "_on_Header_gui_input")
 	Add.connect("pressed", self, "_on_Add_pressed")
 	AddPopupMenu.connect("index_pressed", self, "_on_AddPopupMenu_index_pressed")
+
+func _on_Header_gui_input(event):
+	if event is InputEventMouseButton:
+		if event.button_index == BUTTON_LEFT and event.pressed:
+			toggle_conditions()
+			if not ContentContainer.visible:
+				get_parent().owner.rect_size = Vector2.ZERO
 
 func _on_Add_pressed():
 	Utils.popup_on_target(AddPopupMenu, Add)
@@ -55,10 +64,10 @@ func _on_ConditionEditorRemove_pressed(editor):
 	transition.remove_condition(editor.condition.name)
 	Conditions.remove_child(editor)
 	editor.queue_free()
-	get_parent().get_parent().get_parent().rect_size = Vector2.ZERO # TODO: Better way to force GraphNode update rect_size
+	update_condition_count()
+	get_parent().owner.rect_size = Vector2.ZERO
 
 func _on_transition_changed(new_transition):
-	TitleLabel.text = TRANSITION_TITLE_TEMPLATE % transition.to
 	for condition in transition.conditions.values():
 		var editor
 		if condition is BooleanCondition:
@@ -70,6 +79,8 @@ func _on_transition_changed(new_transition):
 		else:
 			editor = ConditionEditor.instance()
 		add_condition_editor(editor, condition)
+	update_title()
+	update_condition_count()
 
 func _on_condition_editor_added(editor):
 	editor.Remove.connect("pressed", self, "_on_ConditionEditorRemove_pressed", [editor])
@@ -79,6 +90,27 @@ func add_condition_editor(editor, condition):
 	_on_condition_editor_added(editor)
 	editor.condition = condition
 	transition.add_condition(condition)
+	update_condition_count()
+
+func update_title():
+	TitleLabel.text = transition.to
+
+func update_condition_count():
+	var count = transition.conditions.size()
+	ConditionCountLabel.text = str(count)
+	if count == 0:
+		hide_conditions()
+	else:
+		show_conditions()
+
+func show_conditions():
+	ContentContainer.visible = true
+
+func hide_conditions():
+	ContentContainer.visible = false
+
+func toggle_conditions():
+	ContentContainer.visible = !ContentContainer.visible
 
 func set_transition(t):
 	if transition != t:
