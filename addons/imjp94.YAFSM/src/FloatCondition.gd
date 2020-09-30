@@ -10,3 +10,8 @@ func set_value(v):
 
 func get_value():
 	return value
+
+func compare(v):
+	if typeof(v) != TYPE_REAL:
+		return false
+	return .compare(v)
