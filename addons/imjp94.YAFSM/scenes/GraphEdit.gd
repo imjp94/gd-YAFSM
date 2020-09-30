@@ -32,9 +32,10 @@ var _requesting_transition # Transition that is on hold before connection reques
 
 
 func _init():
+	# Allow connection from both side
 	add_valid_connection_type(0, 1)
 	add_valid_connection_type(1, 0)
-	add_valid_left_disconnect_type(1)
+	# Only allow disconnection from right slot(0)
 	add_valid_right_disconnect_type(0)
 
 func _ready():
