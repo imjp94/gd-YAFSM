@@ -64,6 +64,11 @@ func _on_connection_request_confirmed():
 	_request_stack.clear()
 
 func _on_connection_request(from, from_slot, to, to_slot):
+	if from == to:
+		# TODO: Revert disconnection
+		push_warning("Connection rejected, attempting to connect to self(%s)" % from)
+		return
+
 	connect_node(from, from_slot, to, to_slot) # Visually connect
 	_request_stack.append(Request.new(REQUEST.CONNECTION, {
 		"from": from,
