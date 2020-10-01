@@ -2,13 +2,6 @@ tool
 extends EditorPlugin
 const StateMachinePlayer = preload("src/StateMachinePlayer.gd")
 const StateMachine = preload("src/states/StateMachine.gd")
-const State = preload("src/states/State.gd")
-const Transition = preload("src/transitions/Transition.gd")
-const Condition = preload("src/conditions/Condition.gd")
-const ValueCondition = preload("src/conditions/ValueCondition.gd")
-const BooleanCondition = preload("src/conditions/BooleanCondition.gd")
-const IntegerCondition = preload("src/conditions/IntegerCondition.gd")
-const FloatCondition = preload("src/conditions/FloatCondition.gd")
 
 const StateMachineEditor = preload("scenes/StateMachineEditor.tscn")
 
@@ -23,13 +16,6 @@ func _enter_tree():
 	var resource_icon = editor_base_control.get_icon("ResourcePreloader", "EditorIcons")
 	add_custom_type("StateMachinePlayer", "Node", StateMachinePlayer, node_icon)
 	add_custom_type("StateMachine", "Resource", StateMachine, resource_icon)
-	add_custom_type("State", "Resource", State, resource_icon)
-	add_custom_type("Transition", "Resource", Transition, resource_icon)
-	add_custom_type("Condition", "Resource", Condition, resource_icon)
-	add_custom_type("ValueCondition", "Resource", ValueCondition, resource_icon)
-	add_custom_type("BooleanCondition", "Resource", BooleanCondition, resource_icon)
-	add_custom_type("IntegerCondition", "Resource", IntegerCondition, resource_icon)
-	add_custom_type("FloatCondition", "Resource", FloatCondition, resource_icon)
 
 	state_machine_editor = StateMachineEditor.instance()
 
