@@ -23,18 +23,18 @@ enum ResetEventTrigger {
 }
 
 export(Resource) var state_machine
-export(Dictionary) var parameters
 export(ProcessMode) var process_mode = ProcessMode.IDLE setget set_process_mode
 
 var current_state setget , get_current_state
 var state_stack = []
 
+var _parameters
 var _is_update_locked = false
 var _was_transited = false # If last transition was successful
 
 
-func _init(p_parameters={}):
-	parameters = p_parameters
+func _init():
+	_parameters = {}
 
 func _get_configuration_warning():
 	if state_machine:
@@ -103,9 +103,9 @@ func _exit(to):
 			emit_signal("entry", state_machine)
 		emit_signal("state_exited", from)
 
-# Only get called in 2 condition, parameters edited or last transition was successful
+# Only get called in 2 condition, _parameters edited or last transition was successful
 func _transition():
-	var next_state = state_machine.states[get_current_state()].transit(parameters)
+	var next_state = state_machine.states[get_current_state()].transit(_parameters)
 	if next_state:
 		if state_stack.has(next_state):
 			reset(state_stack.find(next_state))
@@ -175,33 +175,36 @@ func reset(to=0, event=ResetEventTrigger.LAST_TO_DEST):
 		assert(num_to_pop >= 0)
 
 func _flush_trigger():
-	for param_key in parameters.keys():
-		var value = parameters[param_key]
+	for param_key in _parameters.keys():
+		var value = _parameters[param_key]
 		if value == null: # Param with null as value is treated as trigger
-			parameters.erase(param_key)
+			_parameters.erase(param_key)
 
 func _on_param_edited():
 	_transition()
 
 func set_trigger(name):
-	parameters[name] = null
+	_parameters[name] = null
 	_on_param_edited()
 
 func set_param(name, value):
-	parameters[name] = value
+	_parameters[name] = value
 	_on_param_edited()
 
 func erase_param(name):
-	var result = parameters.erase(name)
+	var result = _parameters.erase(name)
 	_on_param_edited()
 	return result
 
 func clear_param():
-	parameters.clear()
+	_parameters.clear()
 	_on_param_edited()
 
 func get_param(name):
-	return parameters[name]
+	return _parameters[name]
+
+func get_params():
+	return _parameters.duplicate()
 
 func get_current_state():
 	return state_stack.back() if not state_stack.empty() else State.ENTRY_KEY
