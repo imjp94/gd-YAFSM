@@ -16,3 +16,28 @@ __meta__ = {
 items = [ "Add State", null, 0, false, false, 0, 0, null, "", false, "Add Entry", null, 0, false, false, 1, 0, null, "", false, "Add Exit", null, 0, false, false, 2, 0, null, "", false ]
 
 [node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
+
+[node name="OverlayContainer" type="MarginContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="Panel" parent="OverlayContainer"]
+margin_right = 1024.0
+margin_bottom = 600.0
+mouse_filter = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="OverlayContainer"]
+margin_right = 1024.0
+margin_bottom = 600.0
+mouse_filter = 2
+
+[node name="CreateStateMachine" type="Button" parent="OverlayContainer/CenterContainer"]
+margin_left = 440.0
+margin_top = 290.0
+margin_right = 583.0
+margin_bottom = 310.0
+text = "Create StateMachine"

@@ -22,6 +22,8 @@ enum GraphRequestType {
 
 onready var ContextMenu = $ContextMenu
 onready var Confirmation = $ConfirmationDialog
+onready var OverlayContainer = $OverlayContainer
+onready var CreateStateMachine = $OverlayContainer/CenterContainer/CreateStateMachine
 
 var focused_object setget set_focused_object
 var focused_state_machine setget set_focused_state_machine
@@ -184,8 +186,10 @@ func _on_focused_state_machine_changed(new_state_machine):
 	if new_state_machine:
 		clear_graph()
 		draw_graph()
+		OverlayContainer.hide()
 	else:
 		clear_graph()
+		OverlayContainer.show()
 
 func connect_state_node(from, from_slot, to, to_slot):
 	connect_node(from, from_slot, to, to_slot)
