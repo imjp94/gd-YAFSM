@@ -102,6 +102,7 @@ func _transition():
 			reset(state_stack.find(next_state))
 		else:
 			_push_state(next_state)
+	_flush_trigger()
 
 func _update_start():
 	_is_update_locked = false
@@ -160,6 +161,35 @@ func reset(to=0, event=RESET_EVENT_TRIGGER.LAST_TO_DEST):
 	else:
 		print("Error: state_stack_last_index(%d) - to_index(%d) < 0(%d)" % [last_index, to, num_to_pop])
 		assert(num_to_pop >= 0)
+
+func _flush_trigger():
+	for param_key in parameters.keys():
+		var value = parameters[param_key]
+		if value == null: # Param with null as value is treated as trigger
+			parameters.erase(param_key)
+
+func _on_param_edited():
+	_transition()
+
+func set_trigger(name):
+	parameters[name] = null
+	_on_param_edited()
+
+func set_param(name, value):
+	parameters[name] = value
+	_on_param_edited()
+
+func erase_param(name):
+	var result = parameters.erase(name)
+	_on_param_edited()
+	return result
+
+func clear_param():
+	parameters.clear()
+	_on_param_edited()
+
+func get_param(name):
+	return parameters[name]
 
 func get_current_state():
 	return state_stack.back() if not state_stack.empty() else ""
