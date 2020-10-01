@@ -25,7 +25,6 @@ onready var Confirmation = $ConfirmationDialog
 onready var OverlayContainer = $OverlayContainer
 onready var CreateStateMachine = $OverlayContainer/CenterContainer/CreateStateMachine
 
-var focused_object setget set_focused_object
 var focused_state_machine setget set_focused_state_machine
 
 var selected_nodes = {}
@@ -176,13 +175,6 @@ func _on_new_node_added(node, node_name=DEFAULT_NODE_NAME, offset=DEFAULT_NODE_O
 	node.state.name = node.name
 	focused_state_machine.add_state(node.state)
 
-func _on_focused_object_changed(new_obj):
-	if new_obj == null:
-		set_focused_object(null)
-		set_focused_state_machine(null)
-	elif new_obj is StateMachine:
-		set_focused_state_machine(new_obj)
-
 func _on_focused_state_machine_changed(new_state_machine):
 	if new_state_machine:
 		clear_graph()
@@ -246,11 +238,6 @@ func save():
 	ResourceSaver.save(resource_path, focused_state_machine)
 	Confirmation.dialog_text = "StateMachine saved to %s" % resource_path
 	Confirmation.popup_centered()
-
-func set_focused_object(obj):
-	if focused_object != obj:
-		focused_object = obj
-		_on_focused_object_changed(obj)
 
 func set_focused_state_machine(state_machine):
 	if focused_state_machine != state_machine:
