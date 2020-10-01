@@ -183,6 +183,7 @@ func _on_Confirmation_confirmed():
 	save()
 
 func _on_new_node_added(node):
+	node.undo_redo = undo_redo
 	if node.has_signal("name_changed"): # BaseStateNode doesn't have name_changed signal
 		if not node.is_connected("name_changed", self, "_on_node_name_changed"): # Potential reconnect when undo/redo
 			node.connect("name_changed", self, "_on_node_name_changed")
