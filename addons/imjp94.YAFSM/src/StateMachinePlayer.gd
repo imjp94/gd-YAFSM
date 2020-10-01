@@ -25,8 +25,6 @@ enum ResetEventTrigger {
 export(Resource) var state_machine
 export(ProcessMode) var process_mode = ProcessMode.IDLE setget set_process_mode
 
-var current_state setget , get_current_state
-
 var _parameters
 var _state_stack = []
 var _is_update_locked = false
