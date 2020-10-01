@@ -21,6 +21,7 @@ enum GraphRequestType {
 }
 
 onready var ContextMenu = $ContextMenu
+onready var Confirmation = $ConfirmationDialog
 
 var focused_object setget set_focused_object
 var focused_state_machine setget set_focused_state_machine
@@ -52,6 +53,15 @@ func _gui_input(event):
 		if (event.button_index == BUTTON_LEFT or event.button_index == BUTTON_RIGHT) and not event.pressed:
 			if not _request_stack.empty():
 				_on_connection_request_confirmed()
+
+func _unhandled_input(event):
+	if not visible:
+		return
+
+	if event is InputEventKey:
+		if event.control:
+			if event.scancode == KEY_S and event.pressed:
+				save()
 
 # Confirm request when left/right mouse button released, while _request_stack is not empty
 func _on_connection_request_confirmed():
@@ -220,6 +230,17 @@ func remove_node_connections(node_name):
 	for connection in get_connection_list():
 		if connection.from == node_name or connection.to == node_name:
 			disconnect_state_node(connection.from, connection.from_port, connection.to, connection.to_port)
+
+func save():
+	if not focused_state_machine:
+		return
+	var resource_path = focused_state_machine.resource_path
+	if resource_path.empty(): # Built-in resource will be saved by scene
+		return
+	
+	ResourceSaver.save(resource_path, focused_state_machine)
+	Confirmation.dialog_text = "StateMachine saved to %s" % resource_path
+	Confirmation.popup_centered()
 
 func set_focused_object(obj):
 	if focused_object != obj:
