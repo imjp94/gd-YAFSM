@@ -26,6 +26,7 @@ onready var OverlayContainer = $OverlayContainer
 onready var CreateStateMachine = $OverlayContainer/CenterContainer/CreateStateMachine
 
 var focused_state_machine setget set_focused_state_machine
+var undo_redo
 
 var selected_nodes = {}
 
@@ -78,9 +79,9 @@ func _on_connection_request_confirmed():
 	for request in _request_stack:
 		var args = request.args
 		if request.type == GraphRequestType.CONNECTION:
-			connect_state_node(args.from, args.from_slot, args.to, args.to_slot)
+			connect_action(args.from, args.from_slot, args.to, args.to_slot)
 		elif request.type == GraphRequestType.DISCONNECTION:
-			disconnect_state_node(args.from, args.from_slot, args.to, args.to_slot)
+			disconnect_action(args.from, args.from_slot, args.to, args.to_slot)
 	_requesting_transition = null
 	_request_stack.clear()
 
@@ -248,6 +249,18 @@ func save():
 		return
 	
 	ResourceSaver.save(resource_path, focused_state_machine)
+
+func connect_action(from, from_slot, to, to_slot):
+	undo_redo.create_action("Connect")
+	undo_redo.add_do_method(self, "connect_state_node", from, from_slot, to, to_slot)
+	undo_redo.add_undo_method(self, "disconnect_state_node", from, from_slot, to, to_slot)
+	undo_redo.commit_action()
+
+func disconnect_action(from, from_slot, to, to_slot):
+	undo_redo.create_action("Disconnect")
+	undo_redo.add_do_method(self, "disconnect_state_node", from, from_slot, to, to_slot)
+	undo_redo.add_undo_method(self, "connect_state_node", from, from_slot, to, to_slot)
+	undo_redo.commit_action()
 
 func set_focused_state_machine(state_machine):
 	if focused_state_machine != state_machine:

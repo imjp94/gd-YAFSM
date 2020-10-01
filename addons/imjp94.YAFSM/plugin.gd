@@ -21,6 +21,7 @@ func _enter_tree():
 	add_custom_type("StateMachine", "Resource", StateMachine, resource_icon)
 
 	state_machine_editor = StateMachineEditor.instance()
+	state_machine_editor.undo_redo = get_undo_redo()
 	state_machine_editor.connect("ready", self, "_on_StateMachineEditor_ready")
 
 func _exit_tree():
