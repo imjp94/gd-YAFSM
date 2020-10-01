@@ -10,7 +10,7 @@ const ExitStateNode = preload("state_nodes/ExitStateNode.tscn")
 const DEFAULT_NODE_NAME = "State"
 const DEFAULT_NODE_OFFSET = Vector2.ZERO
 
-enum REQUEST {
+enum GraphRequestType {
 	CONNECTION,
 	DISCONNECTION,
 	DELETE,
@@ -57,9 +57,9 @@ func _gui_input(event):
 func _on_connection_request_confirmed():
 	for request in _request_stack:
 		var args = request.args
-		if request.type == REQUEST.CONNECTION:
+		if request.type == GraphRequestType.CONNECTION:
 			connect_state_node(args.from, args.from_slot, args.to, args.to_slot)
-		elif request.type == REQUEST.DISCONNECTION:
+		elif request.type == GraphRequestType.DISCONNECTION:
 			disconnect_state_node(args.from, args.from_slot, args.to, args.to_slot)
 	_requesting_transition = null
 	_request_stack.clear()
@@ -71,7 +71,7 @@ func _on_connection_request(from, from_slot, to, to_slot):
 		return
 
 	connect_node(from, from_slot, to, to_slot) # Visually connect
-	_request_stack.append(Request.new(REQUEST.CONNECTION, {
+	_request_stack.append(GraphRequest.new(GraphRequestType.CONNECTION, {
 		"from": from,
 		"from_slot": from_slot, 
 		"to": to, 
@@ -81,7 +81,7 @@ func _on_connection_request(from, from_slot, to, to_slot):
 func _on_disconnection_request(from, from_slot, to, to_slot):
 	disconnect_node(from, from_slot, to, to_slot) # Visually disconnect
 	_requesting_transition = focused_state_machine.states[from].transitions[to]
-	_request_stack.append(Request.new(REQUEST.DISCONNECTION, {
+	_request_stack.append(GraphRequest.new(GraphRequestType.DISCONNECTION, {
 		"from": from,
 		"from_slot": from_slot, 
 		"to": to, 
@@ -232,7 +232,7 @@ func set_focused_state_machine(state_machine):
 		_on_focused_state_machine_changed(state_machine)
 
 # Data holder for request emitted by GraphEdit
-class Request:
+class GraphRequest:
 	var type
 	var args
 
