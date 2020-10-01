@@ -4,9 +4,9 @@ const State = preload("states/State.gd")
 
 signal entry(state_machine)
 signal exit(state_machine)
-signal state_changed(from, to, push)
-signal state_entered(from, to, push)
-signal state_exited(from, to, push)
+signal state_changed(from, to)
+signal state_entered(to)
+signal state_exited(from)
 signal state_update(state, delta)
 
 enum ProcessMode {
@@ -69,10 +69,10 @@ func _physics_process(delta):
 
 func _push_state(to):
 	var from = get_current_state()
-	_exit(to, true)
+	_exit(to)
 	state_stack.push_back(to)
-	_enter(from, true)
-	emit_signal("state_changed", from, to, true)
+	_enter(from)
+	emit_signal("state_changed", from, to)
 
 func _pop_state():
 	if state_stack.size() == 1:
@@ -80,27 +80,27 @@ func _pop_state():
 		return
 
 	var to = get_previous_state()
-	_exit(to, false)
+	_exit(to)
 	var from = state_stack.pop_back()
-	_enter(from, false)
-	emit_signal("state_changed", from, to, false)
+	_enter(from)
+	emit_signal("state_changed", from, to)
 
 func _on_pop_last_state():
 	pass
 
-func _enter(from, push):
+func _enter(from):
 	var to = get_current_state()
 	if to:
 		if to == State.EXIT_KEY:
 			emit_signal("exit", state_machine)
-		emit_signal("state_entered", from, to, push)
+		emit_signal("state_entered", from, to)
 
-func _exit(to, push):
+func _exit(to):
 	var from = get_current_state()
 	if from:
 		if from == State.ENTRY_KEY:
 			emit_signal("entry", state_machine)
-		emit_signal("state_exited", from, to, push)
+		emit_signal("state_exited", from)
 
 func _transition():
 	var next_state = state_machine.states[get_current_state()].transit(parameters)
