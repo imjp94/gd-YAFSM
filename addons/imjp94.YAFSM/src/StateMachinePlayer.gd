@@ -29,6 +29,7 @@ var current_state setget , get_current_state
 var state_stack = []
 
 var _is_update_locked = false
+var _was_transited = false # If last transition was successful
 
 
 func _init(p_parameters={}):
@@ -48,6 +49,7 @@ func _ready():
 
 	_on_process_mode_changed()
 	_push_state(state_machine.get_entry().to)
+	_transition()
 
 func _process(delta):
 	if Engine.editor_hint:
@@ -56,7 +58,6 @@ func _process(delta):
 	_update_start()
 	update(delta)
 	_update_end()
-	_transition()
 
 func _physics_process(delta):
 	if Engine.editor_hint:
@@ -65,7 +66,6 @@ func _physics_process(delta):
 	_update_start()
 	update(delta)
 	_update_end()
-	_transition()
 
 func _push_state(to):
 	var from = get_current_state()
@@ -102,6 +102,7 @@ func _exit(to):
 			emit_signal("entry", state_machine)
 		emit_signal("state_exited", from)
 
+# Only get called in 2 condition, parameters edited or last transition was successful
 func _transition():
 	var next_state = state_machine.states[get_current_state()].transit(parameters)
 	if next_state:
@@ -109,6 +110,7 @@ func _transition():
 			reset(state_stack.find(next_state))
 		else:
 			_push_state(next_state)
+	_was_transited = !!next_state
 	_flush_trigger()
 
 func _update_start():
@@ -134,6 +136,8 @@ func _on_process_mode_changed():
 			set_process(false)
 
 func update(delta):
+	if _was_transited: # Attempt to transit if last transition was successful
+		_transition()
 	if process_mode != ProcessMode.MANUAL:
 		assert(not _is_update_locked, "Attempting to update manually with ProcessMode.%s" % ProcessMode.keys()[process_mode])
 	var current_state = get_current_state()
