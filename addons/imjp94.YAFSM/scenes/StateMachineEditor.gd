@@ -48,6 +48,7 @@ func _ready():
 	connect("node_selected", self, "_on_node_selected")
 	connect("node_unselected", self, "_on_node_unselected")
 	ContextMenu.connect("index_pressed", self, "_on_ContextMenu_index_pressed")
+	Confirmation.connect("confirmed", self, "_on_Confirmation_confirmed")
 
 func _gui_input(event):
 	if event is InputEventMouseButton:
@@ -62,7 +63,15 @@ func _unhandled_input(event):
 	if event is InputEventKey:
 		if event.control:
 			if event.scancode == KEY_S and event.pressed:
-				save()
+				_on_save_request()
+
+func _on_save_request():
+	var resource_path = focused_state_machine.resource_path
+	if resource_path.empty(): # Built-in resource will be saved by scene
+		return
+
+	Confirmation.dialog_text = "Saving StateMachine to %s" % resource_path
+	Confirmation.popup_centered()
 
 # Confirm request when left/right mouse button released, while _request_stack is not empty
 func _on_connection_request_confirmed():
@@ -167,6 +176,9 @@ func _on_ContextMenu_index_pressed(index):
 			var node = ExitStateNode.instance()
 			add_node(node, State.EXIT_KEY, local_mouse_pos)
 
+func _on_Confirmation_confirmed():
+	save()
+
 func _on_new_node_added(node, node_name=DEFAULT_NODE_NAME, offset=DEFAULT_NODE_OFFSET):
 	if node.has_signal("name_changed"): # BaseStateNode doesn't have name_changed signal
 		node.connect("name_changed", self, "_on_node_name_changed")
@@ -236,8 +248,6 @@ func save():
 		return
 	
 	ResourceSaver.save(resource_path, focused_state_machine)
-	Confirmation.dialog_text = "StateMachine saved to %s" % resource_path
-	Confirmation.popup_centered()
 
 func set_focused_state_machine(state_machine):
 	if focused_state_machine != state_machine:

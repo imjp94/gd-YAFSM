@@ -18,6 +18,7 @@ items = [ "Add State", null, 0, false, false, 0, 0, null, "", false, "Add Entry"
 [node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
 
 [node name="OverlayContainer" type="MarginContainer" parent="."]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
