@@ -132,9 +132,7 @@ func _on_disconnect_node(from, from_slot, to, to_slot):
 
 func _on_delete_nodes_request():
 	for node in selected_nodes.values():
-		remove_node_connections(node.name)
-		remove_child(node)
-		focused_state_machine.remove_state(node.name)
+		delete_node_action(node)
 	selected_nodes.clear()
 
 func _on_node_selected(node):
@@ -159,33 +157,36 @@ func _on_popup_request(position):
 	ContextMenu.popup()
 
 func _on_ContextMenu_index_pressed(index):
-	var local_mouse_pos = get_local_mouse_position() + scroll_offset
+	var node
+	var node_name = DEFAULT_NODE_NAME
+	var offset = get_local_mouse_position() + scroll_offset
 	match index: # TODO: Proper way to handle menu items
 		0: # Add State
-			var node = StateNode.instance()
-			add_node(node, DEFAULT_NODE_NAME, local_mouse_pos)
+			node = StateNode.instance()
 		1: # Add Entry
 			if State.ENTRY_KEY in focused_state_machine.states:
 				push_warning("Entry node already exist")
 				return
-			var node = EntryStateNode.instance()
-			add_node(node, State.ENTRY_KEY, local_mouse_pos)
+			node = EntryStateNode.instance()
+			node_name = State.ENTRY_KEY
 		2: # Add Exit
 			if State.EXIT_KEY in focused_state_machine.states:
 				push_warning("Exit node already exist")
 				return
-			var node = ExitStateNode.instance()
-			add_node(node, State.EXIT_KEY, local_mouse_pos)
+			node = ExitStateNode.instance()
+			node_name = State.EXIT_KEY
+	node.state.name = node_name
+	node.offset = offset
+	add_node_action(node)
 
 func _on_Confirmation_confirmed():
 	save()
 
-func _on_new_node_added(node, node_name=DEFAULT_NODE_NAME, offset=DEFAULT_NODE_OFFSET):
+func _on_new_node_added(node):
 	if node.has_signal("name_changed"): # BaseStateNode doesn't have name_changed signal
-		node.connect("name_changed", self, "_on_node_name_changed")
-	node.offset = offset
-	node.name = node_name
-	node.state.name = node.name
+		if not node.is_connected("name_changed", self, "_on_node_name_changed"): # Potential reconnect when undo/redo
+			node.connect("name_changed", self, "_on_node_name_changed")
+	node.name = node.state.name
 	focused_state_machine.add_state(node.state)
 
 func _on_focused_state_machine_changed(new_state_machine):
@@ -219,7 +220,9 @@ func draw_graph():
 			new_node = StateNode.instance()
 
 		new_node.state = state
-		add_node(new_node, state_key, state.offset)
+		new_node.state.name = state_key
+		new_node.offset = state.offset
+		add_node(new_node)
 		for transition in state.transitions.values():
 			# Reflecting state node, so call connect_node instead
 			connect_node(transition.from, 0, transition.to, 0) # TODO: Save port index to state
@@ -232,9 +235,14 @@ func clear_graph():
 			remove_child(child)
 			child.queue_free()
 
-func add_node(node, node_name=DEFAULT_NODE_NAME, offset=Vector2.ZERO):
+func add_node(node):
 	add_child(node)
-	_on_new_node_added(node, node_name, offset)
+	_on_new_node_added(node)
+
+func delete_node(node):
+	remove_node_connections(node.name)
+	remove_child(node)
+	focused_state_machine.remove_state(node.name)
 
 func remove_node_connections(node_name):
 	for connection in get_connection_list():
@@ -249,6 +257,18 @@ func save():
 		return
 	
 	ResourceSaver.save(resource_path, focused_state_machine)
+
+func add_node_action(node):
+	undo_redo.create_action("Add State Node")
+	undo_redo.add_do_method(self, "add_node", node)
+	undo_redo.add_undo_method(self, "delete_node", node)
+	undo_redo.commit_action()
+
+func delete_node_action(node):
+	undo_redo.create_action("Add State Node")
+	undo_redo.add_do_method(self, "delete_node", node)
+	undo_redo.add_undo_method(self, "add_node", node)
+	undo_redo.commit_action()
 
 func connect_action(from, from_slot, to, to_slot):
 	undo_redo.create_action("Connect")
