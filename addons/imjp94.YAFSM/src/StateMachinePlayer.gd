@@ -15,10 +15,11 @@ enum ProcessMode {
 	MANUAL
 }
 
-enum RESET_EVENT_TRIGGER {
-	NONE = -1,
-	ALL = 0,
-	LAST_TO_DEST = 1
+# Enum to specify how reseting state stack should trigger event(state_changed, state_entered, state_exited etc.)
+enum ResetEventTrigger {
+	NONE = -1, # No event
+	ALL = 0, # All removed state will emit event
+	LAST_TO_DEST = 1 # Only last state and destination will emit event
 }
 
 export(Resource) var state_machine
@@ -144,7 +145,7 @@ func update(delta):
 	_on_update(current_state, delta)
 	emit_signal("state_update", current_state, delta)
 
-func reset(to=0, event=RESET_EVENT_TRIGGER.LAST_TO_DEST):
+func reset(to=0, event=ResetEventTrigger.LAST_TO_DEST):
 	assert(to > -1)
 	var last_index = state_stack.size() - 1
 	var first_state = ""
@@ -154,18 +155,18 @@ func reset(to=0, event=RESET_EVENT_TRIGGER.LAST_TO_DEST):
 		for i in range(num_to_pop):
 			first_state = get_current_state() if i == 0 else first_state
 			match event:
-				RESET_EVENT_TRIGGER.LAST_TO_DEST:
+				ResetEventTrigger.LAST_TO_DEST:
 					state_stack.pop_back()
 					if i == num_to_pop - 1:
 						state_stack.push_back(first_state)
 						_pop_state()
-				RESET_EVENT_TRIGGER.ALL:
+				ResetEventTrigger.ALL:
 					_pop_state()
 				_:
 					state_stack.pop_back()
 	elif num_to_pop == 0:
 		match event:
-			RESET_EVENT_TRIGGER.NONE:
+			ResetEventTrigger.NONE:
 				state_stack.pop_back()
 			_:
 				_pop_state()
