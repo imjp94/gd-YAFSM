@@ -144,7 +144,7 @@ func update(delta):
 	emit_signal("state_update", current_state, delta)
 
 func reset(to=0, event=ResetEventTrigger.LAST_TO_DEST):
-	assert(to > -1)
+	assert(to > -1 and to < _state_stack.size(), "Reset to index(%d) out of bounds(%d)" % [to, _state_stack.size()])
 	var last_index = _state_stack.size() - 1
 	var first_state = ""
 	var num_to_pop = last_index - to
@@ -168,9 +168,6 @@ func reset(to=0, event=ResetEventTrigger.LAST_TO_DEST):
 				_state_stack.pop_back()
 			_:
 				_pop_state()
-	else:
-		print("Error: _state_stack_last_index(%d) - to_index(%d) < 0(%d)" % [last_index, to, num_to_pop])
-		assert(num_to_pop >= 0)
 
 func _flush_trigger():
 	for param_key in _parameters.keys():
