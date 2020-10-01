@@ -26,9 +26,9 @@ export(Resource) var state_machine
 export(ProcessMode) var process_mode = ProcessMode.IDLE setget set_process_mode
 
 var current_state setget , get_current_state
-var state_stack = []
 
 var _parameters
+var _state_stack = []
 var _is_update_locked = false
 var _was_transited = false # If last transition was successful
 
@@ -71,18 +71,18 @@ func _physics_process(delta):
 func _push_state(to):
 	var from = get_current_state()
 	_exit(to)
-	state_stack.push_back(to)
+	_state_stack.push_back(to)
 	_enter(from)
 	emit_signal("state_changed", from, to)
 
 func _pop_state():
-	if state_stack.size() == 1:
+	if _state_stack.size() == 1:
 		_on_pop_last_state()
 		return
 
 	var to = get_previous_state()
 	_exit(to)
-	var from = state_stack.pop_back()
+	var from = _state_stack.pop_back()
 	_enter(from)
 	emit_signal("state_changed", from, to)
 
@@ -107,8 +107,8 @@ func _exit(to):
 func _transition():
 	var next_state = state_machine.states[get_current_state()].transit(_parameters)
 	if next_state:
-		if state_stack.has(next_state):
-			reset(state_stack.find(next_state))
+		if _state_stack.has(next_state):
+			reset(_state_stack.find(next_state))
 		else:
 			_push_state(next_state)
 	_was_transited = !!next_state
@@ -147,7 +147,7 @@ func update(delta):
 
 func reset(to=0, event=ResetEventTrigger.LAST_TO_DEST):
 	assert(to > -1)
-	var last_index = state_stack.size() - 1
+	var last_index = _state_stack.size() - 1
 	var first_state = ""
 	var num_to_pop = last_index - to
 
@@ -156,22 +156,22 @@ func reset(to=0, event=ResetEventTrigger.LAST_TO_DEST):
 			first_state = get_current_state() if i == 0 else first_state
 			match event:
 				ResetEventTrigger.LAST_TO_DEST:
-					state_stack.pop_back()
+					_state_stack.pop_back()
 					if i == num_to_pop - 1:
-						state_stack.push_back(first_state)
+						_state_stack.push_back(first_state)
 						_pop_state()
 				ResetEventTrigger.ALL:
 					_pop_state()
 				_:
-					state_stack.pop_back()
+					_state_stack.pop_back()
 	elif num_to_pop == 0:
 		match event:
 			ResetEventTrigger.NONE:
-				state_stack.pop_back()
+				_state_stack.pop_back()
 			_:
 				_pop_state()
 	else:
-		print("Error: state_stack_last_index(%d) - to_index(%d) < 0(%d)" % [last_index, to, num_to_pop])
+		print("Error: _state_stack_last_index(%d) - to_index(%d) < 0(%d)" % [last_index, to, num_to_pop])
 		assert(num_to_pop >= 0)
 
 func _flush_trigger():
@@ -207,10 +207,10 @@ func get_params():
 	return _parameters.duplicate()
 
 func get_current_state():
-	return state_stack.back() if not state_stack.empty() else State.ENTRY_KEY
+	return _state_stack.back() if not _state_stack.empty() else State.ENTRY_KEY
 
 func get_previous_state():
-	return state_stack[state_stack.size() - 2] if state_stack.size() > 1 else State.ENTRY_KEY
+	return _state_stack[_state_stack.size() - 2] if _state_stack.size() > 1 else State.ENTRY_KEY
 
 func set_process_mode(mode):
 	if process_mode != mode:
