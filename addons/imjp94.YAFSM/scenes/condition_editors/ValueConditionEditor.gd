@@ -17,11 +17,11 @@ func _on_Comparation_pressed():
 func _on_ComparationPopupMenu_index_changed(index):
 	match index:
 		0: # Equal
-			condition.comparation = ValueCondition.COMPARATION.EQUAL
+			condition.comparation = ValueCondition.Comparation.EQUAL
 		1: # Greater
-			condition.comparation = ValueCondition.COMPARATION.GREATER
+			condition.comparation = ValueCondition.Comparation.GREATER
 		2: # Lesser
-			condition.comparation = ValueCondition.COMPARATION.LESSER
+			condition.comparation = ValueCondition.Comparation.LESSER
 		_:
 			push_error("Unexpected index(%d) from PopupMenu" % index)
 	Comparation.text = ComparationPopupMenu.get_item_text(index)

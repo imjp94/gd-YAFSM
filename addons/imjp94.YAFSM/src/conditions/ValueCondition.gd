@@ -3,15 +3,15 @@ extends "Condition.gd"
 signal comparation_changed(new_comparation)
 signal value_changed(new_value)
 
-enum COMPARATION {
+enum Comparation {
 	LESSER = -1,
 	EQUAL = 0,
 	GREATER = 1
 }
 
-export(COMPARATION) var comparation = COMPARATION.EQUAL setget set_comparation
+export(Comparation) var comparation = Comparation.EQUAL setget set_comparation
 
-func _init(p_name="", p_comparation=COMPARATION.EQUAL):
+func _init(p_name="", p_comparation=Comparation.EQUAL):
 	._init(p_name)
 	comparation = p_comparation
 
@@ -32,9 +32,9 @@ func compare(v):
 		return false
 
 	match comparation:
-		COMPARATION.LESSER:
+		Comparation.LESSER:
 			return v < get_value()
-		COMPARATION.EQUAL:
+		Comparation.EQUAL:
 			return v == get_value()
-		COMPARATION.GREATER:
+		Comparation.GREATER:
 			return v > get_value()
