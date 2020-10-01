@@ -1,6 +1,9 @@
 tool
 extends Node
+const State = preload("states/State.gd")
 
+signal entry(state_machine)
+signal exit(state_machine)
 signal state_changed(from, to, push)
 signal state_entered(from, to, push)
 signal state_exited(from, to, push)
@@ -88,11 +91,15 @@ func _on_pop_last_state():
 func _enter(from, push):
 	var to = get_current_state()
 	if to:
+		if to == State.EXIT_KEY:
+			emit_signal("exit", state_machine)
 		emit_signal("state_entered", from, to, push)
 
 func _exit(to, push):
 	var from = get_current_state()
 	if from:
+		if from == State.ENTRY_KEY:
+			emit_signal("entry", state_machine)
 		emit_signal("state_exited", from, to, push)
 
 func _transition():
@@ -192,10 +199,10 @@ func get_param(name):
 	return parameters[name]
 
 func get_current_state():
-	return state_stack.back() if not state_stack.empty() else ""
+	return state_stack.back() if not state_stack.empty() else State.ENTRY_KEY
 
 func get_previous_state():
-	return state_stack[state_stack.size() - 2] if state_stack.size() > 1 else ""
+	return state_stack[state_stack.size() - 2] if state_stack.size() > 1 else State.ENTRY_KEY
 
 func set_process_mode(mode):
 	if process_mode != mode:
