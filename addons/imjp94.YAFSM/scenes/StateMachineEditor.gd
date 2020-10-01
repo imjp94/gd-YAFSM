@@ -179,7 +179,8 @@ func _on_new_node_added(node, node_name=DEFAULT_NODE_NAME, offset=DEFAULT_NODE_O
 func _on_focused_object_changed(new_obj):
 	if new_obj == null:
 		set_focused_object(null)
-	if new_obj is StateMachine:
+		set_focused_state_machine(null)
+	elif new_obj is StateMachine:
 		set_focused_state_machine(new_obj)
 
 func _on_focused_state_machine_changed(new_state_machine):
