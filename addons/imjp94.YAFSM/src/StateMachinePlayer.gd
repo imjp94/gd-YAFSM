@@ -6,8 +6,11 @@ signal state_entered(from, to, push)
 signal state_exited(from, to, push)
 signal state_update(state, delta)
 
-export(Resource) var state_machine
-export(Dictionary) var parameters
+enum ProcessMode {
+	PHYSICS,
+	IDLE,
+	MANUAL
+}
 
 enum RESET_EVENT_TRIGGER {
 	NONE = -1,
@@ -15,8 +18,14 @@ enum RESET_EVENT_TRIGGER {
 	LAST_TO_DEST = 1
 }
 
+export(Resource) var state_machine
+export(Dictionary) var parameters
+export(ProcessMode) var process_mode = ProcessMode.IDLE setget set_process_mode
+
 var current_state setget , get_current_state
 var state_stack = []
+
+var _is_update_locked = false
 
 
 func _init(p_parameters={}):
@@ -34,13 +43,25 @@ func _ready():
 	if Engine.editor_hint:
 		return
 
+	_on_process_mode_changed()
 	_push_state(state_machine.get_entry().to)
 
 func _process(delta):
 	if Engine.editor_hint:
 		return
 
-	_update(delta)
+	_update_start()
+	update(delta)
+	_update_end()
+	_transition()
+
+func _physics_process(delta):
+	if Engine.editor_hint:
+		return
+
+	_update_start()
+	update(delta)
+	_update_end()
 	_transition()
 
 func _push_state(to):
@@ -66,18 +87,13 @@ func _on_pop_last_state():
 
 func _enter(from, push):
 	var to = get_current_state()
-#	print("%s enter to %s" % [from, to])
 	if to:
 		emit_signal("state_entered", from, to, push)
 
 func _exit(to, push):
 	var from = get_current_state()
-#	print("%s exit to %s" % [from, to])
 	if from:
 		emit_signal("state_exited", from, to, push)
-
-func _update(delta):
-	emit_signal("state_update", get_current_state(), delta)
 
 func _transition():
 	var next_state = state_machine.states[get_current_state()].transit(parameters)
@@ -86,6 +102,35 @@ func _transition():
 			reset(state_stack.find(next_state))
 		else:
 			_push_state(next_state)
+
+func _update_start():
+	_is_update_locked = false
+
+func _update_end():
+	_is_update_locked = true
+
+# Called after update() which is dependant on process_mode, override to process current state
+func _on_update(delta, state):
+	pass
+
+func _on_process_mode_changed():
+	match process_mode:
+		ProcessMode.PHYSICS:
+			set_physics_process(true)
+			set_process(false)
+		ProcessMode.IDLE:
+			set_physics_process(false)
+			set_process(true)
+		ProcessMode.MANUAL:
+			set_physics_process(false)
+			set_process(false)
+
+func update(delta):
+	if process_mode != ProcessMode.MANUAL:
+		assert(not _is_update_locked, "Attempting to update manually with ProcessMode.%s" % ProcessMode.keys()[process_mode])
+	var current_state = get_current_state()
+	_on_update(current_state, delta)
+	emit_signal("state_update", current_state, delta)
 
 func reset(to=0, event=RESET_EVENT_TRIGGER.LAST_TO_DEST):
 	assert(to > -1)
@@ -121,6 +166,11 @@ func get_current_state():
 
 func get_previous_state():
 	return state_stack[state_stack.size() - 2] if state_stack.size() > 1 else ""
+
+func set_process_mode(mode):
+	if process_mode != mode:
+		process_mode = mode
+		_on_process_mode_changed()
 
 func get_class():
 	return "StateMachinePlayer"
