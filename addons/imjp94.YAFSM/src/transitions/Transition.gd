@@ -12,15 +12,19 @@ func _init(p_from="", p_to="", p_conditions={}):
 	conditions = p_conditions
 
 func transit(params={}):
-	var can_transit = true
+	var can_transit = conditions.size() > 0
 	for condition in conditions.values():
+		if not (condition.name in params):
+			can_transit = false
+			continue
+
 		var value = params.get(condition.name)
-		if value:
+		if value == null: # null value is treated ass trigger
+			can_transit = can_transit and true
+		else:
 			if "value" in condition:
 				can_transit = can_transit and condition.compare(value)
-			else: # Condition without value property is a trigger
-				can_transit = can_transit and true
-	if can_transit:
+	if can_transit or conditions.size() == 0:
 		return to
 	return null
 
