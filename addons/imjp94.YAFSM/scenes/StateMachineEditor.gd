@@ -32,6 +32,7 @@ var selected_nodes = {}
 
 var _request_stack = [] # Stack of request waited to be confirmed, currently only handle CONNECTION/DISCONNECTION
 var _requesting_transition # Transition that is on hold before connection request confirmed
+var _to_free = []
 
 
 func _init():
@@ -40,6 +41,12 @@ func _init():
 	add_valid_connection_type(1, 0)
 	# Only allow disconnection from right slot(0)
 	add_valid_right_disconnect_type(0)
+
+func _exit_tree():
+	for node in _to_free: # Free orphna node in undo/redo
+		if node:
+			node.queue_free()
+	_to_free.clear()
 
 func _ready():
 	connect("connection_request", self, "_on_connection_request")
@@ -246,6 +253,7 @@ func add_node(node):
 func delete_node(node):
 	remove_node_connections(node.name)
 	remove_child(node)
+	_to_free.append(node)
 	focused_state_machine.remove_state(node.name)
 
 func remove_node_connections(node_name):

@@ -39,6 +39,7 @@ func _exit_tree():
 	for node in _to_free: # Free all orphan node in undo/redo
 		if node:
 			node.queue_free()
+	_to_free.clear()
 
 func _on_Header_gui_input(event):
 	if event is InputEventMouseButton:
