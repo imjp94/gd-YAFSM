@@ -6,6 +6,13 @@ const ValueCondition = preload("../../src/conditions/ValueCondition.gd")
 onready var Comparation = $Comparation
 onready var ComparationPopupMenu = $Comparation/PopupMenu
 
+# Dumb method to convert comparation to menu index
+const COMPARATION_TO_MENU = {
+	ValueCondition.Comparation.LESSER: 2,
+	ValueCondition.Comparation.EQUAL: 0,
+	ValueCondition.Comparation.GREATER: 1
+}
+
 
 func _ready():
 	Comparation.connect("pressed", self, "_on_Comparation_pressed")
@@ -15,6 +22,14 @@ func _on_Comparation_pressed():
 	Utils.popup_on_target(ComparationPopupMenu, Comparation)
 
 func _on_ComparationPopupMenu_index_changed(index):
+	change_comparation_action(index)
+
+func _on_condition_changed(new_condition):
+	._on_condition_changed(new_condition)
+	if new_condition:
+		Comparation.text = ComparationPopupMenu.get_item_text(COMPARATION_TO_MENU[new_condition.comparation])
+
+func change_comparation(index):
 	match index:
 		0: # Equal
 			condition.comparation = ValueCondition.Comparation.EQUAL
@@ -26,13 +41,10 @@ func _on_ComparationPopupMenu_index_changed(index):
 			push_error("Unexpected index(%d) from PopupMenu" % index)
 	Comparation.text = ComparationPopupMenu.get_item_text(index)
 
-func _on_condition_changed(new_condition):
-	._on_condition_changed(new_condition)
-	if new_condition:
-		match new_condition.comparation:
-			-1:
-				Comparation.text = ComparationPopupMenu.get_item_text(2)
-			0:
-				Comparation.text = ComparationPopupMenu.get_item_text(0)
-			1:
-				Comparation.text = ComparationPopupMenu.get_item_text(1)
+func change_comparation_action(index):
+	var from = COMPARATION_TO_MENU[condition.comparation]
+	var to = index
+	undo_redo.create_action("Change Condition Comparation")
+	undo_redo.add_do_method(self, "change_comparation", to)
+	undo_redo.add_undo_method(self, "change_comparation", from)
+	undo_redo.commit_action()
