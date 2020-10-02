@@ -1,3 +1,4 @@
+tool
 extends Resource
 
 signal name_changed(old, new)

@@ -1,6 +1,7 @@
+tool
 extends "ValueCondition.gd"
 
-export(bool) var value
+export(bool) var value setget set_value, get_value
 
 
 func set_value(v):

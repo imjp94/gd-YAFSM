@@ -29,6 +29,9 @@ func _on_condition_changed(new_condition):
 	if new_condition:
 		Comparation.text = ComparationPopupMenu.get_item_text(COMPARATION_TO_MENU[new_condition.comparation])
 
+func _on_value_changed(new_value):
+	pass
+
 func change_comparation(index):
 	match index:
 		0: # Equal
@@ -47,4 +50,17 @@ func change_comparation_action(index):
 	undo_redo.create_action("Change Condition Comparation")
 	undo_redo.add_do_method(self, "change_comparation", to)
 	undo_redo.add_undo_method(self, "change_comparation", from)
+	undo_redo.commit_action()
+
+func set_value(v):
+	if condition.value != v:
+		condition.value = v
+		_on_value_changed(v)
+
+func change_value_action(from, to):
+	if from == to:
+		return
+	undo_redo.create_action("Change Condition Value")
+	undo_redo.add_do_method(self, "set_value", to)
+	undo_redo.add_undo_method(self, "set_value", from)
 	undo_redo.commit_action()

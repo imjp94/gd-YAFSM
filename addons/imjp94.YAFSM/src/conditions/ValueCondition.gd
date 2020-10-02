@@ -1,3 +1,4 @@
+tool
 extends "Condition.gd"
 
 signal comparation_changed(new_comparation)
