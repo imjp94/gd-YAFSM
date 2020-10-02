@@ -233,7 +233,7 @@ func draw_graph():
 
 		new_node.state = state
 		new_node.state.name = state_key
-		new_node.offset = state.offset
+		new_node.offset = state.graph_offset
 		add_node(new_node)
 		for transition in state.transitions.values():
 			# Reflecting state node, so call connect_node instead

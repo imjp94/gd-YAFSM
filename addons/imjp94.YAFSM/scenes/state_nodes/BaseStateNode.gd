@@ -22,7 +22,7 @@ func _on_dragged(from, to):
 	drag_action(from, to)
 
 func _on_offset_changed():
-	state.offset = offset
+	state.graph_offset = offset
 
 func _on_state_transition_added(transition):
 	var editor = TransitionEditor.instance()
@@ -53,5 +53,5 @@ func drag_action(from, to):
 func set_state(s):
 	if state != s:
 		state = s
-		offset = state.offset
+		offset = state.graph_offset
 		_on_state_changed(s)
