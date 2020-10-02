@@ -26,6 +26,7 @@ func _on_offset_changed():
 
 func _on_state_transition_added(transition):
 	var editor = TransitionEditor.instance()
+	editor.undo_redo = undo_redo
 	Transitions.add_child(editor)
 	editor.transition = transition
 	editor.name = transition.to
