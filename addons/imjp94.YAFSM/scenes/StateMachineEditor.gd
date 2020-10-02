@@ -198,7 +198,7 @@ func _on_new_node_added(node):
 		if not node.is_connected("name_changed", self, "_on_node_name_changed"): # Potential reconnect when undo/redo
 			node.connect("name_changed", self, "_on_node_name_changed")
 	node.name = node.state.name
-	focused_state_machine.add_state(node.state)
+	node.state.name = node.name
 
 func _on_focused_state_machine_changed(new_state_machine):
 	if new_state_machine:
@@ -283,7 +283,7 @@ func add_node_action(node):
 	undo_redo.commit_action()
 
 func delete_node_action(node):
-	undo_redo.create_action("Add State Node")
+	undo_redo.create_action("Delete State Node")
 	undo_redo.add_do_method(self, "delete_node", node)
 	undo_redo.add_undo_method(self, "add_node", node)
 	undo_redo.commit_action()
