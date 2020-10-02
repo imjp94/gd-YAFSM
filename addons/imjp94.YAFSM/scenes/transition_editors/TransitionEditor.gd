@@ -77,6 +77,7 @@ func _on_transition_changed(new_transition):
 	update_condition_count()
 
 func _on_condition_editor_added(editor):
+	editor.undo_redo = undo_redo
 	if not editor.Remove.is_connected("pressed", self, "_on_ConditionEditorRemove_pressed"):
 		editor.Remove.connect("pressed", self, "_on_ConditionEditorRemove_pressed", [editor])
 	transition.add_condition(editor.condition)

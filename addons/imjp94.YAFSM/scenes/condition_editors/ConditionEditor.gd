@@ -4,6 +4,8 @@ extends HBoxContainer
 onready var Name = $Name
 onready var Remove = $Remove
 
+var undo_redo
+
 var condition setget set_condition
 
 
@@ -16,22 +18,32 @@ func _on_Name_text_entered(new_text):
 	if condition.name == new_text: # Avoid infinite loop
 		return
 
-	change_name(condition.name, new_text)
+	rename_action(new_text)
 
 func _on_Name_focus_exited():
 	if condition.name == Name.text:
 		return
 
-	change_name(condition.name, Name.text)
+	rename_action(Name.text)
 
 func _on_Name_text_changed(new_text):
 	Name.hint_tooltip = new_text
 
 func change_name(from, to):
 	var transition = get_parent().get_parent().get_parent().transition # TODO: Better way to get Transition object
-	if not transition.change_condition_name(from, to):
+	if transition.change_condition_name(from, to):
+		if Name.text != to: # Manually update Name.text, in case called from undo_redo
+			Name.text = to
+	else:
 		Name.text = from
 		push_warning("Change Condition name from (%s) to (%s) failed, name existed" % [from, to])
+
+func rename_action(new_name):
+	var old_name = condition.name
+	undo_redo.create_action("Rename Condition")
+	undo_redo.add_do_method(self, "change_name", old_name, new_name)
+	undo_redo.add_undo_method(self, "change_name", new_name, old_name)
+	undo_redo.commit_action()
 
 func _on_condition_changed(new_condition):
 	if new_condition:
