@@ -23,13 +23,13 @@ func _on_Name_text_entered(new_text):
 	if name == new_text: # Avoid infinite loop
 		return
 
-	change_name(Name.text)
+	rename_action(Name.text)
 
 func _on_Name_focus_exited():
 	if name == Name.text:
 		return
 
-	change_name(Name.text)
+	rename_action(Name.text)
 
 # Change name through Name ui, but always respect the naming system of scene tree
 func change_name(new_name):
@@ -41,3 +41,10 @@ func change_name(new_name):
 
 	name = new_name
 	emit_signal("name_changed", old, name)
+
+func rename_action(new_name):
+	var old_name = name
+	undo_redo.create_action("Rename State Node")
+	undo_redo.add_do_method(self, "change_name", new_name)
+	undo_redo.add_undo_method(self, "change_name", old_name)
+	undo_redo.commit_action()
