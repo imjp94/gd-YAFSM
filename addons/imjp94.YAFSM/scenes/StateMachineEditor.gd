@@ -199,6 +199,7 @@ func _on_new_node_added(node):
 			node.connect("name_changed", self, "_on_node_name_changed")
 	node.name = node.state.name
 	node.state.name = node.name
+	focused_state_machine.add_state(node.state)
 
 func _on_focused_state_machine_changed(new_state_machine):
 	if new_state_machine:
