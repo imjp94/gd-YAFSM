@@ -79,9 +79,9 @@ func _on_connection_request_confirmed():
 	for request in _request_stack:
 		var args = request.args
 		if request.type == GraphRequestType.CONNECTION:
-			connect_action(args.from, args.from_slot, args.to, args.to_slot)
+			connect_action(create_transition(args.from, args.to))
 		elif request.type == GraphRequestType.DISCONNECTION:
-			disconnect_action(args.from, args.from_slot, args.to, args.to_slot)
+			disconnect_action(focused_state_machine.states[args.from].transitions[args.to])
 	_requesting_transition = null
 	_request_stack.clear()
 
@@ -110,25 +110,22 @@ func _on_disconnection_request(from, from_slot, to, to_slot):
 	}))
 
 # Always called after connect_node() to update data of focused_state_machine
-func _on_connect_node(from, from_slot, to, to_slot):
-	var state = focused_state_machine.states.get(from)
+func _on_connect_node(transition):
+	var state = focused_state_machine.states.get(transition.from)
 	if state:
-		if to in state.transitions: # Transition existed, mainly to silent warning from State.add_transition
+		if transition.to in state.transitions: # Transition existed, mainly to silent warning from State.add_transition
 			return
 
-	var new_transition = _requesting_transition if _requesting_transition else Transition.new()
-	new_transition.from = from
-	new_transition.to = to
 	if not state:
-		state = State.new(from)
+		state = State.new(transition.from)
 		focused_state_machine.add_state(state)
-	state.add_transition(new_transition)
+	state.add_transition(transition)
 
 # Always called after disconnect_node() to update data of focused_state_machine
-func _on_disconnect_node(from, from_slot, to, to_slot):
-	var state = focused_state_machine.states.get(from)
+func _on_disconnect_node(transition):
+	var state = focused_state_machine.states.get(transition.from)
 	if state:
-		state.remove_transition(to)
+		state.remove_transition(transition.to)
 
 func _on_delete_nodes_request():
 	for node in selected_nodes.values():
@@ -146,11 +143,17 @@ func _on_node_name_changed(old, new):
 	# Manually handle re-connections after rename
 	for connection in get_connection_list():
 		if connection.from == old:
-			disconnect_state_node(connection.from, connection.from_port, connection.to, connection.to_port)
-			connect_state_node(new, connection.from_port, connection.to, connection.to_port)
+			var transition = focused_state_machine.states[new].transitions[connection.to]
+			transition.from = old # Transition keys from other state to name changed state haven't get updated yet
+			disconnect_state_node(transition)
+			transition.from = new
+			connect_state_node(transition)
 		elif connection.to == old:
-			disconnect_state_node(connection.from, connection.from_port, connection.to, connection.to_port)
-			connect_state_node(connection.from, connection.from_port, new, connection.to_port)
+			var transition = focused_state_machine.states[connection.from].transitions[old]
+			transition.to = old # Transition keys from other state to name changed state haven't get updated yet
+			disconnect_state_node(transition)
+			transition.to = new
+			connect_state_node(transition)
 
 func _on_popup_request(position):
 	ContextMenu.rect_position = get_viewport().get_mouse_position()
@@ -199,13 +202,13 @@ func _on_focused_state_machine_changed(new_state_machine):
 		clear_graph()
 		OverlayContainer.show()
 
-func connect_state_node(from, from_slot, to, to_slot):
-	connect_node(from, from_slot, to, to_slot)
-	_on_connect_node(from, from_slot, to, to_slot)
+func connect_state_node(transition):
+	connect_node(transition.from, 0, transition.to, 0)
+	_on_connect_node(transition)
 
-func disconnect_state_node(from, from_slot, to, to_slot):
-	disconnect_node(from, from_slot, to, to_slot)
-	_on_disconnect_node(from, from_slot, to, to_slot)
+func disconnect_state_node(transition):
+	disconnect_node(transition.from, 0, transition.to, 0)
+	_on_disconnect_node(transition)
 
 func draw_graph():
 	for state_key in focused_state_machine.states.keys():
@@ -248,7 +251,7 @@ func delete_node(node):
 func remove_node_connections(node_name):
 	for connection in get_connection_list():
 		if connection.from == node_name or connection.to == node_name:
-			disconnect_state_node(connection.from, connection.from_port, connection.to, connection.to_port)
+			disconnect_state_node(focused_state_machine.states[connection.from].transitions[connection.to])
 
 func save():
 	if not focused_state_machine:
@@ -258,6 +261,12 @@ func save():
 		return
 	
 	ResourceSaver.save(resource_path, focused_state_machine)
+
+func create_transition(from, to):
+	var new_transition = _requesting_transition if _requesting_transition else Transition.new()
+	new_transition.from = from
+	new_transition.to = to
+	return new_transition
 
 func add_node_action(node):
 	undo_redo.create_action("Add State Node")
@@ -271,16 +280,16 @@ func delete_node_action(node):
 	undo_redo.add_undo_method(self, "add_node", node)
 	undo_redo.commit_action()
 
-func connect_action(from, from_slot, to, to_slot):
+func connect_action(transition):
 	undo_redo.create_action("Connect")
-	undo_redo.add_do_method(self, "connect_state_node", from, from_slot, to, to_slot)
-	undo_redo.add_undo_method(self, "disconnect_state_node", from, from_slot, to, to_slot)
+	undo_redo.add_do_method(self, "connect_state_node", transition)
+	undo_redo.add_undo_method(self, "disconnect_state_node", transition)
 	undo_redo.commit_action()
 
-func disconnect_action(from, from_slot, to, to_slot):
+func disconnect_action(transition):
 	undo_redo.create_action("Disconnect")
-	undo_redo.add_do_method(self, "disconnect_state_node", from, from_slot, to, to_slot)
-	undo_redo.add_undo_method(self, "connect_state_node", from, from_slot, to, to_slot)
+	undo_redo.add_do_method(self, "disconnect_state_node", transition)
+	undo_redo.add_undo_method(self, "connect_state_node", transition)
 	undo_redo.commit_action()
 
 func set_focused_state_machine(state_machine):
