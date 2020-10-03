@@ -15,7 +15,7 @@ export(Dictionary) var transitions
 var graph_offset setget set_graph_offset, get_graph_offset
 
 
-func _init(p_name="", p_transitions={}, p_offset=Vector2.ZERO):
+func _init(p_name="", p_transitions={}):
 	name = p_name
 	transitions = p_transitions
 

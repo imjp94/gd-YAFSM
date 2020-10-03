@@ -5,8 +5,8 @@ const State = preload("State.gd")
 export(Dictionary) var states
 
 
-func _init(p_name="", p_offset=Vector2.ZERO, p_states={}):
-	._init(p_name, p_offset)
+func _init(p_name="", p_transitions={}, p_states={}):
+	._init(p_name, p_transitions)
 	states = p_states
 
 func add_state(state):
