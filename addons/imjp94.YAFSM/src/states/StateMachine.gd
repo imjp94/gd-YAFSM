@@ -40,6 +40,9 @@ func change_state_name(from, to):
 			else:
 				if transition.to == from:
 					transition.to = to
+					# Transitions to name changed state needs to be updated
+					state.transitions.erase(from)
+					state.transitions[to] = transition
 	return true
 
 func get_entry():
