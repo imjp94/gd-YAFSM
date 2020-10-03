@@ -24,25 +24,55 @@ func _on_dragged(from, to):
 func _on_offset_changed():
 	state.graph_offset = offset
 
-func _on_state_transition_added(transition):
+func connect_node(from, from_slot, to, to_slot):
+	get_parent().connect_node(from, from_slot, to, to_slot)
 	var editor = TransitionEditor.instance()
+	var transition = get_parent().create_transition(from, to)
+	add_transition_editor(editor, transition)
+
+func disconnect_node(from, from_slot, to, to_slot):
+	get_parent().disconnect_node(from, from_slot, to, to_slot)
+	var editor = Transitions.get_node(to)
+	remove_transition_editor(editor)
+
+func connect_action(from, from_slot, to, to_slot):
+	get_parent().connect_node(from, from_slot, to, to_slot)
+	var editor = TransitionEditor.instance()
+	var transition = get_parent().create_transition(from, to)
+	add_transition_editor_action(editor, transition)
+
+func disconnect_action(from, from_slot, to, to_slot):
+	get_parent().disconnect_node(from, from_slot, to, to_slot)
+	var editor = Transitions.get_node(to)
+	remove_transition_editor_action(editor)
+
+func add_transition_editor(editor, transition):
+	get_parent().connect_node(transition.from, 0, transition.to, 0)
 	editor.undo_redo = undo_redo
 	Transitions.add_child(editor)
 	editor.transition = transition
 	editor.name = transition.to
+	if not (transition.to in state.transitions): # Transition may be added when loaded from file
+		state.add_transition(transition)
 
-func _on_state_transition_removed(to_state):
-	for child in Transitions.get_children():
-		if child.name == to_state:
-			Transitions.remove_child(child)
-			child.queue_free()
-			rect_size = Vector2.ZERO # Reset rect size
-			break
+func remove_transition_editor(editor):
+	var transition = editor.transition
+	get_parent().disconnect_node(transition.from, 0, transition.to, 0)
+	Transitions.remove_child(editor)
+	rect_size = Vector2.ZERO
+	state.remove_transition(editor.transition.to)
 
-func _on_state_changed(new_state):
-	if new_state:
-		new_state.connect("transition_added", self, "_on_state_transition_added")
-		new_state.connect("transition_removed", self, "_on_state_transition_removed")
+func add_transition_editor_action(editor, transition):
+	undo_redo.create_action("Connect")
+	undo_redo.add_do_method(self, "add_transition_editor", editor, transition)
+	undo_redo.add_undo_method(self, "remove_transition_editor", editor)
+	undo_redo.commit_action()
+
+func remove_transition_editor_action(editor):
+	undo_redo.create_action("Disconnect")
+	undo_redo.add_do_method(self, "remove_transition_editor", editor)
+	undo_redo.add_undo_method(self, "add_transition_editor", editor, editor.transition)
+	undo_redo.commit_action()
 
 func drag_action(from, to):
 	undo_redo.create_action("Drag State Node")
@@ -54,4 +84,4 @@ func set_state(s):
 	if state != s:
 		state = s
 		offset = state.graph_offset
-		_on_state_changed(s)
+
