@@ -145,18 +145,6 @@ func _on_node_selected(node):
 func _on_node_unselected(node):
 	selected_nodes.erase(node.name)
 
-func _on_node_name_changed(old, new):
-	focused_state_machine.change_state_name(old, new)
-	var node = get_node(new)
-	# Manually handle re-connections after rename
-	for connection in get_connection_list():
-		if connection.from == old:
-			node.disconnect_node(old, 0, connection.to, 0)
-			node.connect_node(new, 0, connection.to, 0)
-		elif connection.to == old:
-			node.disconnect_node(connection.from, 0, old, 0)
-			node.connect_node(connection.from, 0, new, 0)
-
 func _on_popup_request(position):
 	ContextMenu.set_item_disabled(CONTEXT_MENU_ADD_ENTRY_INDEX, focused_state_machine.has_entry())
 	ContextMenu.set_item_disabled(CONTEXT_MENU_ADD_EXIT_INDEX, focused_state_machine.has_exit())
@@ -191,9 +179,6 @@ func _on_Confirmation_confirmed():
 
 func _on_new_node_added(node):
 	node.undo_redo = undo_redo
-	if node.has_signal("name_changed"): # BaseStateNode doesn't have name_changed signal
-		if not node.is_connected("name_changed", self, "_on_node_name_changed"): # Potential reconnect when undo/redo
-			node.connect("name_changed", self, "_on_node_name_changed")
 	node.name = node.state.name
 	node.state.name = node.name
 	focused_state_machine.add_state(node.state)
