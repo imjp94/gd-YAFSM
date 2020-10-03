@@ -6,6 +6,7 @@ const StateMachine = preload("../src/states/StateMachine.gd")
 const StateNode = preload("state_nodes/StateNode.tscn")
 const EntryStateNode = preload("state_nodes/EntryStateNode.tscn")
 const ExitStateNode = preload("state_nodes/ExitStateNode.tscn")
+const TransitionEditor = preload("transition_editors/TransitionEditor.tscn")
 
 const CONTEXT_MENU_ADD_ENTRY_INDEX = 1
 const CONTEXT_MENU_ADD_EXIT_INDEX = 2
@@ -224,8 +225,8 @@ func draw_graph():
 		new_node.offset = state.graph_offset
 		add_node(new_node)
 		for transition in state.transitions.values():
-			# Reflecting state node, so call connect_node instead
-			new_node.connect_node(transition.from, 0, transition.to, 0)
+			# Reflecting state node, so only required to add new transition editor
+			new_node.add_transition_editor(TransitionEditor.instance(), transition)
 
 func clear_graph():
 	clear_connections()
