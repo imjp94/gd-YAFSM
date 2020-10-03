@@ -46,10 +46,8 @@ func _init():
 	add_valid_right_disconnect_type(0)
 
 func _exit_tree():
-	for node in _to_free: # Free orphna node in undo/redo
-		if node:
-			node.queue_free()
-	_to_free.clear()
+	undo_redo.clear_history()
+	free_node_from_undo_redo()
 
 func _ready():
 	connect("visibility_changed", self, "_on_visibility_changed")
@@ -218,7 +216,7 @@ func clear_graph():
 	for child in get_children():
 		if child is GraphNode:
 			remove_child(child)
-			child.queue_free()
+			_to_free.append(child)
 
 func add_node(node):
 	add_child(node)
@@ -275,6 +273,15 @@ func set_focused_state_machine(state_machine):
 	if focused_state_machine != state_machine:
 		focused_state_machine = state_machine
 		_on_focused_state_machine_changed(state_machine)
+
+# Free nodes cached in UndoRedo stack
+func free_node_from_undo_redo():
+	for node in _to_free:
+		if is_instance_valid(node):
+			if node.has_method("free_node_from_undo_redo"):
+				node.free_node_from_undo_redo()
+			node.queue_free()
+	_to_free.clear()
 
 # Data holder for request emitted by GraphEdit
 class GraphRequest:

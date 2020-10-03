@@ -10,8 +10,11 @@ var undo_redo
 
 var state setget set_state
 
+var _to_free
+
 
 func _init():
+	_to_free = []
 	set_state(State.new())
 
 func _ready():
@@ -59,6 +62,7 @@ func remove_transition_editor(editor):
 	var transition = editor.transition
 	get_parent().disconnect_node(transition.from, 0, transition.to, 0)
 	Transitions.remove_child(editor)
+	_to_free.append(editor)
 	rect_size = Vector2.ZERO
 	state.remove_transition(editor.transition.to)
 
@@ -79,6 +83,11 @@ func drag_action(from, to):
 	undo_redo.add_do_property(self, "offset", to)
 	undo_redo.add_undo_property(self, "offset", from)
 	undo_redo.commit_action()
+
+# Free nodes cached in UndoRedo stack
+func free_node_from_undo_redo():
+	for transition_editor in _to_free:
+		transition_editor.free_node_from_undo_redo()
 
 func set_state(s):
 	if state != s:

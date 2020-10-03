@@ -35,12 +35,6 @@ func _ready():
 	Add.connect("pressed", self, "_on_Add_pressed")
 	AddPopupMenu.connect("index_pressed", self, "_on_AddPopupMenu_index_pressed")
 
-func _exit_tree():
-	for node in _to_free: # Free all orphan node in undo/redo
-		if node:
-			node.queue_free()
-	_to_free.clear()
-
 func _on_Header_gui_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed:
@@ -145,3 +139,10 @@ func set_transition(t):
 	if transition != t:
 		transition = t
 		_on_transition_changed(t)
+
+# Free nodes cached in UndoRedo stack
+func free_node_from_undo_redo():
+	for node in _to_free:
+		if is_instance_valid(node):
+			node.queue_free()
+	_to_free.clear()
