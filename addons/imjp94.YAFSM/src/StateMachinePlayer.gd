@@ -75,18 +75,11 @@ func _push_state(to):
 	emit_signal("state_changed", from, to)
 
 func _pop_state():
-	if _state_stack.size() == 1:
-		_on_pop_last_state()
-		return
-
 	var to = get_previous_state()
 	_exit(to)
 	var from = _state_stack.pop_back()
 	_enter(from)
 	emit_signal("state_changed", from, to)
-
-func _on_pop_last_state():
-	pass
 
 func _enter(from):
 	var to = get_current_state()
