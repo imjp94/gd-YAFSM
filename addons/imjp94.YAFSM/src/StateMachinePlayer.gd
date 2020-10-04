@@ -49,7 +49,6 @@ func _ready():
 		return
 
 	_on_process_mode_changed()
-	_push_state(state_machine.get_entry().to)
 	_transition()
 
 func _process(delta):
