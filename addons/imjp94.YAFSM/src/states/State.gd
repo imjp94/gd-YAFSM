@@ -10,7 +10,7 @@ signal transition_added(transition)
 signal transition_removed(to_state)
 
 export(String) var name = ""
-export(Dictionary) var transitions
+export(Dictionary) var transitions setget ,get_transitions
 
 var graph_offset setget set_graph_offset, get_graph_offset
 
@@ -56,3 +56,6 @@ func set_graph_offset(offset):
 
 func get_graph_offset():
 	return get_meta(META_GRAPH_OFFSET) if has_meta(META_GRAPH_OFFSET) else Vector2.ZERO
+
+func get_transitions():
+	return transitions.duplicate()

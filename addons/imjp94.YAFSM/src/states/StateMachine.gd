@@ -2,7 +2,7 @@ tool
 extends "State.gd"
 const State = preload("State.gd")
 
-export(Dictionary) var states
+export(Dictionary) var states setget ,get_states
 
 
 func _init(p_name="", p_transitions={}, p_states={}):
@@ -59,3 +59,6 @@ func has_entry():
 
 func has_exit():
 	return State.EXIT_KEY in states
+
+func get_states():
+	return states.duplicate()

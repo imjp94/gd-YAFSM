@@ -3,7 +3,7 @@ extends Resource
 
 export(String) var from
 export(String) var to
-export(Dictionary) var conditions
+export(Dictionary) var conditions setget ,get_conditions
 
 
 func _init(p_from="", p_to="", p_conditions={}):
@@ -62,3 +62,6 @@ func equals(obj):
 		return false
 
 	return from == obj.from and to == obj.to
+
+func get_conditions():
+	return conditions.duplicate()
