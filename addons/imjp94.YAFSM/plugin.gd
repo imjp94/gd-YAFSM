@@ -2,7 +2,7 @@ tool
 extends EditorPlugin
 const StateMachinePlayer = preload("src/StateMachinePlayer.gd")
 const StateMachine = preload("src/states/StateMachine.gd")
-
+const State = preload("src/states/State.gd")
 const StateMachineEditor = preload("scenes/StateMachineEditor.tscn")
 
 var state_machine_editor
@@ -75,6 +75,7 @@ func _on_StateMachineEditor_ready():
 func _on_CreateStateMachine_pressed():
 	if focused_object is StateMachinePlayer:
 		var new_state_machine = StateMachine.new()
+		new_state_machine.add_state(State.new(State.ENTRY_KEY))
 		focused_object.state_machine = new_state_machine
 		state_machine_editor.focused_state_machine = new_state_machine
 		get_editor_interface().get_inspector().refresh()
