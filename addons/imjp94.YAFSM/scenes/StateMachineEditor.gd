@@ -7,6 +7,8 @@ const StateNode = preload("state_nodes/StateNode.tscn")
 const EntryStateNode = preload("state_nodes/EntryStateNode.tscn")
 const ExitStateNode = preload("state_nodes/ExitStateNode.tscn")
 
+const CONTEXT_MENU_ADD_ENTRY_INDEX = 1
+const CONTEXT_MENU_ADD_EXIT_INDEX = 2
 const DEFAULT_NODE_NAME = "State"
 const DEFAULT_NODE_OFFSET = Vector2.ZERO
 
@@ -170,6 +172,8 @@ func _on_node_name_changed(old, new):
 			connect_state_node(transition)
 
 func _on_popup_request(position):
+	ContextMenu.set_item_disabled(CONTEXT_MENU_ADD_ENTRY_INDEX, focused_state_machine.has_entry())
+	ContextMenu.set_item_disabled(CONTEXT_MENU_ADD_EXIT_INDEX, focused_state_machine.has_exit())
 	ContextMenu.rect_position = get_viewport().get_mouse_position()
 	ContextMenu.popup()
 
