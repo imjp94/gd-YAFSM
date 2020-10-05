@@ -51,6 +51,7 @@ func _exit_tree():
 	_to_free.clear()
 
 func _ready():
+	connect("visibility_changed", self, "_on_visibility_changed")
 	connect("connection_request", self, "_on_connection_request")
 	connect("disconnection_request", self, "_on_disconnection_request")
 	connect("popup_request", self, "_on_popup_request")
@@ -74,6 +75,13 @@ func _unhandled_input(event):
 		if event.control:
 			if event.scancode == KEY_S and event.pressed:
 				_on_save_request()
+
+func _on_visibility_changed():
+	if visible:
+		if focused_state_machine:
+			OverlayContainer.hide()
+		else:
+			OverlayContainer.show()
 
 func _on_save_request():
 	var resource_path = focused_state_machine.resource_path
