@@ -23,6 +23,7 @@ enum ResetEventTrigger {
 }
 
 export(Resource) var state_machine
+export(bool) var active setget set_active
 export(ProcessMode) var process_mode = ProcessMode.IDLE setget set_process_mode
 
 var current_state setget ,get_current_state
@@ -49,6 +50,7 @@ func _ready():
 	if Engine.editor_hint:
 		return
 
+	_on_active_changed()
 	_on_process_mode_changed()
 	_transition()
 
@@ -98,6 +100,9 @@ func _exit(to):
 
 # Only get called in 2 condition, _parameters edited or last transition was successful
 func _transition():
+	if not active:
+		return
+
 	var next_state = state_machine.states[get_current_state()].transit(_parameters)
 	if next_state:
 		if state_stack.has(next_state):
@@ -118,6 +123,9 @@ func _on_update(delta, state):
 	pass
 
 func _on_process_mode_changed():
+	if not active:
+		return
+
 	match process_mode:
 		ProcessMode.PHYSICS:
 			set_physics_process(true)
@@ -129,7 +137,23 @@ func _on_process_mode_changed():
 			set_physics_process(false)
 			set_process(false)
 
+func _on_active_changed():
+	if Engine.editor_hint:
+		return
+
+	print("active changed")
+	if active:
+		_flush_trigger()
+		_on_process_mode_changed()
+		_transition()
+	else:
+		set_physics_process(false)
+		set_process(false)
+
 func update(delta):
+	if not active:
+		return
+
 	if _was_transited: # Attempt to transit if last transition was successful
 		_transition()
 	if process_mode != ProcessMode.MANUAL:
@@ -208,6 +232,11 @@ func get_current_state():
 
 func get_previous_state():
 	return state_stack[state_stack.size() - 2] if state_stack.size() > 1 else State.ENTRY_KEY
+
+func set_active(v):
+	if active != v:
+		active = v
+		_on_active_changed()
 
 func set_process_mode(mode):
 	if process_mode != mode:
