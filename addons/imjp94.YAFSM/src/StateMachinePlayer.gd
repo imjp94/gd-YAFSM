@@ -26,6 +26,7 @@ var _was_transited = false # If last transition was successful
 func _init():
 	._init()
 	_parameters = {}
+	push(State.ENTRY_KEY)
 
 func _get_configuration_warning():
 	if state_machine:
@@ -68,16 +69,14 @@ func _on_pop(from, to):
 	_transit_in(to)
 
 func _transit_in(to):
-	if to:
-		emit_signal("transit_in", to)
-		if to == State.EXIT_KEY:
-			emit_signal("exit", state_machine)
+	emit_signal("transit_in", to)
+	if to == State.EXIT_KEY:
+		emit_signal("exit", state_machine)
 
 func _transit_out(from):
-	if from:
-		emit_signal("transit_out", from)
-		if from == State.ENTRY_KEY:
-			emit_signal("entry", state_machine)
+	emit_signal("transit_out", from)
+	if from == State.ENTRY_KEY:
+		emit_signal("entry", state_machine)
 
 # Only get called in 2 condition, _parameters edited or last transition was successful
 func _transition():
@@ -139,6 +138,10 @@ func _flush_trigger():
 func _on_param_edited():
 	_transition()
 
+func reset(to=0, event=ResetEventTrigger.LAST_TO_DEST):
+	assert(to > 0, "StateMachinePlayer's stack must not be emptied")
+	.reset(to, event)
+
 func update(delta):
 	if not active:
 		return
@@ -183,9 +186,3 @@ func set_process_mode(mode):
 	if process_mode != mode:
 		process_mode = mode
 		_on_process_mode_changed()
-
-func get_current():
-	return stack.back() if not stack.empty() else State.ENTRY_KEY
-
-func get_previous():
-	return stack[stack.size() - 2] if stack.size() > 1 else State.ENTRY_KEY
