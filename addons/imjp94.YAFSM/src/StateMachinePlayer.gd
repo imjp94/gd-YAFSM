@@ -21,10 +21,13 @@ export(ProcessMode) var process_mode = ProcessMode.IDLE setget set_process_mode
 var _parameters
 var _is_update_locked = false
 var _was_transited = false # If last transition was successful
+var _is_param_edited = false
 
 
 func _init():
-	._init()
+	if Engine.editor_hint:
+		return
+
 	_parameters = {}
 	push(State.ENTRY_KEY)
 
@@ -82,6 +85,9 @@ func _transit_out(from):
 func _transition():
 	if not active:
 		return
+	# Attempt to transit if parameter edited or last transition was successful
+	if not _is_param_edited and not _was_transited:
+		return
 
 	var next_state = state_machine.states[get_current()].transit(_parameters)
 	if next_state:
@@ -90,6 +96,7 @@ func _transition():
 		else:
 			push(next_state)
 	_was_transited = !!next_state
+	_is_param_edited = false
 	_flush_trigger()
 
 func _update_start():
@@ -135,9 +142,6 @@ func _flush_trigger():
 		if value == null: # Param with null as value is treated as trigger
 			_parameters.erase(param_key)
 
-func _on_param_edited():
-	_transition()
-
 func reset(to=0, event=ResetEventTrigger.LAST_TO_DEST):
 	assert(to > 0, "StateMachinePlayer's stack must not be emptied")
 	.reset(to, event)
@@ -146,8 +150,7 @@ func update(delta):
 	if not active:
 		return
 
-	if _was_transited: # Attempt to transit if last transition was successful
-		_transition()
+	_transition()
 	if process_mode != ProcessMode.MANUAL:
 		assert(not _is_update_locked, "Attempting to update manually with ProcessMode.%s" % ProcessMode.keys()[process_mode])
 	var current_state = get_current()
@@ -156,20 +159,20 @@ func update(delta):
 
 func set_trigger(name):
 	_parameters[name] = null
-	_on_param_edited()
+	_is_param_edited = true
 
 func set_param(name, value):
 	_parameters[name] = value
-	_on_param_edited()
+	_is_param_edited = true
 
 func erase_param(name):
 	var result = _parameters.erase(name)
-	_on_param_edited()
+	_is_param_edited = true
 	return result
 
 func clear_param():
 	_parameters.clear()
-	_on_param_edited()
+	_is_param_edited = true
 
 func get_param(name):
 	return _parameters[name]
