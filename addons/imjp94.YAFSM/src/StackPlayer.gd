@@ -1,6 +1,8 @@
 extends Node
 
 signal changed(from, to)
+signal push(to)
+signal pop(from)
 
 # Enum to specify how reseting state stack should trigger event(changed, push, pop etc.)
 enum ResetEventTrigger {
@@ -21,12 +23,14 @@ func push(to):
 	stack.push_back(to)
 	_on_push(from, to)
 	emit_signal("changed", from, to)
+	emit_signal("push", to)
 
 func pop():
 	var to = get_previous()
 	var from = stack.pop_back()
 	_on_pop(from, to)
 	emit_signal("changed", from, to)
+	emit_signal("pop", from)
 
 func _on_push(from, to):
 	pass
@@ -34,7 +38,7 @@ func _on_push(from, to):
 func _on_pop(from, to):
 	pass
 
-func reset(to=0, event=ResetEventTrigger.LAST_TO_DEST):
+func reset(to=0, event=ResetEventTrigger.ALL):
 	assert(to > -1 and to < stack.size(), "Reset to index(%d) out of bounds(%d)" % [to, stack.size()])
 	var last_index = stack.size() - 1
 	var first_state = ""
