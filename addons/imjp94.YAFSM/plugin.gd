@@ -1,5 +1,6 @@
 tool
 extends EditorPlugin
+const StackPlayer = preload("src/StackPlayer.gd")
 const StateMachinePlayer = preload("src/StateMachinePlayer.gd")
 const StateMachine = preload("src/states/StateMachine.gd")
 const State = preload("src/states/State.gd")
@@ -17,6 +18,7 @@ func _enter_tree():
 	var editor_base_control = get_editor_interface().get_base_control()
 	var node_icon = editor_base_control.get_icon("Node", "EditorIcons")
 	var resource_icon = editor_base_control.get_icon("ResourcePreloader", "EditorIcons")
+	add_custom_type("StackPlayer", "Node", StackPlayer, node_icon)
 	add_custom_type("StateMachinePlayer", "Node", StateMachinePlayer, node_icon)
 	add_custom_type("StateMachine", "Resource", StateMachine, resource_icon)
 
