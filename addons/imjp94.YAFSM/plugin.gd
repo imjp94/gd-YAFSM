@@ -2,6 +2,7 @@ tool
 extends EditorPlugin
 const StackPlayer = preload("src/StackPlayer.gd")
 const StateMachinePlayer = preload("src/StateMachinePlayer.gd")
+const StackPlayerDebugger = preload("src/debugger/StackPlayerDebugger.gd")
 const StateMachine = preload("src/states/StateMachine.gd")
 const State = preload("src/states/State.gd")
 const StateMachineEditor = preload("scenes/StateMachineEditor.tscn")
@@ -17,9 +18,11 @@ func _enter_tree():
 	editor_selection.connect("selection_changed", self, "_on_EditorSelection_selection_changed")
 	var editor_base_control = get_editor_interface().get_base_control()
 	var node_icon = editor_base_control.get_icon("Node", "EditorIcons")
+	var control_icon = editor_base_control.get_icon("Control", "EditorIcons")
 	var resource_icon = editor_base_control.get_icon("ResourcePreloader", "EditorIcons")
 	add_custom_type("StackPlayer", "Node", StackPlayer, node_icon)
 	add_custom_type("StateMachinePlayer", "Node", StateMachinePlayer, node_icon)
+	add_custom_type("StackPlayerDebugger", "Control", StackPlayerDebugger, control_icon)
 	add_custom_type("StateMachine", "Resource", StateMachine, resource_icon)
 
 	state_machine_editor = StateMachineEditor.instance()

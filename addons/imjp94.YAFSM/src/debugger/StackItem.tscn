@@ -1,0 +1,17 @@
+[gd_scene format=2]
+
+[node name="StackItem" type="PanelContainer"]
+margin_right = 14.0
+margin_bottom = 14.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 38.0
+margin_bottom = 21.0
+text = "Item"
+align = 1
+valign = 1
