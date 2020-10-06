@@ -1,10 +1,11 @@
 tool
 extends EditorPlugin
-const StackPlayer = preload("src/StackPlayer.gd")
-const StateMachinePlayer = preload("src/StateMachinePlayer.gd")
-const StackPlayerDebugger = preload("src/debugger/StackPlayerDebugger.gd")
-const StateMachine = preload("src/states/StateMachine.gd")
-const State = preload("src/states/State.gd")
+const YAFSM = preload("YAFSM.gd")
+const StackPlayer = YAFSM.StackPlayer
+const StateMachinePlayer = YAFSM.StateMachinePlayer
+const StackPlayerDebugger = YAFSM.StackPlayerDebugger
+const StateMachine = YAFSM.StateMachine
+const State = YAFSM.State
 const StateMachineEditor = preload("scenes/StateMachineEditor.tscn")
 
 var state_machine_editor
