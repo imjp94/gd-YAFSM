@@ -30,6 +30,7 @@ func _init():
 
 	_parameters = {}
 	push(State.ENTRY_KEY)
+	_was_transited = true # Trigger _transition on _ready
 
 func _get_configuration_warning():
 	if state_machine:
