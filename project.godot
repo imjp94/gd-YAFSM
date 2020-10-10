@@ -20,7 +20,7 @@ config/icon="res://icon.png"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "imjp94.YAFSM" )
+enabled=PoolStringArray( "editor_icon_previewer", "imjp94.yafsm" )
 
 [rendering]
 

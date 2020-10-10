@@ -1,7 +1,9 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://addons/imjp94.YAFSM/scenes/state_nodes/StateNode.gd" type="Script" id=1]
-[ext_resource path="res://addons/imjp94.YAFSM/scenes/state_nodes/BaseStateNode.tscn" type="PackedScene" id=2]
+[ext_resource path="res://addons/imjp94.yafsm/scenes/state_nodes/StateNode.gd" type="Script" id=1]
+[ext_resource path="res://addons/imjp94.yafsm/scenes/state_nodes/BaseStateNode.tscn" type="PackedScene" id=2]
+
+
 
 
 

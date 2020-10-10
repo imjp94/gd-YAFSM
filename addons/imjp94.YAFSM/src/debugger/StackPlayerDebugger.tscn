@@ -1,6 +1,8 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://addons/imjp94.YAFSM/src/debugger/StackPlayerDebugger.gd" type="Script" id=1]
+[ext_resource path="res://addons/imjp94.yafsm/src/debugger/StackPlayerDebugger.gd" type="Script" id=1]
+
+
 
 [node name="StackPlayerDebugger" type="Control"]
 modulate = Color( 1, 1, 1, 0.498039 )

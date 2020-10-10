@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/close-white-18dp.svg-c4db0dab878b27554f233cc6ca1bf928.stex"
+path="res://.import/close-white-18dp.svg-3d0e2341eb99a6dc45a6aecef969301b.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/imjp94.YAFSM/assets/icons/close-white-18dp.svg"
-dest_files=[ "res://.import/close-white-18dp.svg-c4db0dab878b27554f233cc6ca1bf928.stex" ]
+source_file="res://addons/imjp94.yafsm/assets/icons/close-white-18dp.svg"
+dest_files=[ "res://.import/close-white-18dp.svg-3d0e2341eb99a6dc45a6aecef969301b.stex" ]
 
 [params]
 
