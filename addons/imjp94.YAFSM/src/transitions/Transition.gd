@@ -35,6 +35,7 @@ func add_condition(condition):
 		return false
 
 	conditions[condition.name] = condition
+	return true
 
 # Remove condition by name of condition
 func remove_condition(name):
