@@ -84,7 +84,7 @@ func _on_visibility_changed():
 
 func _on_save_request():
 	var resource_path = focused_state_machine.resource_path
-	if resource_path.empty(): # Built-in resource will be saved by scene
+	if ".scn" in resource_path or ".tscn" in resource_path: # Built-in resource will be saved by scene
 		return
 
 	Confirmation.dialog_text = "Saving StateMachine to %s" % resource_path
@@ -238,7 +238,7 @@ func save():
 	if not focused_state_machine:
 		return
 	var resource_path = focused_state_machine.resource_path
-	if resource_path.empty(): # Built-in resource will be saved by scene
+	if ".scn" in resource_path or ".tscn" in resource_path: # Built-in resource will be saved by scene
 		return
 	
 	ResourceSaver.save(resource_path, focused_state_machine)
