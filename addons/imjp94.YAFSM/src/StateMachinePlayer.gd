@@ -15,7 +15,7 @@ enum ProcessMode {
 }
 
 export(Resource) var state_machine
-export(bool) var active setget set_active
+export(bool) var active = true setget set_active
 export(ProcessMode) var process_mode = ProcessMode.IDLE setget set_process_mode
 
 var _parameters
