@@ -1,9 +1,9 @@
 tool
 extends Resource
 
-export(String) var from
-export(String) var to
-export(Dictionary) var conditions setget ,get_conditions
+export(String) var from # Name of state transiting from
+export(String) var to # Name of state transiting to
+export(Dictionary) var conditions setget ,get_conditions # Conditions to transit successfuly, keyed by Condition.name
 
 
 func _init(p_from="", p_to="", p_conditions={}):
@@ -11,6 +11,7 @@ func _init(p_from="", p_to="", p_conditions={}):
 	to = p_to
 	conditions = p_conditions
 
+# Attempt to transit with parameters given, return name of next state if succeeded else null
 func transit(params={}):
 	var can_transit = conditions.size() > 0
 	for condition in conditions.values():
@@ -28,15 +29,18 @@ func transit(params={}):
 		return to
 	return null
 
+# Add condition, return true if succeeded
 func add_condition(condition):
 	if condition.name in conditions:
 		return false
 
 	conditions[condition.name] = condition
 
+# Remove condition by name of condition
 func remove_condition(name):
 	return conditions.erase(name)
 
+# Change condition name, return true if succeeded
 func change_condition_name(from, to):
 	if not (from in conditions) or to in conditions:
 		return false
@@ -63,5 +67,6 @@ func equals(obj):
 
 	return from == obj.from and to == obj.to
 
+# Get duplicate of conditions dictionary
 func get_conditions():
 	return conditions.duplicate()
