@@ -1,9 +1,10 @@
 tool
 extends "Condition.gd"
 
-signal comparation_changed(new_comparation)
-signal value_changed(new_value)
+signal comparation_changed(new_comparation) # Comparation hanged
+signal value_changed(new_value) # Value changed
 
+# Enum to define how to compare value
 enum Comparation {
 	LESSER = -1,
 	EQUAL = 0,
@@ -21,6 +22,7 @@ func set_comparation(c):
 		comparation = c
 		emit_signal("comparation_changed", c)
 
+# To be overrided by child class and emit value_changed signal
 func set_value(v):
 	pass
 
@@ -28,6 +30,7 @@ func set_value(v):
 func get_value():
 	pass
 
+# Compare value against this condition, return true if succeeded
 func compare(v):
 	if v == null:
 		return false
