@@ -2,23 +2,24 @@ tool
 extends "StackPlayer.gd"
 const State = preload("states/State.gd")
 
-signal transit_in(to)
-signal transit_out(from)
-signal entry(state_machine)
-signal exit(state_machine)
-signal update(state, delta)
+signal transit_in(to) # Transit to state
+signal transit_out(from) # Transit from state
+signal entry(state_machine) # Entry of state machine
+signal exit(state_machine) # Exit of state machine
+signal update(state, delta) # Update of state machine, only emitted if process_mode is PHYSICS/IDLE
 
+# Enum to define how state machine should be updated
 enum ProcessMode {
 	PHYSICS,
 	IDLE,
 	MANUAL
 }
 
-export(Resource) var state_machine
-export(bool) var active = true setget set_active
-export(ProcessMode) var process_mode = ProcessMode.IDLE setget set_process_mode
+export(Resource) var state_machine # StateMachine being played 
+export(bool) var active = true setget set_activea # Activeness of player
+export(ProcessMode) var process_mode = ProcessMode.IDLE setget set_process_mode # ProcessMode of player
 
-var _parameters
+var _parameters # Parameters to be passed to condition
 var _is_update_locked = false
 var _was_transited = false # If last transition was successful
 var _is_param_edited = false
@@ -137,6 +138,7 @@ func _on_active_changed():
 		set_physics_process(false)
 		set_process(false)
 
+# Remove all trigger(param with null value) in _parameters, only get called after _transition
 func _flush_trigger():
 	for param_key in _parameters.keys():
 		var value = _parameters[param_key]
@@ -158,26 +160,32 @@ func update(delta):
 	_on_update(current_state, delta)
 	emit_signal("update", current_state, delta)
 
+# Set trigger to be tested with condition, then trigger _transition on next update
 func set_trigger(name):
 	_parameters[name] = null
 	_is_param_edited = true
 
+# Set param(null value treated as trigger) to be tested with condition, then trigger _transition on next update
 func set_param(name, value):
 	_parameters[name] = value
 	_is_param_edited = true
 
+# Remove param, then trigger _transition on next update
 func erase_param(name):
 	var result = _parameters.erase(name)
 	_is_param_edited = true
 	return result
 
+# Clear all param , then trigger _transition on next update
 func clear_param():
 	_parameters.clear()
 	_is_param_edited = true
 
+# Get value of param
 func get_param(name):
 	return _parameters[name]
 
+# Get duplicate of whole parameter dictionary
 func get_params():
 	return _parameters.duplicate()
 

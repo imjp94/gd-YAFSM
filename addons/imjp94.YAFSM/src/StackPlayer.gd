@@ -1,8 +1,8 @@
 extends Node
 
-signal changed(from, to)
-signal push(to)
-signal pop(from)
+signal changed(from, to) # When stack pushed/popped
+signal push(to) # When item pushed to stack
+signal pop(from) # When item popped from stack
 
 # Enum to specify how reseting state stack should trigger event(changed, push, pop etc.)
 enum ResetEventTrigger {
@@ -11,13 +11,14 @@ enum ResetEventTrigger {
 	LAST_TO_DEST = 1 # Only last state and destination will emit event
 }
 
-var current setget ,get_current
+var current setget ,get_current # Current item on top of stack
 var stack setget set_stack, get_stack
 
 
 func _init():
 	stack = []
 
+# Push an item to the top of stack
 func push(to):
 	var from = get_current()
 	stack.push_back(to)
@@ -25,6 +26,7 @@ func push(to):
 	emit_signal("changed", from, to)
 	emit_signal("push", to)
 
+# Remove the current item on top of stack
 func pop():
 	var to = get_previous()
 	var from = stack.pop_back()
@@ -32,12 +34,15 @@ func pop():
 	emit_signal("changed", from, to)
 	emit_signal("pop", from)
 
+# Called when item pushed
 func _on_push(from, to):
 	pass
 
+# Called when item popped
 func _on_pop(from, to):
 	pass
 
+# Popping multiple items in stack, use ResetEventTrigger to define how _on_pop should be called
 func reset(to=0, event=ResetEventTrigger.ALL):
 	assert(to > -1 and to < stack.size(), "Reset to index(%d) out of bounds(%d)" % [to, stack.size()])
 	var last_index = stack.size() - 1
@@ -68,6 +73,7 @@ func set_stack(stack):
 	push_warning("Attempting to edit read-only state stack directly. " \
 		+ "Control state machine from setting parameters or call update() instead")
 
+# Get duplicate of the stack being played
 func get_stack():
 	return stack.duplicate()
 
