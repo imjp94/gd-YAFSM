@@ -16,7 +16,7 @@ enum ProcessMode {
 }
 
 export(Resource) var state_machine # StateMachine being played 
-export(bool) var active = true setget set_activea # Activeness of player
+export(bool) var active = true setget set_active # Activeness of player
 export(ProcessMode) var process_mode = ProcessMode.IDLE setget set_process_mode # ProcessMode of player
 
 var _parameters # Parameters to be passed to condition
