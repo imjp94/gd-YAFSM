@@ -2,13 +2,14 @@ tool
 extends "State.gd"
 const State = preload("State.gd")
 
-export(Dictionary) var states setget ,get_states
+export(Dictionary) var states setget ,get_states # States within this StateMachine, keyed by State.name
 
 
 func _init(p_name="", p_transitions={}, p_states={}):
 	._init(p_name, p_transitions)
 	states = p_states
 
+# Add state, state name must be unique within this StateMachine, return state added if succeed else reutrn null
 func add_state(state):
 	if not state:
 		return null
@@ -18,6 +19,7 @@ func add_state(state):
 	states[state.name] = state
 	return state
 
+# Remove state by its name
 func remove_state(state):
 	return states.erase(state)
 
@@ -63,5 +65,6 @@ func has_entry():
 func has_exit():
 	return State.EXIT_KEY in states
 
+# Get duplicate of states dictionary
 func get_states():
 	return states.duplicate()
