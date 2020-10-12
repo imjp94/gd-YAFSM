@@ -1,0 +1,76 @@
+# Documentation
+
+## Classes
+
+All of the classes are located in `res://addons/imjp94.yafsm/src` but you can just preload `res://addons/imjp94.yafsm/YAFSM.gd` to import all classes available:
+
+```gdscript
+const YAFSM = preload("res://addons/imjp94.yafsm/YAFSM.gd")
+const StackPlayer = YAFSM.StackPlayer
+const StateMachinePlayer = YAFSM.StateMachinePlayer
+const StateMachine = YAFSM.StateMachine
+const State = YAFSM.State
+```
+
+### Node
+
+- [StackPlayer](src/StackPlayer.gd)
+  > Manage stack of item, use push/pop function to set current item on top of stack
+  - `current`
+  - `stack`
+  - signals:
+    - `changed(from, to) # When stack pushed/popped`
+    - `push(to) # When item pushed to stack`
+    - `pop(from) # When item popped from stack`
+- [StateMachinePlayer](src/StateMachinePlayer.gd)(extends StackPlayer)
+  > Manage state based on `StateMachine` and parameters inputted
+  - `state_machine`
+  - `active`
+  - `process_mode`
+  - signals:
+    - `transit_in(to) # Transit to state`
+    - `transit_out(from) # Transit from state`
+    - `entry(state_machine) # Entry of state machine`
+    - `exit(state_machine) # Exit of state machine`
+    - `update(state, delta) # Update of state machine`
+
+### Control
+
+- [StackPlayerDebugger](src/debugger/StackPlayerDebugger.gd)
+  > Visualize stack of parent StackPlayer on screen
+
+### Resource
+
+Relationship between all `Resource`s can be best represented as below:
+
+```gdscript
+var state_machine = state_machine_player.state_machine
+var state = state_machine.states[state_name] # keyed by state name
+var transition = state.transitions[to_state_name] # keyed by state name transition to
+var condition = transition.conditions[condition_name] # keyed by condition name
+```
+
+> For normal usage, you really don't have to access any `Resource` during runtime as they only store static data that describe the state machine, accessing `StackPlayer`/`StateMachinePlayer` alone should be sufficient.
+
+- [State](src/states/State.gd)
+  > Container of `Transition`s from this state to another
+  - `name`
+  - `transitions`
+- [StateMachine](src/states/StateMachine.gd)(`extends State`)
+  > `StateMachine` is also a `State`, but mainly used as container of `State`s
+  - `states`
+- [Transition](src/transitions/Transition.gd)
+  > Describing connection from one state to another, all condition must be fulfilled to transit to next state
+  - `from`
+  - `to`
+  - `conditions`
+- [Condition](src/conditions/Condition.gd)
+  > Empty condition, treated as trigger
+  - `name`
+- [ValueCondition](src/conditions/ValueCondition.gd)(`extends Condition`)
+  > Condition with value, fulfilled by comparing values based on comparation
+  - `comparation`
+  - `value`
+- [BooleanCondition](src/conditions/BooleanCondition.gd)(`extends ValueCondition`)
+- [IntegerCondition](src/conditions/IntegerCondition.gd)(`extends ValueCondition`)
+- [FloatCondition](src/conditions/FloatCondition.gd)(`extends ValueCondition`)
