@@ -117,8 +117,6 @@ func _on_connection_request(from, from_slot, to, to_slot):
 
 func _on_disconnection_request(from, from_slot, to, to_slot):
 	disconnect_node(from, from_slot, to, to_slot) # Visually disconnect
-	print(focused_state_machine.transitions)
-	print(focused_state_machine.transitions[from])
 	_requesting_transition = focused_state_machine.transitions[from][to]
 	_request_stack.append(GraphRequest.new(GraphRequestType.DISCONNECTION, {
 		"from": from,
@@ -209,9 +207,11 @@ func draw_graph():
 		new_node.state.name = state_key
 		new_node.offset = state.graph_offset
 		add_node(new_node)
-		for transition in focused_state_machine.transitions[state_key].values():
-			# Reflecting state node, so only required to add new transition editor
-			new_node.add_transition_editor(TransitionEditor.instance(), transition)
+		var from_transitions = focused_state_machine.transitions.get(state_key)
+		if from_transitions:
+			for transition in from_transitions.values():
+				# Reflecting state node, so only required to add new transition editor
+				new_node.add_transition_editor(TransitionEditor.instance(), transition)
 
 func clear_graph():
 	clear_connections()
