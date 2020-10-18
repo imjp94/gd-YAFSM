@@ -55,8 +55,7 @@ func add_transition_editor(editor, transition):
 	Transitions.add_child(editor)
 	editor.transition = transition
 	editor.name = transition.to
-	if not (transition.to in state.transitions): # Transition may be added when loaded from file
-		state.add_transition(transition)
+	get_parent().focused_state_machine.add_transition(transition)
 
 func remove_transition_editor(editor):
 	var transition = editor.transition
@@ -64,7 +63,7 @@ func remove_transition_editor(editor):
 	Transitions.remove_child(editor)
 	_to_free.append(editor)
 	rect_size = Vector2.ZERO
-	state.remove_transition(editor.transition.to)
+	get_parent().focused_state_machine.remove_transition(editor.transition.from, editor.transition.to)
 
 func add_transition_editor_action(editor, transition):
 	undo_redo.create_action("Connect")
