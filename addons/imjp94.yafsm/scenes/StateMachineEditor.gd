@@ -129,10 +129,8 @@ func _on_delete_nodes_request():
 	for node in selected_nodes.values():
 		for connection in get_connection_list():
 			if connection.from == node.state.name:
-				var transition = focused_state_machine.states[node.state.name].transitions[connection.to]
 				disconnect_action(connection.from, 0, connection.to, 0)
 			elif connection.to == node.state.name:
-				var transition = focused_state_machine.states[connection.from].transitions[node.state.name]
 				disconnect_action(connection.from, 0, connection.to, 0)
 		delete_node_action(node)
 	selected_nodes.clear()
