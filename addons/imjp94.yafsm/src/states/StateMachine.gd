@@ -49,16 +49,21 @@ func change_state_name(from, to):
 			state.name = to
 			states[to] = state
 			states.erase(from)
-		for transition in transitions.values():
-			if is_name_changing_state:
+		for from_key in transitions.keys():
+			var from_transitions = transitions[from_key]
+			if from_key == from:
+				transitions.erase(from)
+				transitions[to] = from_transitions
+			for to_key in from_transitions.keys():
+				var transition = from_transitions[to_key]
 				if transition.from == from:
 					transition.from = to
-			else:
-				if transition.from == from:
-					transition.from = to
-					# Transitions to name changed state needs to be updated
-					transitions.erase(from)
-					transitions[to] = transition
+				elif transition.to == from:
+					transition.to = to
+					if not is_name_changing_state:
+						# Transitions to name changed state needs to be updated
+						from_transitions.erase(from)
+						from_transitions[to] = transition
 	return true
 
 # Add transition, Transition.from must be equal to this state's name and Transition.to not added yet
@@ -74,9 +79,7 @@ func add_transition(transition):
 		from_transitions = {}
 		transitions[transition.from] = from_transitions
 
-	prints(transition.from, transition.to)
 	from_transitions[transition.to] = transition
-	print(from_transitions)
 	emit_signal("transition_added", transition)
 
 # Remove transition with Transition.to(name of state transiting to)
