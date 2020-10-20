@@ -93,17 +93,11 @@ func remove_transition(from_state, to_state):
 				transitions.erase(from_state)
 			emit_signal("transition_removed", from_state, to_state)
 
-func get_entry():
-	return get_entries()[0] # TODO: Should no assume one entry
-
-func get_exit():
-	return get_exits()[0] # TODO: Should no assume one exit
-
 func get_entries():
-	return states[State.ENTRY_KEY].transitions.values()
+	return transitions[State.ENTRY_KEY].values()
 	
 func get_exits():
-	return states[State.EXIT_KEY].transitions.values()
+	return transitions[State.EXIT_KEY].values()
 
 func has_entry():
 	return State.ENTRY_KEY in states
