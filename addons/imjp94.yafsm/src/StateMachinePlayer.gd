@@ -96,7 +96,7 @@ func _transition():
 	if not _is_param_edited and not _was_transited:
 		return
 
-	var next_state = state_machine.states[get_current()].transit(_parameters)
+	var next_state = state_machine.transit(get_current(), _parameters)
 	if next_state:
 		if stack.has(next_state):
 			reset(stack.find(next_state))

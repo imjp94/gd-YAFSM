@@ -16,11 +16,12 @@ func _init(p_name="", p_transitions={}, p_states={}):
 
 # Attempt to transit with parameters given
 func transit(current_state, param={}):
-	var current_transitions = transitions[current_state]
-	for transition in current_transitions:
-		var next_state = transition.transit(param)
-		if next_state:
-			return next_state
+	var from_transitions = transitions.get(current_state)
+	if from_transitions:
+		for transition in from_transitions.values():
+			var next_state = transition.transit(param)
+			if next_state:
+				return next_state
 	return null
 
 # Add state, state name must be unique within this StateMachine, return state added if succeed else reutrn null
