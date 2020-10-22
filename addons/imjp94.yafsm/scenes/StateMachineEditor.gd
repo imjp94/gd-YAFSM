@@ -28,7 +28,7 @@ onready var Confirmation = $ConfirmationDialog
 onready var OverlayContainer = $OverlayContainer
 onready var CreateStateMachine = $OverlayContainer/CenterContainer/CreateStateMachine
 
-var focused_state_machine setget set_focused_state_machine
+var state_machine setget set_state_machine
 var undo_redo
 
 var selected_nodes = {}
@@ -77,13 +77,13 @@ func _unhandled_input(event):
 
 func _on_visibility_changed():
 	if visible:
-		if focused_state_machine:
+		if state_machine:
 			OverlayContainer.hide()
 		else:
 			OverlayContainer.show()
 
 func _on_save_request():
-	var resource_path = focused_state_machine.resource_path
+	var resource_path = state_machine.resource_path
 	if ".scn" in resource_path or ".tscn" in resource_path: # Built-in resource will be saved by scene
 		return
 
@@ -118,7 +118,7 @@ func _on_connection_request(from, from_slot, to, to_slot):
 
 func _on_disconnection_request(from, from_slot, to, to_slot):
 	disconnect_node(from, from_slot, to, to_slot) # Visually disconnect
-	_requesting_transition = focused_state_machine.transitions[from][to]
+	_requesting_transition = state_machine.transitions[from][to]
 	_request_stack.append(GraphRequest.new(GraphRequestType.DISCONNECTION, {
 		"from": from,
 		"from_slot": from_slot, 
@@ -141,8 +141,8 @@ func _on_node_unselected(node):
 	selected_nodes.erase(node.name)
 
 func _on_popup_request(position):
-	ContextMenu.set_item_disabled(CONTEXT_MENU_ADD_ENTRY_INDEX, focused_state_machine.has_entry())
-	ContextMenu.set_item_disabled(CONTEXT_MENU_ADD_EXIT_INDEX, focused_state_machine.has_exit())
+	ContextMenu.set_item_disabled(CONTEXT_MENU_ADD_ENTRY_INDEX, state_machine.has_entry())
+	ContextMenu.set_item_disabled(CONTEXT_MENU_ADD_EXIT_INDEX, state_machine.has_exit())
 	ContextMenu.rect_position = get_viewport().get_mouse_position()
 	ContextMenu.popup()
 
@@ -154,13 +154,13 @@ func _on_ContextMenu_index_pressed(index):
 		0: # Add State
 			node = StateNode.instance()
 		1: # Add Entry
-			if State.ENTRY_KEY in focused_state_machine.states:
+			if State.ENTRY_KEY in state_machine.states:
 				push_warning("Entry node already exist")
 				return
 			node = EntryStateNode.instance()
 			node_name = State.ENTRY_KEY
 		2: # Add Exit
-			if State.EXIT_KEY in focused_state_machine.states:
+			if State.EXIT_KEY in state_machine.states:
 				push_warning("Exit node already exist")
 				return
 			node = ExitStateNode.instance()
@@ -176,9 +176,9 @@ func _on_new_node_added(node):
 	node.undo_redo = undo_redo
 	node.name = node.state.name
 	node.state.name = node.name
-	focused_state_machine.add_state(node.state)
+	state_machine.add_state(node.state)
 
-func _on_focused_state_machine_changed(new_state_machine):
+func _on_state_machine_changed(new_state_machine):
 	if new_state_machine:
 		clear_graph()
 		draw_graph()
@@ -188,10 +188,10 @@ func _on_focused_state_machine_changed(new_state_machine):
 		OverlayContainer.show()
 
 func draw_graph():
-	for state_key in focused_state_machine.states.keys():
+	for state_key in state_machine.states.keys():
 		var is_entry = state_key == State.ENTRY_KEY
 		var is_exit = state_key == State.EXIT_KEY
-		var state = focused_state_machine.states[state_key]
+		var state = state_machine.states[state_key]
 		var new_node
 		if is_entry:
 			new_node = EntryStateNode.instance()
@@ -204,7 +204,7 @@ func draw_graph():
 		new_node.state.name = state_key
 		new_node.offset = state.graph_offset
 		add_node(new_node)
-		var from_transitions = focused_state_machine.transitions.get(state_key)
+		var from_transitions = state_machine.transitions.get(state_key)
 		if from_transitions:
 			for transition in from_transitions.values():
 				# Reflecting state node, so only required to add new transition editor
@@ -226,7 +226,7 @@ func delete_node(node):
 	remove_node_connections(node.name)
 	remove_child(node)
 	_to_free.append(node)
-	focused_state_machine.remove_state(node.name)
+	state_machine.remove_state(node.name)
 
 func remove_node_connections(node_name):
 	var node = get_node(node_name)
@@ -236,13 +236,13 @@ func remove_node_connections(node_name):
 			node.remove_transition_editor(node.get_transition_editor(connection.to))
 
 func save():
-	if not focused_state_machine:
+	if not state_machine:
 		return
-	var resource_path = focused_state_machine.resource_path
+	var resource_path = state_machine.resource_path
 	if ".scn" in resource_path or ".tscn" in resource_path: # Built-in resource will be saved by scene
 		return
 	
-	ResourceSaver.save(resource_path, focused_state_machine)
+	ResourceSaver.save(resource_path, state_machine)
 
 func create_transition(from, to):
 	var new_transition = _requesting_transition if _requesting_transition else Transition.new()
@@ -262,11 +262,6 @@ func delete_node_action(node):
 	undo_redo.add_undo_method(self, "add_node", node)
 	undo_redo.commit_action()
 
-func set_focused_state_machine(state_machine):
-	if focused_state_machine != state_machine:
-		focused_state_machine = state_machine
-		_on_focused_state_machine_changed(state_machine)
-
 func connect_action(from, from_slot, to, to_slot):
 	undo_redo.create_action("Connect")
 	undo_redo.add_do_method(self, "connect_node", from, from_slot, to, to_slot)
@@ -281,8 +276,8 @@ func connect_action(from, from_slot, to, to_slot):
 	undo_redo.add_undo_property(transition, "to", transition.to)
 	undo_redo.add_do_method(node, "add_transition_editor", editor, transition)
 	undo_redo.add_undo_method(node, "remove_transition_editor", editor)
-	undo_redo.add_do_method(focused_state_machine, "add_transition", transition)
-	undo_redo.add_undo_method(focused_state_machine, "remove_transition", from, to)
+	undo_redo.add_do_method(state_machine, "add_transition", transition)
+	undo_redo.add_undo_method(state_machine, "remove_transition", from, to)
 	undo_redo.commit_action()
 
 func disconnect_action(from, from_slot, to, to_slot):
@@ -299,9 +294,14 @@ func disconnect_action(from, from_slot, to, to_slot):
 	undo_redo.add_undo_property(transition, "to", transition.to)
 	undo_redo.add_do_method(node, "remove_transition_editor", editor)
 	undo_redo.add_undo_method(node, "add_transition_editor", editor, transition)
-	undo_redo.add_do_method(focused_state_machine, "remove_transition", from, to)
-	undo_redo.add_undo_method(focused_state_machine, "add_transition", transition)
+	undo_redo.add_do_method(state_machine, "remove_transition", from, to)
+	undo_redo.add_undo_method(state_machine, "add_transition", transition)
 	undo_redo.commit_action()
+
+func set_state_machine(v):
+	if state_machine != v:
+		state_machine = v
+		_on_state_machine_changed(v)
 
 # Free nodes cached in UndoRedo stack
 func free_node_from_undo_redo():
