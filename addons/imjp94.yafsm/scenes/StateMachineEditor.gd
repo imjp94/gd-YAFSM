@@ -274,6 +274,11 @@ func connect_action(from, from_slot, to, to_slot):
 	var node = get_node(from)
 	var editor = TransitionEditor.instance()
 	var transition = create_transition(from, to)
+	# Make sure transition.from/to are updated, as it is passed by reference
+	undo_redo.add_do_property(transition, "from", from)
+	undo_redo.add_undo_property(transition, "from", transition.from)
+	undo_redo.add_do_property(transition, "to", to)
+	undo_redo.add_undo_property(transition, "to", transition.to)
 	undo_redo.add_do_method(node, "add_transition_editor", editor, transition)
 	undo_redo.add_undo_method(node, "remove_transition_editor", editor)
 	undo_redo.add_do_method(focused_state_machine, "add_transition", transition)
@@ -287,6 +292,11 @@ func disconnect_action(from, from_slot, to, to_slot):
 	var node = get_node(from)
 	var editor = node.Transitions.get_node(to)
 	var transition = editor.transition
+	# Make sure transition.from/to are updated, as it is passed by reference
+	undo_redo.add_do_property(transition, "from", from)
+	undo_redo.add_undo_property(transition, "from", transition.from)
+	undo_redo.add_do_property(transition, "to", to)
+	undo_redo.add_undo_property(transition, "to", transition.to)
 	undo_redo.add_do_method(node, "remove_transition_editor", editor)
 	undo_redo.add_undo_method(node, "add_transition_editor", editor, transition)
 	undo_redo.add_do_method(focused_state_machine, "remove_transition", from, to)
