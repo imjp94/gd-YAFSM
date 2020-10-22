@@ -3,7 +3,6 @@ extends EditorPlugin
 const YAFSM = preload("YAFSM.gd")
 const StackPlayer = YAFSM.StackPlayer
 const StateMachinePlayer = YAFSM.StateMachinePlayer
-const StackPlayerDebugger = YAFSM.StackPlayerDebugger
 const StateMachine = YAFSM.StateMachine
 const State = YAFSM.State
 const StateMachineEditor = preload("scenes/StateMachineEditor.tscn")
@@ -23,7 +22,6 @@ func _enter_tree():
 	var resource_icon = editor_base_control.get_icon("ResourcePreloader", "EditorIcons")
 	add_custom_type("StackPlayer", "Node", StackPlayer, node_icon)
 	add_custom_type("StateMachinePlayer", "Node", StateMachinePlayer, node_icon)
-	add_custom_type("StackPlayerDebugger", "Control", StackPlayerDebugger, control_icon)
 	add_custom_type("StateMachine", "Resource", StateMachine, resource_icon)
 
 	state_machine_editor = StateMachineEditor.instance()
