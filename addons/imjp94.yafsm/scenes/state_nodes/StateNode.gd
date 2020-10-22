@@ -31,7 +31,7 @@ func _on_Name_focus_exited():
 
 func _on_node_name_changed(old, new):
 	# Set resource data
-	get_parent().focused_state_machine.change_state_name(old, new)
+	get_parent().state_machine.change_state_name(old, new)
 	# Update GraphEdit connection & TransitionEditor
 	for connection in get_parent().get_connection_list():
 		var node

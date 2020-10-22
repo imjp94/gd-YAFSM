@@ -48,7 +48,7 @@ func show_state_machine_editor():
 
 func hide_state_machine_editor():
 	if state_machine_editor.is_inside_tree():
-		state_machine_editor.focused_state_machine = null
+		state_machine_editor.state_machine = null
 		remove_control_from_bottom_panel(state_machine_editor)
 
 func _on_EditorSelection_selection_changed():
@@ -69,7 +69,7 @@ func _on_focused_object_changed(new_obj):
 			state_machine = focused_object.state_machine
 		elif focused_object is StateMachine:
 			state_machine = focused_object
-		state_machine_editor.focused_state_machine = state_machine
+		state_machine_editor.state_machine = state_machine
 	else:
 		hide_state_machine_editor()
 
@@ -81,7 +81,7 @@ func _on_CreateStateMachine_pressed():
 		var new_state_machine = StateMachine.new()
 		new_state_machine.add_state(State.new(State.ENTRY_KEY))
 		focused_object.state_machine = new_state_machine
-		state_machine_editor.focused_state_machine = new_state_machine
+		state_machine_editor.state_machine = new_state_machine
 		get_editor_interface().get_inspector().refresh()
 
 func set_focused_object(obj):
