@@ -1,8 +1,6 @@
 # Node
 const StackPlayer = preload("src/StackPlayer.gd")
 const StateMachinePlayer = preload("src/StateMachinePlayer.gd")
-# Debugger
-const StackPlayerDebugger = preload("src/debugger/StackPlayerDebugger.gd")
 
 # Resources
 # States
