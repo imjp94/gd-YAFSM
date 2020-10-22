@@ -92,12 +92,13 @@ func _on_save_request():
 
 # Confirm request when left/right mouse button released, while _request_stack is not empty
 func _on_connection_request_confirmed():
+	# TODO: Reconnection should not be added to undo/redo stack
 	for request in _request_stack:
 		var args = request.args
 		if request.type == GraphRequestType.CONNECTION:
-			connect_action(args.from, 0, args.to, 0)
+			connect_action(args.from, args.from_slot, args.to, args.to_slot)
 		elif request.type == GraphRequestType.DISCONNECTION:
-			disconnect_action(args.from, 0, args.to, 0)
+			disconnect_action(args.from, args.from_slot, args.to, args.to_slot)
 	_requesting_transition = null
 	_request_stack.clear()
 
@@ -128,10 +129,8 @@ func _on_disconnection_request(from, from_slot, to, to_slot):
 func _on_delete_nodes_request():
 	for node in selected_nodes.values():
 		for connection in get_connection_list():
-			if connection.from == node.state.name:
-				disconnect_action(connection.from, 0, connection.to, 0)
-			elif connection.to == node.state.name:
-				disconnect_action(connection.from, 0, connection.to, 0)
+			if connection.from == node.state.name or connection.to == node.state.name:
+				disconnect_action(connection.from, connection.from_port, connection.to, connection.to_port)
 		delete_node_action(node)
 	selected_nodes.clear()
 
@@ -209,6 +208,7 @@ func draw_graph():
 		if from_transitions:
 			for transition in from_transitions.values():
 				# Reflecting state node, so only required to add new transition editor
+				connect_node(transition.from, 0, transition.to, 0)
 				new_node.add_transition_editor(TransitionEditor.instance(), transition)
 
 func clear_graph():
@@ -232,7 +232,8 @@ func remove_node_connections(node_name):
 	var node = get_node(node_name)
 	for connection in get_connection_list():
 		if connection.from == node_name or connection.to == node_name:
-			node.disconnect_node(connection.from, 0, connection.to, 0)
+			disconnect_node(connection.from, 0, connection.to, 0)
+			node.remove_transition_editor(node.get_transition_editor(connection.to))
 
 func save():
 	if not focused_state_machine:
@@ -261,27 +262,36 @@ func delete_node_action(node):
 	undo_redo.add_undo_method(self, "add_node", node)
 	undo_redo.commit_action()
 
-func connect_action(from, from_slot, to, to_slot):
-	var node = get_node(from)
-	# node.connect_action(from, from_slot, to, to_slot)
-
-	connect_node(from, from_slot, to, to_slot)
-	var editor = TransitionEditor.instance()
-	var transition = create_transition(from, to)
-	node.add_transition_editor_action(editor, transition)
-
-func disconnect_action(from, from_slot, to, to_slot):
-	var node = get_node(from)
-	# node.disconnect_action(from, from_slot, to, to_slot)
-
-	disconnect_node(from, from_slot, to, to_slot)
-	var editor = node.Transitions.get_node(to)
-	node.remove_transition_editor_action(editor)
-
 func set_focused_state_machine(state_machine):
 	if focused_state_machine != state_machine:
 		focused_state_machine = state_machine
 		_on_focused_state_machine_changed(state_machine)
+
+func connect_action(from, from_slot, to, to_slot):
+	undo_redo.create_action("Connect")
+	undo_redo.add_do_method(self, "connect_node", from, from_slot, to, to_slot)
+	undo_redo.add_undo_method(self, "disconnect_node", from, from_slot, to, to_slot)
+	var node = get_node(from)
+	var editor = TransitionEditor.instance()
+	var transition = create_transition(from, to)
+	undo_redo.add_do_method(node, "add_transition_editor", editor, transition)
+	undo_redo.add_undo_method(node, "remove_transition_editor", editor)
+	undo_redo.add_do_method(focused_state_machine, "add_transition", transition)
+	undo_redo.add_undo_method(focused_state_machine, "remove_transition", from, to)
+	undo_redo.commit_action()
+
+func disconnect_action(from, from_slot, to, to_slot):
+	undo_redo.create_action("Disconnect")
+	undo_redo.add_do_method(self, "disconnect_node", from, from_slot, to, to_slot)
+	undo_redo.add_undo_method(self, "connect_node", from, from_slot, to, to_slot)
+	var node = get_node(from)
+	var editor = node.Transitions.get_node(to)
+	var transition = editor.transition
+	undo_redo.add_do_method(node, "remove_transition_editor", editor)
+	undo_redo.add_undo_method(node, "add_transition_editor", editor, transition)
+	undo_redo.add_do_method(focused_state_machine, "remove_transition", from, to)
+	undo_redo.add_undo_method(focused_state_machine, "add_transition", transition)
+	undo_redo.commit_action()
 
 # Free nodes cached in UndoRedo stack
 func free_node_from_undo_redo():
