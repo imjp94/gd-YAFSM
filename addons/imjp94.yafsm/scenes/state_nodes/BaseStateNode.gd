@@ -27,55 +27,20 @@ func _on_dragged(from, to):
 func _on_offset_changed():
 	state.graph_offset = offset
 
-func connect_node(from, from_slot, to, to_slot):
-	get_parent().connect_node(from, from_slot, to, to_slot)
-	var editor = TransitionEditor.instance()
-	var transition = get_parent().create_transition(from, to)
-	add_transition_editor(editor, transition)
-
-func disconnect_node(from, from_slot, to, to_slot):
-	get_parent().disconnect_node(from, from_slot, to, to_slot)
-	var editor = Transitions.get_node(to)
-	remove_transition_editor(editor)
-
-func connect_action(from, from_slot, to, to_slot):
-	get_parent().connect_node(from, from_slot, to, to_slot)
-	var editor = TransitionEditor.instance()
-	var transition = get_parent().create_transition(from, to)
-	add_transition_editor_action(editor, transition)
-
-func disconnect_action(from, from_slot, to, to_slot):
-	get_parent().disconnect_node(from, from_slot, to, to_slot)
-	var editor = Transitions.get_node(to)
-	remove_transition_editor_action(editor)
-
 func add_transition_editor(editor, transition):
-	get_parent().connect_node(transition.from, 0, transition.to, 0)
 	editor.undo_redo = undo_redo
 	Transitions.add_child(editor)
 	editor.transition = transition
 	editor.name = transition.to
-	get_parent().focused_state_machine.add_transition(transition)
 
 func remove_transition_editor(editor):
 	var transition = editor.transition
-	get_parent().disconnect_node(transition.from, 0, transition.to, 0)
 	Transitions.remove_child(editor)
 	_to_free.append(editor)
 	rect_size = Vector2.ZERO
-	get_parent().focused_state_machine.remove_transition(editor.transition.from, editor.transition.to)
 
-func add_transition_editor_action(editor, transition):
-	undo_redo.create_action("Connect")
-	undo_redo.add_do_method(self, "add_transition_editor", editor, transition)
-	undo_redo.add_undo_method(self, "remove_transition_editor", editor)
-	undo_redo.commit_action()
-
-func remove_transition_editor_action(editor):
-	undo_redo.create_action("Disconnect")
-	undo_redo.add_do_method(self, "remove_transition_editor", editor)
-	undo_redo.add_undo_method(self, "add_transition_editor", editor, editor.transition)
-	undo_redo.commit_action()
+func get_transition_editor(to):
+	return Transitions.get_node(to)
 
 func drag_action(from, to):
 	undo_redo.create_action("Drag State Node")
