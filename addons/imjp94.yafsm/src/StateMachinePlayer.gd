@@ -2,8 +2,8 @@ tool
 extends "StackPlayer.gd"
 const State = preload("states/State.gd")
 
-signal transit_in(to) # Transit to state
-signal transit_out(from) # Transit from state
+signal transit_in(to) # Transit to state, exclude Entry/Exit state
+signal transit_out(from) # Transit from state, exclude Entry/Exit state
 signal entry(state_machine) # Entry of state machine
 signal exit(state_machine) # Exit of state machine
 signal update(state, delta) # Update of state machine, only emitted if process_mode is PHYSICS/IDLE
@@ -75,15 +75,27 @@ func _on_pop(from, to):
 	_transit_in(to)
 
 func _transit_in(to):
-	emit_signal("transit_in", to)
-	if to == State.EXIT_KEY:
-		set_active(false) # Disable on exit
-		emit_signal("exit", state_machine)
+	match to:
+		State.ENTRY_KEY:
+			emit_signal("entry", state_machine)
+		State.EXIT_KEY:
+			set_active(false) # Disable on exit
+			emit_signal("exit", state_machine)
+		"":
+			return # Ignore empty state
+		_:
+			emit_signal("transit_in", to)
 
 func _transit_out(from):
-	emit_signal("transit_out", from)
-	if from == State.ENTRY_KEY:
-		emit_signal("entry", state_machine)
+	match from:
+		State.ENTRY_KEY:
+			return
+		State.EXIT_KEY:
+			return
+		"":
+			return # Ignore empty state
+		_:
+			emit_signal("transit_out", from)
 
 # Only get called in 2 condition, _parameters edited or last transition was successful
 func _transition():
