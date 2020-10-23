@@ -1,10 +1,10 @@
 extends Node
 
-signal changed(from, to) # When stack pushed/popped
+signal current_changed(from, to) # When stack pushed/popped
 signal push(to) # When item pushed to stack
 signal pop(from) # When item popped from stack
 
-# Enum to specify how reseting state stack should trigger event(changed, push, pop etc.)
+# Enum to specify how reseting state stack should trigger event(current_changed, push, pop etc.)
 enum ResetEventTrigger {
 	NONE = -1, # No event
 	ALL = 0, # All removed state will emit event
@@ -23,7 +23,7 @@ func push(to):
 	var from = get_current()
 	stack.push_back(to)
 	_on_push(from, to)
-	emit_signal("changed", from, to)
+	emit_signal("current_changed", from, to)
 	emit_signal("push", to)
 
 # Remove the current item on top of stack
@@ -31,7 +31,7 @@ func pop():
 	var to = get_previous()
 	var from = stack.pop_back()
 	_on_pop(from, to)
-	emit_signal("changed", from, to)
+	emit_signal("current_changed", from, to)
 	emit_signal("pop", from)
 
 # Called when item pushed
