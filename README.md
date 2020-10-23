@@ -43,7 +43,7 @@ Finally, right-click on graph to add state node.
 
 After setup `StateMachine` with editor, you can connect to the following signals from a `StateMachinePlayer`:
 
-- `changed(from, to)`: Current state name changed
+- `current_changed(from, to)`: Current state name changed
 - `transit_out(from)`: State name transit out from
 - `transit_in(to)`: State name transit into
 - `update(state, delta)`: Time to update(defined by `process_mode`), up to user to handle anything, for example, update movement of `KinematicBody`

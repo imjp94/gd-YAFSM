@@ -19,7 +19,7 @@ const State = YAFSM.State
   - `current`
   - `stack`
   - signals:
-    - `changed(from, to) # When stack pushed/popped`
+    - `current_changed(from, to) # When stack pushed/popped`
     - `push(to) # When item pushed to stack`
     - `pop(from) # When item popped from stack`
 - [StateMachinePlayer](src/StateMachinePlayer.gd)(extends StackPlayer)
