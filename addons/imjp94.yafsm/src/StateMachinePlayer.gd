@@ -208,3 +208,11 @@ func set_process_mode(mode):
 	if process_mode != mode:
 		process_mode = mode
 		_on_process_mode_changed()
+
+func get_current():
+	var v = .get_current()
+	return v if v  else ""
+
+func get_previous():
+	var v = .get_previous()
+	return v if v else ""
