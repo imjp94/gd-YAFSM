@@ -150,9 +150,10 @@ func _flush_trigger():
 		if value == null: # Param with null as value is treated as trigger
 			_parameters.erase(param_key)
 
-func reset(to=0, event=ResetEventTrigger.LAST_TO_DEST):
+func reset(to=1, event=ResetEventTrigger.LAST_TO_DEST):
 	assert(to > 0, "StateMachinePlayer's stack must not be emptied")
 	.reset(to, event)
+	_was_transited = true # Make sure to call _transition on next update
 
 func update(delta):
 	if not active:
