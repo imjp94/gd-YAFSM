@@ -81,6 +81,7 @@ func _on_pop(from, to):
 func _transit_in(to):
 	emit_signal("transit_in", to)
 	if to == State.EXIT_KEY:
+		set_active(false) # Disable on exit
 		emit_signal("exit", state_machine)
 
 func _transit_out(from):
@@ -150,8 +151,7 @@ func _flush_trigger():
 		if value == null: # Param with null as value is treated as trigger
 			_parameters.erase(param_key)
 
-func reset(to=1, event=ResetEventTrigger.LAST_TO_DEST):
-	assert(to > 0, "StateMachinePlayer's stack must not be emptied")
+func reset(to=0, event=ResetEventTrigger.LAST_TO_DEST):
 	.reset(to, event)
 	_was_transited = true # Make sure to call _transition on next update
 
@@ -197,6 +197,10 @@ func get_params():
 
 func set_active(v):
 	if active != v:
+		if v:
+			if get_current() == State.EXIT_KEY:
+				push_warning("Attempting to make exited StateMachinePlayer active, call reset() then set_active() instead")
+				return
 		active = v
 		_on_active_changed()
 
