@@ -42,9 +42,10 @@ func _on_push(from, to):
 func _on_pop(from, to):
 	pass
 
-# Popping multiple items in stack, use ResetEventTrigger to define how _on_pop should be called
-func reset(to=0, event=ResetEventTrigger.ALL):
-	assert(to > -1 and to < stack.size(), "Reset to index(%d) out of bounds(%d)" % [to, stack.size()])
+# Reset stack to given index, -1 to clear all item by default
+# Use ResetEventTrigger to define how _on_pop should be called
+func reset(to=-1, event=ResetEventTrigger.ALL):
+	assert(to > -2 and to < stack.size(), "Reset to index(%d) out of bounds(%d)" % [to, stack.size()])
 	var last_index = stack.size() - 1
 	var first_state = ""
 	var num_to_pop = last_index - to
