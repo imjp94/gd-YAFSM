@@ -189,10 +189,16 @@ func get_param(name):
 func get_params():
 	return _parameters.duplicate()
 
+func is_entered():
+	return State.ENTRY_KEY in stack
+
+func is_exited():
+	return get_current() == State.EXIT_KEY
+
 func set_active(v):
 	if active != v:
 		if v:
-			if get_current() == State.EXIT_KEY:
+			if is_exited():
 				push_warning("Attempting to make exited StateMachinePlayer active, call reset() then set_active() instead")
 				return
 		active = v
