@@ -45,14 +45,8 @@ func _ready():
 	if Engine.editor_hint:
 		return
 
-	call_deferred("_deferred_ready")
-
-# Setup initial process based on active, then call first _transition().
-# All this happened after _ready, so parent or child node will receive all transition signals even connects during _ready 
-func _deferred_ready():
 	_on_active_changed()
 	_on_process_mode_changed()
-	_transition()
 
 func _process(delta):
 	if Engine.editor_hint:
