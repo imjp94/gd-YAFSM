@@ -40,7 +40,7 @@ func sync_stack():
 			var stack_item = StackItem.instance()
 			Stack.add_child(stack_item)
 		else:
-			var child = Stack.get_child(Stack.get_child_count() - 1 - i)
+			var child = Stack.get_child(0)
 			Stack.remove_child(child)
 			child.queue_free()
 	var stack = get_parent().stack
