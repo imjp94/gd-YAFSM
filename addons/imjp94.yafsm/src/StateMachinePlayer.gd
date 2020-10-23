@@ -20,7 +20,7 @@ export(bool) var active = true setget set_active # Activeness of player
 export(ProcessMode) var process_mode = ProcessMode.IDLE setget set_process_mode # ProcessMode of player
 
 var _parameters # Parameters to be passed to condition
-var _is_update_locked = false
+var _is_update_locked = true
 var _was_transited = false # If last transition was successful
 var _is_param_edited = false
 
@@ -158,10 +158,10 @@ func reset(to=1, event=ResetEventTrigger.LAST_TO_DEST):
 func update(delta):
 	if not active:
 		return
-
-	_transition()
 	if process_mode != ProcessMode.MANUAL:
 		assert(not _is_update_locked, "Attempting to update manually with ProcessMode.%s" % ProcessMode.keys()[process_mode])
+
+	_transition()
 	var current_state = get_current()
 	_on_update(current_state, delta)
 	emit_signal("update", current_state, delta)
