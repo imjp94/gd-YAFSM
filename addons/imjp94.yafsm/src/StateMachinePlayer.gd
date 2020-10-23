@@ -17,6 +17,7 @@ enum ProcessMode {
 
 export(Resource) var state_machine # StateMachine being played 
 export(bool) var active = true setget set_active # Activeness of player
+export(bool) var autostart = true # Automatically enter Entry state on ready if true
 export(ProcessMode) var process_mode = ProcessMode.IDLE setget set_process_mode # ProcessMode of player
 
 var _parameters # Parameters to be passed to condition
@@ -30,7 +31,6 @@ func _init():
 		return
 
 	_parameters = {}
-	push(State.ENTRY_KEY)
 	_was_transited = true # Trigger _transition on _ready
 
 func _get_configuration_warning():
@@ -45,6 +45,8 @@ func _ready():
 	if Engine.editor_hint:
 		return
 
+	if autostart:
+		start()
 	_on_active_changed()
 	_on_process_mode_changed()
 
@@ -148,6 +150,15 @@ func _flush_trigger():
 func reset(to=-1, event=ResetEventTrigger.LAST_TO_DEST):
 	.reset(to, event)
 	_was_transited = true # Make sure to call _transition on next update
+
+func start():
+	push(State.ENTRY_KEY)
+	_was_transited = true
+
+func restart(is_active=true):
+	reset()
+	set_active(is_active)
+	start()
 
 func update(delta):
 	if not active:
