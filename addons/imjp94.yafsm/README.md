@@ -28,8 +28,8 @@ const State = YAFSM.State
   - `active`
   - `process_mode`
   - signals:
-    - `transit_in(to) # Transit to state`
-    - `transit_out(from) # Transit from state`
+    - `transit_in(to) # Transit to state, exclude Entry/Exit state`
+    - `transit_out(from) # Transit from state, exclude Entry/Exit state`
     - `entry(state_machine) # Entry of state machine`
     - `exit(state_machine) # Exit of state machine`
     - `update(state, delta) # Update of state machine`
@@ -46,7 +46,7 @@ Relationship between all `Resource`s can be best represented as below:
 ```gdscript
 var state_machine = state_machine_player.state_machine
 var state = state_machine.states[state_name] # keyed by state name
-var transition = state.transitions[to_state_name] # keyed by state name transition to
+var transition = state_machine.transitions[from][to] # keyed by state name transition from/to
 var condition = transition.conditions[condition_name] # keyed by condition name
 ```
 
