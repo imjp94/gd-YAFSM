@@ -57,7 +57,7 @@ For most of the case, you don't have to inherit from any custom class by this pl
 ### Debug
 
 - Stack
-  > Add `StackPlayerDebugger` to `StackPlayer`(so as `StateMachinePlayer`) to visualize the stack on screen.
+  > Add `res://addons/imjp94.yafsm/src/debugger/StackPlayerDebugger.tscn` to `StackPlayer`(so as `StateMachinePlayer`) to visualize the stack on screen.
 
 ## Documentation
 
