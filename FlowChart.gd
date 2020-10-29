@@ -36,7 +36,8 @@ func _gui_input(event):
 
 	if event is InputEventMouseButton:
 		var hit_node
-		for child in get_children(): # TODO: Inverse order
+		for i in get_child_count():
+			var child = get_child(get_child_count()-1 - i) # Inverse order to check from top to bottom of canvas
 			if child is FlowChartNode:
 				if child.get_rect().has_point(event.position):
 					hit_node = child
