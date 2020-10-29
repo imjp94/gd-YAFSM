@@ -15,13 +15,26 @@ __meta__ = {
 [node name="FlowChart" type="Control" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
+margin_top = -1.0
+margin_bottom = -1.0
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
-to = Vector2( 0, -100 )
 
 [node name="FlowChartNode" parent="FlowChart" instance=ExtResource( 2 )]
+
+[node name="From" parent="FlowChart" instance=ExtResource( 2 )]
+margin_left = 126.0
+margin_top = 201.0
+margin_right = 166.0
+margin_bottom = 241.0
+
+[node name="To" parent="FlowChart" instance=ExtResource( 2 )]
+margin_left = 466.981
+margin_top = 88.4264
+margin_right = 506.981
+margin_bottom = 128.426
 
 [node name="Line" type="Container" parent="FlowChart"]
 margin_left = 8.94429
