@@ -113,10 +113,12 @@ func _disconnect_node(line):
 	line.queue_free()
 
 func connect_node(from, to):
-	# TODO: Check if connection existed
+	var connections_from = _connections.get(from)
+	if connections_from:
+		if to in connections_from:
+			return # Connection existed
 	var line = FlowChartLineScene.instance()
 	var connection = Connection.new(line, get_node(from), get_node(to))
-	var connections_from = _connections.get(from)
 	if not connections_from:
 		connections_from = {}
 		_connections[from] = connections_from
