@@ -35,7 +35,7 @@ func pivot_at_line_start():
 	rect_pivot_offset.x = 0
 	rect_pivot_offset.y = rect_size.y / 2.0
 
-func join(from, to):
+func join(from, to, offset=Vector2.ZERO):
 	rect_size.x = to.distance_to(from)
 	# rect_size.y equals to the thickness of line
 	rect_position = from
@@ -43,4 +43,5 @@ func join(from, to):
 	var dir = (to - from).normalized()
 	var rotation = Vector2.RIGHT.angle_to(dir)
 	rect_rotation = rad2deg(rotation)
+	rect_position += rect_position - get_transform().xform(Vector2.UP * offset) # offset along local Up axis
 	pivot_at_line_start()

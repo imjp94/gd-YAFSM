@@ -7,6 +7,7 @@ const FlowChartLineScene = preload("FlowChartLine.tscn")
 signal node_selected(node)
 signal node_unselected(node)
 
+export var interconnection_offset = 10
 
 var _Lines # Node that hold all lines
 var _connections = {}
@@ -98,7 +99,7 @@ func _process(_delta):
 			for to in connections_from:
 				if from == _moving_node.name or to == _moving_node.name:
 					var connection = _connections[from][to]
-					connection.line.join(connection.get_from_pos(), connection.get_to_pos())
+					connection.join()
 
 func _on_context_menu_request(_pos):
 	var new_node = FlowChartNodeScene.instance()
@@ -133,6 +134,16 @@ func connect_node(from, to):
 	connections_from[to] = connection
 	_connect_node(line, connection.get_from_pos(), connection.get_to_pos())
 
+	# Check if connection in both ways
+	connections_from = _connections.get(to)
+	if connections_from:
+		var inv_connection = connections_from.get(from)
+		if inv_connection:
+			connection.offset = interconnection_offset
+			inv_connection.offset = interconnection_offset
+			connection.join()
+			inv_connection.join()
+
 func disconnect_node(from, to):
 	var connections_from = _connections.get(from)
 	var connection = connections_from.get(to)
@@ -144,6 +155,13 @@ func disconnect_node(from, to):
 		_connections.erase(from)
 	else:
 		connections_from.erase(to)
+
+	connections_from = _connections.get(to)
+	if connections_from:
+		var inv_connection = connections_from[from]
+		if inv_connection:
+			inv_connection.offset = 0
+			inv_connection.join()
 
 func clear_connections():
 	for connections_from in _connections.values():
@@ -172,11 +190,15 @@ class Connection:
 	var line # Control node that draw line
 	var from_node
 	var to_node
+	var offset = 0
 
 	func _init(p_line, p_from_node, p_to_node):
 		line = p_line
 		from_node = p_from_node
 		to_node = p_to_node
+
+	func join():
+		line.join(get_from_pos(), get_to_pos(), offset)
 
 	func get_from_pos():
 		return from_node.rect_position + from_node.rect_size / 2
