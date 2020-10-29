@@ -2,6 +2,7 @@ tool
 extends Control
 const FlowChartNode = preload("FlowChartNode.gd")
 const FlowChartNodeScene = preload("FlowChartNode.tscn")
+const FlowChartLine = preload("FlowChartLine.gd")
 const FlowChartLineScene = preload("FlowChartLine.tscn")
 
 signal node_selected(node)
@@ -37,6 +38,19 @@ func add_child(node, legible_unique_name=false):
 func _init_node_signals(node):
 	node.connect("focus_entered", self, "_on_node_focused_entered", [node])
 	node.connect("focus_exited", self, "_on_node_focused_exited", [node])
+
+func _unhandled_key_input(event):
+	match event.scancode:
+		KEY_DELETE:
+			var selected = get_selected()
+			if selected:
+				if selected is FlowChartLine:
+					# TODO: More efficient way to get connection from Line node
+					for connections_from in _connections.values():
+						for connection in connections_from.values():
+							if connection.line == selected:
+								disconnect_node(connection.from_node.name, connection.to_node.name)
+								return
 
 func _gui_input(event):
 	if Engine.editor_hint:
@@ -179,7 +193,7 @@ func get_connection_list():
 func get_selected():
 	var focused_owner = get_focus_owner()
 	if focused_owner:
-		if focused_owner.get_parent() == self:
+		if focused_owner.get_parent() == self or focused_owner.get_parent() == _Lines:
 			return focused_owner
 	return null
 
