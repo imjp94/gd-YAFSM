@@ -82,7 +82,7 @@ func _gui_input(event):
 						if event.shift:
 							# Connection start
 							prints("start", hit_node.name)
-							var line = FlowChartLineScene.instance()
+							var line = create_line_instance()
 							var connection = Connection.new(line, hit_node, null)
 							_connect_node(line, connection.get_from_pos(), get_local_mouse_position())
 							_current_connection = connection
@@ -138,12 +138,15 @@ func _disconnect_node(line):
 	_Lines.remove_child(line)
 	line.queue_free()
 
+func create_line_instance():
+	return FlowChartLineScene.instance()
+
 func connect_node(from, to):
 	var connections_from = _connections.get(from)
 	if connections_from:
 		if to in connections_from:
 			return # Connection existed
-	var line = FlowChartLineScene.instance()
+	var line = create_line_instance()
 	var connection = Connection.new(line, get_node(from), get_node(to))
 	if not connections_from:
 		connections_from = {}
