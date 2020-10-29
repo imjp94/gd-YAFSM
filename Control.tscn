@@ -1,9 +1,7 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://FlowChart.gd" type="Script" id=1]
 [ext_resource path="res://FlowChartNode.tscn" type="PackedScene" id=2]
-[ext_resource path="res://FlowChartLine.gd" type="Script" id=3]
-[ext_resource path="res://addons/imjp94.yafsm/assets/icons/arrow_right-white-18dp.svg" type="Texture" id=4]
 
 [node name="Control" type="Control"]
 anchor_right = 1.0
@@ -22,41 +20,18 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="FlowChartNode" parent="FlowChart" instance=ExtResource( 2 )]
-
 [node name="From" parent="FlowChart" instance=ExtResource( 2 )]
 margin_left = 126.0
 margin_top = 201.0
 margin_right = 166.0
 margin_bottom = 241.0
+focus_mode = 1
+mouse_filter = 1
 
 [node name="To" parent="FlowChart" instance=ExtResource( 2 )]
 margin_left = 466.981
 margin_top = 88.4264
 margin_right = 506.981
 margin_bottom = 128.426
-
-[node name="Line" type="Container" parent="FlowChart"]
-margin_left = 8.94429
-margin_top = 2.11146
-margin_right = 232.551
-margin_bottom = 22.1115
-rect_rotation = 26.5651
-rect_pivot_offset = Vector2( 0, 10 )
 focus_mode = 1
-script = ExtResource( 3 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="TextureRect" type="TextureRect" parent="FlowChart/Line"]
-margin_left = 75.0
-margin_top = -26.0
-margin_right = 147.0
-margin_bottom = 46.0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-texture = ExtResource( 4 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+mouse_filter = 1

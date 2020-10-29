@@ -1,8 +1,6 @@
+tool
 extends Container
-
-
-var stylebox = StyleBoxFlat.new()
-
+# Custom style normal, focus
 
 func _init():
 	focus_mode = FOCUS_CLICK
@@ -13,7 +11,10 @@ func _ready():
 	update()
 
 func _draw():
-	draw_style_box(stylebox, Rect2(Vector2.ZERO, rect_size))
+	if has_focus():
+		draw_style_box(get_stylebox("focus", "FlowChartNode"), Rect2(Vector2.ZERO, rect_size))
+	else:
+		draw_style_box(get_stylebox("normal", "FlowChartNode"), Rect2(Vector2.ZERO, rect_size))
 
 func _notification(what):
 	match what:
