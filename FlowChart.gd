@@ -22,8 +22,6 @@ func _ready():
 		if child is FlowChartNode:
 			_init_node_signals(child)
 
-	connect_node("From", "To")
-
 func add_child(node, legible_unique_name=false):
 	.add_child(node, legible_unique_name)
 	_init_node_signals(node)
@@ -82,7 +80,12 @@ func _process(_delta):
 		_current_connection.line.join(_current_connection.get_from_pos(), get_local_mouse_position())
 	if _moving_node:
 		_moving_node.rect_position =  get_local_mouse_position() + _mouse_offset
-		# TODO: Update Line as node moved
+		for from in _connections:
+			var connections_from = _connections[from]
+			for to in connections_from:
+				if from == _moving_node.name or to == _moving_node.name:
+					var connection = _connections[from][to]
+					connection.line.join(connection.get_from_pos(), connection.get_to_pos())
 
 func _on_context_menu_request(_pos):
 	var new_node = FlowChartNodeScene.instance()
@@ -106,6 +109,7 @@ func _disconnect_node(line):
 	line.queue_free()
 
 func connect_node(from, to):
+	# TODO: Check if connection existed
 	var line = FlowChartLineScene.instance()
 	var connection = Connection.new(line, get_node(from), get_node(to))
 	var connections_from = _connections.get(from)
