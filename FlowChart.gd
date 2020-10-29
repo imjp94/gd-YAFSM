@@ -7,6 +7,8 @@ const FlowChartLineScene = preload("FlowChartLine.tscn")
 signal node_selected(node)
 signal node_unselected(node)
 
+
+var _Lines # Node that hold all lines
 var _connections = {}
 var _is_connecting = false
 var _current_connection
@@ -17,6 +19,11 @@ var _mouse_offset = Vector2.ZERO
 func _ready():
 	if Engine.editor_hint:
 		return
+
+	_Lines = Control.new()
+	_Lines.name = "Lines"
+	add_child(_Lines)
+	move_child(_Lines, 0) # Make sure lines always behind nodes
 
 	for child in get_children():
 		if child is FlowChartNode:
@@ -106,12 +113,11 @@ func _on_node_focused_exited(node):
 	emit_signal("node_unselected", node)
 
 func _connect_node(line, from_pos, to_pos):
-	add_child(line)
-	move_child(line, 0)
+	_Lines.add_child(line)
 	line.join(from_pos, to_pos)
 
 func _disconnect_node(line):
-	remove_child(line)
+	_Lines.remove_child(line)
 	line.queue_free()
 
 func connect_node(from, to):
