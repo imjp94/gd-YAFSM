@@ -1,7 +1,6 @@
 tool
 extends Container
-
-export var line_width = 1.0 setget set_line_width
+# Custom style normal, focus
 
 
 func _init():
@@ -17,7 +16,10 @@ func _draw():
 	from.y += rect_size.y / 2.0
 	var to = rect_size
 	to.y -= rect_size.y / 2.0
-	draw_line(from, to, Color.white, line_width, true)
+	if has_focus():
+		draw_style_box(get_stylebox("focus", "FlowChartLine"), Rect2(Vector2.ZERO, rect_size))
+	else:
+		draw_style_box(get_stylebox("normal", "FlowChartLine"), Rect2(Vector2.ZERO, rect_size))
 
 func _notification(what):
 	match what:
@@ -35,16 +37,10 @@ func pivot_at_line_start():
 
 func join(from, to):
 	rect_size.x = to.distance_to(from)
-	# rect_size.y remain unchanged as it is bound to line_width
+	# rect_size.y equals to the thickness of line
 	rect_position = from
 	rect_position.y -= rect_size.y / 2.0
 	var dir = (to - from).normalized()
 	var rotation = Vector2.RIGHT.angle_to(dir)
 	rect_rotation = rad2deg(rotation)
 	pivot_at_line_start()
-
-func set_line_width(v):
-	if line_width != v:
-		line_width = v
-		rect_size.y = v
-		update()

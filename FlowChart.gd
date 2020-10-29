@@ -59,6 +59,10 @@ func _gui_input(event):
 							# Move node
 							_moving_node = hit_node
 							_mouse_offset = _moving_node.rect_position - event.position
+					else:
+						var focus_owner = get_focus_owner()
+						if focus_owner:
+							focus_owner.release_focus()
 				else:
 					if _current_connection:
 						if hit_node:
