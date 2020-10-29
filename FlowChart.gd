@@ -48,6 +48,7 @@ func _gui_input(event):
 					if hit_node:
 						# Select node
 						hit_node.grab_focus()
+						move_child(hit_node, get_child_count()-1) # Raise selected node to top
 						if event.shift:
 							# Connection start
 							prints("start", hit_node.name)
