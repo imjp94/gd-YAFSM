@@ -11,6 +11,7 @@ var _connections = {}
 var _is_connecting = false
 var _current_connection
 var _moving_node
+var _mouse_offset = Vector2.ZERO
 
 
 func _ready():
@@ -59,6 +60,7 @@ func _gui_input(event):
 						else:
 							# Move node
 							_moving_node = hit_node
+							_mouse_offset = _moving_node.rect_position - event.position
 				else:
 					if _current_connection:
 						if hit_node:
@@ -70,6 +72,7 @@ func _gui_input(event):
 							_current_connection.line.queue_free()
 					_current_connection = null
 					_moving_node = null
+					_mouse_offset = Vector2.ZERO
 
 func _process(_delta):
 	if Engine.editor_hint:
@@ -78,8 +81,7 @@ func _process(_delta):
 	if _current_connection:
 		_current_connection.line.join(_current_connection.get_from_pos(), get_local_mouse_position())
 	if _moving_node:
-		_moving_node.rect_position = get_local_mouse_position()
-		# TODO: Move position relative to start mouse position
+		_moving_node.rect_position =  get_local_mouse_position() + _mouse_offset
 		# TODO: Update Line as node moved
 
 func _on_context_menu_request(_pos):
