@@ -5,6 +5,8 @@ const FlowChartNodeScene = preload("FlowChartNode.tscn")
 const FlowChartLine = preload("FlowChartLine.gd")
 const FlowChartLineScene = preload("FlowChartLine.tscn")
 
+signal connection(from, to)
+signal disconnection(from, to)
 signal node_selected(node)
 signal node_unselected(node)
 
@@ -120,10 +122,6 @@ func _process(_delta):
 					var connection = _connections[from][to]
 					connection.join()
 
-func _on_context_menu_request(_pos):
-	var new_node = FlowChartNodeScene.instance()
-	add_child(new_node)
-
 func _on_node_focused_entered(node):
 	prints("focus", node.name)
 	emit_signal("node_selected", node)
@@ -162,6 +160,7 @@ func connect_node(from, to):
 			inv_connection.offset = interconnection_offset
 			connection.join()
 			inv_connection.join()
+	emit_signal("connection", from, to)
 
 func disconnect_node(from, to):
 	var connections_from = _connections.get(from)
@@ -181,6 +180,7 @@ func disconnect_node(from, to):
 		if inv_connection:
 			inv_connection.offset = 0
 			inv_connection.join()
+	emit_signal("disconnection", from, to)
 
 func clear_connections():
 	for connections_from in _connections.values():
