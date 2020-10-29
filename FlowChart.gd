@@ -51,6 +51,11 @@ func _unhandled_key_input(event):
 							if connection.line == selected:
 								disconnect_node(connection.from_node.name, connection.to_node.name)
 								return
+				elif selected is FlowChartNode:
+					for connection_pair in get_connection_list():
+						if connection_pair.from == selected.name or connection_pair.to == selected.name:
+							disconnect_node(connection_pair.from, connection_pair.to)
+					selected.queue_free()
 
 func _gui_input(event):
 	if Engine.editor_hint:
@@ -187,7 +192,7 @@ func get_connection_list():
 	var connection_list = []
 	for connections_from in _connections.values():
 		for connection in connections_from.values():
-			connection_list.append({"from": connection.from_node.name}, {"to": connection.to_node.name})
+			connection_list.append({"from": connection.from_node.name, "to": connection.to_node.name})
 	return connection_list
 
 func get_selected():
