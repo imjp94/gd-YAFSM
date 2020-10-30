@@ -10,6 +10,7 @@ signal disconnection(from, to)
 signal node_selected(node)
 signal node_unselected(node)
 
+export var scroll_margin = 100
 export var interconnection_offset = 10
 
 var _Lines # Node that hold all lines
@@ -113,14 +114,22 @@ func _process(_delta):
 
 	if _current_connection:
 		_current_connection.line.join(_current_connection.get_from_pos(), get_local_mouse_position())
-	if _moving_node:
+	if _moving_node: # TODO: Immediate dragging right after selected, cause ScrollContainer unable focus properly
 		_moving_node.rect_position =  get_local_mouse_position() + _mouse_offset
+		rect_min_size = get_minimum_size() # Update minimum size so ScrollContainer can handle scrolling
 		for from in _connections:
 			var connections_from = _connections[from]
 			for to in connections_from:
 				if from == _moving_node.name or to == _moving_node.name:
 					var connection = _connections[from][to]
 					connection.join()
+
+func _get_minimum_size():
+	var rect = Rect2()
+	for child in get_children():
+		rect = rect.merge(child.get_rect())
+	rect = rect.grow(scroll_margin)
+	return rect.size
 
 func _on_node_focused_entered(node):
 	prints("focus", node.name)
