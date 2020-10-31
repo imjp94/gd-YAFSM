@@ -1,5 +1,6 @@
 tool
 extends Control
+const FlowChartContainer = preload("FlowChartContainer.gd")
 const FlowChartNode = preload("FlowChartNode.gd")
 const FlowChartNodeScene = preload("FlowChartNode.tscn")
 const FlowChartLine = preload("FlowChartLine.gd")
@@ -117,6 +118,8 @@ func _process(_delta):
 	if _moving_node: # TODO: Immediate dragging right after selected, cause ScrollContainer unable focus properly
 		_moving_node.rect_position =  get_local_mouse_position() + _mouse_offset
 		rect_min_size = get_minimum_size() # Update minimum size so ScrollContainer can handle scrolling
+		if get_parent() is FlowChartContainer:
+			get_parent().update()
 		for from in _connections:
 			var connections_from = _connections[from]
 			for to in connections_from:
@@ -124,12 +127,12 @@ func _process(_delta):
 					var connection = _connections[from][to]
 					connection.join()
 
-func _get_minimum_size():
+func get_scroll_rect():
 	var rect = Rect2()
 	for child in get_children():
-		rect = rect.merge(child.get_rect())
-	rect = rect.grow(scroll_margin)
-	return rect.size
+		var child_rect = child.get_rect()
+		rect = rect.merge(child_rect)
+	return rect.grow(scroll_margin)
 
 func _on_node_focused_entered(node):
 	prints("focus", node.name)
