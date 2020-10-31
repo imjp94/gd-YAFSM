@@ -9,14 +9,35 @@ func _ready():
 	add_child(h_scroll)
 	h_scroll.set_anchors_and_margins_preset(PRESET_BOTTOM_WIDE)
 	h_scroll.connect("value_changed", self, "_on_h_scroll_changed")
+	h_scroll.connect("gui_input", self, "_on_h_scroll_gui_input")
 
 	v_scroll = VScrollBar.new()
 	add_child(v_scroll)
 	v_scroll.set_anchors_and_margins_preset(PRESET_RIGHT_WIDE)
 	v_scroll.connect("value_changed", self, "_on_v_scroll_changed")
+	v_scroll.connect("gui_input", self, "_on_v_scroll_gui_input")
 
 	h_scroll.margin_right = -v_scroll.rect_size.x
 	v_scroll.margin_bottom = -h_scroll.rect_size.y
+
+func _on_h_scroll_gui_input(event):
+	if event is InputEventMouseButton:
+		print(event)
+		var v = (h_scroll.max_value - h_scroll.min_value) * 0.01 # Scroll at 0.1% step
+		match event.button_index:
+			BUTTON_WHEEL_UP:
+				h_scroll.value -= v
+			BUTTON_WHEEL_DOWN:
+				h_scroll.value += v
+
+func _on_v_scroll_gui_input(event):
+	if event is InputEventMouseButton:
+		var v = (v_scroll.max_value - v_scroll.min_value) * 0.01 # Scroll at 0.1% step
+		match event.button_index:
+			BUTTON_WHEEL_UP:
+				v_scroll.value -= v # scroll left
+			BUTTON_WHEEL_DOWN:
+				v_scroll.value += v # scroll right
 
 func _notification(what):
 	match what:
@@ -35,4 +56,3 @@ func _on_h_scroll_changed(value):
 
 func _on_v_scroll_changed(value):
 	get_child(0).rect_position.y = -value
-			
