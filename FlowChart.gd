@@ -22,6 +22,9 @@ var _moving_node
 var _mouse_offset = Vector2.ZERO
 
 
+func _init():
+	mouse_filter = MOUSE_FILTER_PASS # Let FlowChartContainer handle scrolling
+
 func _ready():
 	if Engine.editor_hint:
 		return

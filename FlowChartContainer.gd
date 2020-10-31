@@ -22,7 +22,6 @@ func _ready():
 
 func _on_h_scroll_gui_input(event):
 	if event is InputEventMouseButton:
-		print(event)
 		var v = (h_scroll.max_value - h_scroll.min_value) * 0.01 # Scroll at 0.1% step
 		match event.button_index:
 			BUTTON_WHEEL_UP:
@@ -38,6 +37,13 @@ func _on_v_scroll_gui_input(event):
 				v_scroll.value -= v # scroll left
 			BUTTON_WHEEL_DOWN:
 				v_scroll.value += v # scroll right
+
+func _gui_input(event):
+	if event is InputEventMouseMotion:
+		match event.button_mask:
+			BUTTON_MASK_MIDDLE:
+				h_scroll.value -= event.relative.x
+				v_scroll.value -= event.relative.y
 
 func _notification(what):
 	match what:
