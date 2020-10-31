@@ -39,6 +39,15 @@ func _on_v_scroll_gui_input(event):
 				v_scroll.value += v # scroll right
 
 func _gui_input(event):
+	if event is InputEventMouseButton:
+		match event.button_index:
+			BUTTON_MIDDLE:
+				if event.doubleclick:
+					get_child(0).rect_scale = Vector2.ONE
+			BUTTON_WHEEL_UP:
+				get_child(0).rect_scale += Vector2.ONE * 0.01
+			BUTTON_WHEEL_DOWN:
+				get_child(0).rect_scale -= Vector2.ONE * 0.01
 	if event is InputEventMouseMotion:
 		match event.button_mask:
 			BUTTON_MASK_MIDDLE:
