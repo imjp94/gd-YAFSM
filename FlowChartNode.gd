@@ -2,16 +2,15 @@ tool
 extends Container
 # Custom style normal, focus
 
+var selected = false setget set_selected
+
+
 func _init():
 	focus_mode = FOCUS_CLICK
 	mouse_filter = MOUSE_FILTER_PASS
 
-func _ready():
-	connect("focus_entered", self, "_on_focused_entered")
-	update()
-
 func _draw():
-	if has_focus():
+	if selected:
 		draw_style_box(get_stylebox("focus", "FlowChartNode"), Rect2(Vector2.ZERO, rect_size))
 	else:
 		draw_style_box(get_stylebox("normal", "FlowChartNode"), Rect2(Vector2.ZERO, rect_size))
@@ -26,5 +25,7 @@ func _notification(what):
 func _get_minimum_size():
 	return Vector2(50, 50)
 
-func _on_focused_entered():
-	print("focused")
+func set_selected(v):
+	if selected != v:
+		selected = v
+		update()

@@ -2,13 +2,12 @@ tool
 extends Container
 # Custom style normal, focus
 
+var selected = false setget set_selected
+
 
 func _init():
 	focus_mode = FOCUS_CLICK
-	connect("focus_entered", self, "_on_focused_entered")
-
-func _on_focused_entered():
-	print("focused line")
+	mouse_filter = MOUSE_FILTER_IGNORE
 
 func _draw():
 	pivot_at_line_start()
@@ -16,7 +15,7 @@ func _draw():
 	from.y += rect_size.y / 2.0
 	var to = rect_size
 	to.y -= rect_size.y / 2.0
-	if has_focus():
+	if selected:
 		draw_style_box(get_stylebox("focus", "FlowChartLine"), Rect2(Vector2.ZERO, rect_size))
 	else:
 		draw_style_box(get_stylebox("normal", "FlowChartLine"), Rect2(Vector2.ZERO, rect_size))
@@ -45,3 +44,14 @@ func join(from, to, offset=Vector2.ZERO):
 	rect_rotation = rad2deg(rotation)
 	rect_position += rect_position - get_transform().xform(Vector2.UP * offset) # offset along local Up axis
 	pivot_at_line_start()
+
+func set_selected(v):
+	if selected != v:
+		selected = v
+		update()
+
+func get_from_pos():
+	return get_transform().xform(rect_position)
+
+func get_to_pos():
+	return get_transform().xform(rect_position + rect_size)

@@ -20,6 +20,8 @@ var _is_connecting = false
 var _current_connection
 var _moving_node
 var _mouse_offset = Vector2.ZERO
+var _selection = []
+var _mouse_start = Vector2.ZERO
 
 
 func _init():
@@ -34,35 +36,23 @@ func _ready():
 	add_child(_Lines)
 	move_child(_Lines, 0) # Make sure lines always behind nodes
 
-	for child in get_children():
-		if child is FlowChartNode:
-			_init_node_signals(child)
-
-func add_child(node, legible_unique_name=false):
-	.add_child(node, legible_unique_name)
-	_init_node_signals(node)
-
-func _init_node_signals(node):
-	node.connect("focus_entered", self, "_on_node_focused_entered", [node])
-	node.connect("focus_exited", self, "_on_node_focused_exited", [node])
-
 func _unhandled_key_input(event):
 	match event.scancode:
 		KEY_DELETE:
-			var selected = get_selected()
-			if selected:
-				if selected is FlowChartLine:
-					# TODO: More efficient way to get connection from Line node
-					for connections_from in _connections.values():
-						for connection in connections_from.values():
-							if connection.line == selected:
-								disconnect_node(connection.from_node.name, connection.to_node.name)
-								return
-				elif selected is FlowChartNode:
-					for connection_pair in get_connection_list():
-						if connection_pair.from == selected.name or connection_pair.to == selected.name:
-							disconnect_node(connection_pair.from, connection_pair.to)
-					selected.queue_free()
+			for node in _selection:
+				if node:
+					if node is FlowChartLine:
+						# TODO: More efficient way to get connection from Line node
+						for connections_from in _connections.values():
+							for connection in connections_from.values():
+								if connection.line == node:
+									disconnect_node(connection.from_node.name, connection.to_node.name)
+									return
+					elif node is FlowChartNode:
+						for connection_pair in get_connection_list():
+							if connection_pair.from == node.name or connection_pair.to == node.name:
+								disconnect_node(connection_pair.from, connection_pair.to)
+							node.queue_free()
 
 func _gui_input(event):
 	if Engine.editor_hint:
@@ -76,32 +66,48 @@ func _gui_input(event):
 				if child.get_rect().has_point(event.position):
 					hit_node = child
 					break
+		if not hit_node:
+			# Test Line
+			# Refer https://github.com/godotengine/godot/blob/master/editor/plugins/animation_state_machine_editor.cpp#L187
+			var closest = -1
+			var closest_d = 1e20
+			var connection_list = get_connection_list()
+			for i in connection_list.size():
+				var connection = _connections[connection_list[i].from][connection_list[i].to]
+				var cp = Geometry.get_closest_point_to_segment_2d(event.position, connection.get_from_pos(), connection.get_to_pos())
+				var d = cp.distance_to(event.position)
+				if d > connection.line.rect_size.y * 2:
+					continue
+				if d < closest_d:
+					closest = i
+					closest_d = d
+
+			if closest >= 0:
+				hit_node = _connections[connection_list[closest].from][connection_list[closest].to].line
 
 		match event.button_index:
 			BUTTON_LEFT:
 				if event.pressed:
+					if not hit_node in _selection and not event.shift:
+						clear_selection()
+
 					if hit_node:
-						# Select node
-						hit_node.grab_focus()
-						move_child(hit_node, get_child_count()-1) # Raise selected node to top
-						if event.shift:
-							# Connection start
-							prints("start", hit_node.name)
-							var line = create_line_instance()
-							var connection = Connection.new(line, hit_node, null)
-							_connect_node(line, connection.get_from_pos(), get_local_mouse_position())
-							_current_connection = connection
-						else:
-							# Move node
-							_moving_node = hit_node
-							_mouse_offset = _moving_node.rect_position - event.position
-					else:
-						var focus_owner = get_focus_owner()
-						if focus_owner:
-							focus_owner.release_focus()
+						select(hit_node)
+						if hit_node is FlowChartNode:
+							move_child(hit_node, get_child_count()-1) # Raise selected node to top
+							if event.shift:
+								# Connection start
+								var line = create_line_instance()
+								var connection = Connection.new(line, hit_node, null)
+								_connect_node(line, connection.get_from_pos(), get_local_mouse_position())
+								_current_connection = connection
+							else:
+								# Move node
+								_moving_node = hit_node
+								_mouse_offset = _moving_node.rect_position - event.position
 				else:
 					if _current_connection:
-						if hit_node:
+						if hit_node is FlowChartNode:
 							# Connection end
 							_disconnect_node(_current_connection.line)
 							_current_connection.to_node = hit_node
@@ -136,14 +142,6 @@ func get_scroll_rect():
 		var child_rect = child.get_rect()
 		rect = rect.merge(child_rect)
 	return rect.grow(scroll_margin)
-
-func _on_node_focused_entered(node):
-	prints("focus", node.name)
-	emit_signal("node_selected", node)
-
-func _on_node_focused_exited(node):
-	prints("unfocus", node.name)
-	emit_signal("node_unselected", node)
 
 func _connect_node(line, from_pos, to_pos):
 	_Lines.add_child(line)
@@ -194,7 +192,7 @@ func disconnect_node(from, to):
 
 	connections_from = _connections.get(to)
 	if connections_from:
-		var inv_connection = connections_from[from]
+		var inv_connection = connections_from.get(from)
 		if inv_connection:
 			inv_connection.offset = 0
 			inv_connection.join()
@@ -205,6 +203,24 @@ func clear_connections():
 		for connection in connections_from.values():
 			connection.line.queue_free()
 	_connections.clear()
+
+func select(node):
+	if node in _selection:
+		return
+
+	_selection.append(node)
+	node.selected = true
+
+func deselect(node):
+	_selection.erase(node)
+	node.selected = false
+
+func clear_selection():
+	for node in _selection:
+		if not node:
+			continue
+		node.selected = false
+	_selection.clear()
 
 func get_connection_list():
 	var connection_list = []
