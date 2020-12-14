@@ -6,10 +6,10 @@ const FlowChartNodeScene = preload("FlowChartNode.tscn")
 const FlowChartLine = preload("FlowChartLine.gd")
 const FlowChartLineScene = preload("FlowChartLine.tscn")
 
-signal connection(from, to)
-signal disconnection(from, to)
+signal connection(from, to, line)
+signal disconnection(from, to, line)
 signal node_selected(node)
-signal node_unselected(node)
+signal node_deselected(node)
 
 export var scroll_margin = 100
 export var interconnection_offset = 10
@@ -28,9 +28,6 @@ func _init():
 	mouse_filter = MOUSE_FILTER_PASS # Let FlowChartContainer handle scrolling
 
 func _ready():
-	if Engine.editor_hint:
-		return
-
 	_Lines = Control.new()
 	_Lines.name = "Lines"
 	add_child(_Lines)
@@ -55,9 +52,6 @@ func _unhandled_key_input(event):
 							node.queue_free()
 
 func _gui_input(event):
-	if Engine.editor_hint:
-		return
-
 	if event is InputEventMouseButton:
 		var hit_node
 		for i in get_child_count():
@@ -119,9 +113,6 @@ func _gui_input(event):
 					_mouse_offset = Vector2.ZERO
 
 func _process(_delta):
-	if Engine.editor_hint:
-		return
-
 	if _current_connection:
 		_current_connection.line.join(_current_connection.get_from_pos(), get_local_mouse_position())
 	if _moving_node: # TODO: Immediate dragging right after selected, cause ScrollContainer unable focus properly
@@ -176,7 +167,7 @@ func connect_node(from, to):
 			inv_connection.offset = interconnection_offset
 			connection.join()
 			inv_connection.join()
-	emit_signal("connection", from, to)
+	emit_signal("connection", from, to, line)
 
 func disconnect_node(from, to):
 	var connections_from = _connections.get(from)
@@ -210,16 +201,18 @@ func select(node):
 
 	_selection.append(node)
 	node.selected = true
+	emit_signal("node_selected", node)
 
 func deselect(node):
 	_selection.erase(node)
 	node.selected = false
+	emit_signal("node_deselected", node)
 
 func clear_selection():
 	for node in _selection:
 		if not node:
 			continue
-		node.selected = false
+		deselect(node)
 	_selection.clear()
 
 func get_connection_list():

@@ -1,3 +1,4 @@
+tool
 extends Container
 
 var h_scroll
