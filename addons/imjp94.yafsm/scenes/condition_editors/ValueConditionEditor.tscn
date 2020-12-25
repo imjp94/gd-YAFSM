@@ -3,16 +3,16 @@
 [ext_resource path="res://addons/imjp94.yafsm/scenes/condition_editors/ConditionEditor.tscn" type="PackedScene" id=1]
 [ext_resource path="res://addons/imjp94.yafsm/scenes/condition_editors/ValueConditionEditor.gd" type="Script" id=2]
 
-
-
-
 [node name="ValueConditionEditor" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
 
 [node name="Comparation" type="Button" parent="." index="1"]
 margin_left = 62.0
+margin_top = 2.0
 margin_right = 90.0
-margin_bottom = 24.0
+margin_bottom = 22.0
+size_flags_horizontal = 5
+size_flags_vertical = 4
 text = "=="
 
 [node name="PopupMenu" type="PopupMenu" parent="Comparation" index="0"]
@@ -26,6 +26,6 @@ margin_right = 94.0
 margin_bottom = 24.0
 
 [node name="Remove" parent="." index="3"]
-margin_left = 157.0
-margin_right = 187.0
+margin_left = 98.0
+margin_right = 128.0
 hint_tooltip = "Remove Condition"

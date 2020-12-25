@@ -1,72 +1,71 @@
 tool
-extends "BaseStateNode.gd"
+extends "res://addons/imjp94.yafsm/scenes/flowchart/FlowChartNode.gd"
+const State = preload("../../src/states/State.gd")
 
-onready var Name = $Name
+signal name_edit_entered(new_name) # Emits when focused exit or Enter pressed
 
+onready var name_edit = $MarginContainer/NameEdit
+
+var undo_redo
+
+var state setget set_state
+
+var _to_free
+
+func _init():
+	_to_free = []
+	set_state(State.new("State"))
 
 func _ready():
-	connect("renamed", self, "_on_renamed")
-	Name.connect("text_entered", self, "_on_Name_text_entered")
-	Name.connect("focus_exited", self, "_on_Name_focus_exited")
+	name_edit.text = "State"
+	name_edit.connect("focus_exited", self, "_on_NameEdit_focus_exited")
+	name_edit.connect("text_entered", self, "_on_NameEdit_text_entered")
+	set_process_input(false) # _input only required when name_edit enabled to check mouse click outside
 
 func _gui_input(event):
 	if event is InputEventMouseButton:
-		if event.button_index == BUTTON_RIGHT:
-			accept_event() # Consume right-click event
+		if event.doubleclick:
+			enable_name_edit(true)
+			accept_event()
 
-func _on_renamed():
-	Name.text = name # Sync Name ui text with Node.name
+func _input(event):
+	if event is InputEventMouseButton:
+		if event.pressed:
+			if get_focus_owner() == name_edit:
+				var local_event = name_edit.make_input_local(event)
+				if not name_edit.get_rect().has_point(local_event.position):
+					name_edit.release_focus()
 
-func _on_Name_text_entered(new_text):
-	if name == new_text: # Avoid infinite loop
-		return
+func enable_name_edit(v):
+	if v:
+		set_process_input(true)
+		name_edit.editable = true
+		name_edit.mouse_filter = MOUSE_FILTER_PASS
+		name_edit.grab_focus()
+	else:
+		set_process_input(false)
+		name_edit.editable = false
+		name_edit.mouse_filter = MOUSE_FILTER_IGNORE
+		name_edit.release_focus()
 
-	rename_action(Name.text)
+func _on_state_name_changed(new_name):
+	name_edit.text = new_name
 
-func _on_Name_focus_exited():
-	if name == Name.text:
-		return
+func _on_state_changed(new_state):
+	if state:
+		state.connect("name_changed", self, "_on_state_name_changed")
+		if name_edit:
+			name_edit.text = state.name
 
-	rename_action(Name.text)
+func _on_NameEdit_focus_exited():
+	enable_name_edit(false)
+	emit_signal("name_edit_entered", name_edit.text)
 
-func _on_node_name_changed(old, new):
-	# Set resource data
-	get_parent().state_machine.change_state_name(old, new)
-	# Update GraphEdit connection & TransitionEditor
-	for connection in get_parent().get_connection_list():
-		var node
-		var transition_editor
-		if connection.from == old:
-			node = self
-			transition_editor = node.Transitions.get_node(connection.to)
-			transition_editor.name = connection.to # Update name in scene tree
-			transition_editor.update_title()
-			transition_editor.update_condition_count()
-			get_parent().disconnect_node(old, 0, connection.to, 0)
-			get_parent().connect_node(new, 0, connection.to, 0)
-		elif connection.to == old:
-			node = get_parent().get_node(connection.from)
-			transition_editor = node.Transitions.get_node(old)
-			transition_editor.name = new # Update name in scene tree
-			transition_editor.update_title()
-			transition_editor.update_condition_count()
-			get_parent().disconnect_node(connection.from, 0, old, 0)
-			get_parent().connect_node(connection.from, 0, new, 0)
+func _on_NameEdit_text_entered(new_text):
+	enable_name_edit(false)
+	emit_signal("name_edit_entered", new_text)
 
-# Change name through Name ui, but always respect the naming system of scene tree
-func change_name(new_name):
-	var old = name
-	if new_name.nocasecmp_to(State.ENTRY_KEY) == 0 or new_name.nocasecmp_to(State.EXIT_KEY) == 0:
-		push_warning("Failed to change state name to %s/%s keyword" % [State.ENTRY_KEY, State.EXIT_KEY])
-		Name.text = old
-		return
-
-	name = new_name
-	_on_node_name_changed(old, new_name)
-
-func rename_action(new_name):
-	var old_name = name
-	undo_redo.create_action("Rename State Node")
-	undo_redo.add_do_method(self, "change_name", new_name)
-	undo_redo.add_undo_method(self, "change_name", old_name)
-	undo_redo.commit_action()
+func set_state(s):
+	if state != s:
+		state = s
+		_on_state_changed(s)

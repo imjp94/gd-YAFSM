@@ -39,7 +39,6 @@ func _on_Header_gui_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed:
 			toggle_conditions()
-			get_parent().owner.rect_size = Vector2.ZERO
 
 func _on_Add_pressed():
 	Utils.popup_on_target(AddPopupMenu, Add)
@@ -65,6 +64,9 @@ func _on_ConditionEditorRemove_pressed(editor):
 	remove_condition_editor_action(editor)
 
 func _on_transition_changed(new_transition):
+	if not new_transition:
+		return
+
 	for condition in transition.conditions.values():
 		var editor = create_condition_editor(condition)
 		add_condition_editor(editor, condition)
@@ -77,7 +79,6 @@ func _on_condition_editor_added(editor):
 		editor.Remove.connect("pressed", self, "_on_ConditionEditorRemove_pressed", [editor])
 	transition.add_condition(editor.condition)
 	update_condition_count()
-	get_parent().owner.rect_size = Vector2.ZERO
 
 func add_condition_editor(editor, condition):
 	Conditions.add_child(editor)
@@ -89,7 +90,6 @@ func remove_condition_editor(editor):
 	Conditions.remove_child(editor)
 	_to_free.append(editor) # Freeing immediately after removal will break undo/redo
 	update_condition_count()
-	get_parent().owner.rect_size = Vector2.ZERO
 
 func update_title():
 	TitleLabel.text = transition.to

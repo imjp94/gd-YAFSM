@@ -2,6 +2,7 @@ tool
 extends Resource
 
 signal name_changed(old, new)
+signal display_string_changed(new)
 
 export(String) var name = "" setget set_name
 
@@ -14,3 +15,7 @@ func set_name(n):
 		var old = name
 		name = n
 		emit_signal("name_changed", old, n)
+		emit_signal("display_string_changed", display_string())
+
+func display_string():
+	return name
