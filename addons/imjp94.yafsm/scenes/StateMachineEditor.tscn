@@ -1,46 +1,63 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://addons/imjp94.yafsm/scenes/StateMachineEditor.gd" type="Script" id=1]
+[ext_resource path="res://addons/imjp94.yafsm/scenes/state_nodes/StateNode.tscn" type="PackedScene" id=1]
 [ext_resource path="res://addons/imjp94.yafsm/scenes/ContextMenu.tscn" type="PackedScene" id=2]
+[ext_resource path="res://addons/imjp94.yafsm/scenes/StateMachineEditor.gd" type="Script" id=3]
 
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.164706, 0.164706, 0.164706, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0.901961, 0.756863, 0.243137, 1 )
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
+[sub_resource type="StyleBoxFlat" id=2]
+bg_color = Color( 0.164706, 0.164706, 0.164706, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
-[node name="StateMachineEditor" type="GraphEdit"]
+[sub_resource type="Theme" id=3]
+FlowChartNode/styles/focus = SubResource( 1 )
+FlowChartNode/styles/normal = SubResource( 2 )
+
+[node name="StateMachineEditor" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-rect_min_size = Vector2( 0, 200 )
-script = ExtResource( 1 )
+rect_min_size = Vector2( 500, 600 )
+mouse_filter = 1
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="FlowChartNode" parent="." instance=ExtResource( 1 )]
+theme = SubResource( 3 )
+
+[node name="FlowChartNode2" parent="." instance=ExtResource( 1 )]
+margin_left = 425.736
+margin_top = 161.732
+margin_right = 475.736
+margin_bottom = 211.732
+theme = SubResource( 3 )
 
 [node name="ContextMenu" parent="." instance=ExtResource( 2 )]
+margin_right = 81.0
+margin_bottom = 70.0
 items = [ "Add State", null, 0, false, false, 0, 0, null, "", false, "Add Entry", null, 0, false, false, 1, 0, null, "", false, "Add Exit", null, 0, false, false, 2, 0, null, "", false ]
 
-[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
-
-[node name="OverlayContainer" type="MarginContainer" parent="."]
-visible = false
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Panel" type="Panel" parent="OverlayContainer"]
-margin_right = 1024.0
-margin_bottom = 600.0
-mouse_filter = 2
-
-[node name="CenterContainer" type="CenterContainer" parent="OverlayContainer"]
-margin_right = 1024.0
-margin_bottom = 600.0
-mouse_filter = 2
-
-[node name="CreateStateMachine" type="Button" parent="OverlayContainer/CenterContainer"]
-margin_left = 440.0
-margin_top = 290.0
-margin_right = 583.0
-margin_bottom = 310.0
-text = "Create StateMachine"
+[node name="SaveDialog" type="ConfirmationDialog" parent="."]
+margin_right = 200.0
+margin_bottom = 70.0

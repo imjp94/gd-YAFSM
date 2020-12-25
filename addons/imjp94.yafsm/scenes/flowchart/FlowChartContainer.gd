@@ -1,5 +1,5 @@
 tool
-extends Container
+extends Control
 
 var h_scroll
 var v_scroll

@@ -21,6 +21,7 @@ func set_comparation(c):
 	if comparation != c:
 		comparation = c
 		emit_signal("comparation_changed", c)
+		emit_signal("display_string_changed", display_string())
 
 # To be overrided by child class and emit value_changed signal
 func set_value(v):
@@ -29,6 +30,10 @@ func set_value(v):
 # To be overrided by child class, as it is impossible to export(Variant)
 func get_value():
 	pass
+
+# To be used in _to_string()
+func get_value_string():
+	return get_value()
 
 # Compare value against this condition, return true if succeeded
 func compare(v):
@@ -42,3 +47,15 @@ func compare(v):
 			return v == get_value()
 		Comparation.GREATER:
 			return v > get_value()
+
+static func comparation_to_symbol(v):
+	match v:
+		Comparation.LESSER:
+			return "<"
+		Comparation.EQUAL:
+			return "=="
+		Comparation.GREATER:
+			return ">"
+
+func display_string():
+	return "%s %s %s" % [.display_string(), comparation_to_symbol(comparation), get_value_string()]

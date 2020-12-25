@@ -1,6 +1,9 @@
 tool
 extends Resource
 
+signal condition_added(condition)
+signal condition_removed(condition)
+
 export(String) var from # Name of state transiting from
 export(String) var to # Name of state transiting to
 export(Dictionary) var conditions setget ,get_conditions # Conditions to transit successfuly, keyed by Condition.name
@@ -35,11 +38,17 @@ func add_condition(condition):
 		return false
 
 	conditions[condition.name] = condition
+	emit_signal("condition_added", condition)
 	return true
 
 # Remove condition by name of condition
 func remove_condition(name):
-	return conditions.erase(name)
+	var condition = conditions.get(name)
+	if condition:
+		conditions.erase(name)
+		emit_signal("condition_removed", condition)
+		return true
+	return false
 
 # Change condition name, return true if succeeded
 func change_condition_name(from, to):

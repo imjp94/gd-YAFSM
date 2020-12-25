@@ -10,6 +10,8 @@ signal connection(from, to, line)
 signal disconnection(from, to, line)
 signal node_selected(node)
 signal node_deselected(node)
+signal drag_start(node)
+signal drag_end(node)
 
 export var scroll_margin = 100
 export var interconnection_offset = 10
@@ -49,7 +51,7 @@ func _unhandled_key_input(event):
 						for connection_pair in get_connection_list():
 							if connection_pair.from == node.name or connection_pair.to == node.name:
 								disconnect_node(connection_pair.from, connection_pair.to)
-							node.queue_free()
+							remove_node(node.name)
 
 func _gui_input(event):
 	if event is InputEventMouseButton:
@@ -99,6 +101,9 @@ func _gui_input(event):
 								# Move node
 								_moving_node = hit_node
 								_mouse_offset = _moving_node.rect_position - event.position
+								_on_drag_end(_moving_node)
+								emit_signal("drag_start", _moving_node)
+							accept_event()
 				else:
 					if _current_connection:
 						if hit_node is FlowChartNode:
@@ -108,9 +113,14 @@ func _gui_input(event):
 							connect_node(_current_connection.from_node.name, _current_connection.to_node.name)
 						else:
 							_current_connection.line.queue_free()
+						accept_event()
+
+					if _moving_node:
+						_on_drag_end(_moving_node)
+						emit_signal("drag_end", _moving_node)
+						_moving_node = null
+						_mouse_offset = Vector2.ZERO
 					_current_connection = null
-					_moving_node = null
-					_mouse_offset = Vector2.ZERO
 
 func _process(_delta):
 	if _current_connection:
@@ -134,6 +144,23 @@ func get_scroll_rect():
 		rect = rect.merge(child_rect)
 	return rect.grow(scroll_margin)
 
+func add_node(node):
+	add_child(node)
+	_on_node_added(node)
+
+func remove_node(node_name):
+	var node = get_node_or_null(node_name)
+	if node:
+		remove_child(node)
+		node.queue_free() # TODO: add to _to_free instead
+		_on_node_removed(node_name)
+
+func _on_node_added(node):
+	pass
+
+func _on_node_removed(node):
+	pass
+
 func _connect_node(line, from_pos, to_pos):
 	_Lines.add_child(line)
 	line.join(from_pos, to_pos)
@@ -144,6 +171,20 @@ func _disconnect_node(line):
 
 func create_line_instance():
 	return FlowChartLineScene.instance()
+
+func rename_node(old, new):
+	for from in _connections.keys():
+		if from == old: # Connection from
+			var from_connections = _connections[from]
+			_connections.erase(old)
+			_connections[new] = from_connections
+		else: # Connection to
+			for to in _connections[from].keys():
+				if to == old:
+					var from_connection = _connections[from]
+					var value = from_connection[old]
+					from_connection.erase(old)
+					from_connection[new] = value
 
 func connect_node(from, to):
 	var connections_from = _connections.get(from)
@@ -167,6 +208,7 @@ func connect_node(from, to):
 			inv_connection.offset = interconnection_offset
 			connection.join()
 			inv_connection.join()
+	_on_connect_node(from, to)
 	emit_signal("connection", from, to, line)
 
 func disconnect_node(from, to):
@@ -187,6 +229,7 @@ func disconnect_node(from, to):
 		if inv_connection:
 			inv_connection.offset = 0
 			inv_connection.join()
+	_on_disconnect_node(from, to)
 	emit_signal("disconnection", from, to)
 
 func clear_connections():
@@ -214,6 +257,18 @@ func clear_selection():
 			continue
 		deselect(node)
 	_selection.clear()
+
+func _on_connect_node(from, to):
+	pass
+
+func _on_disconnect_node(from, to):
+	pass
+
+func _on_drag_start(node):
+	pass
+
+func _on_drag_end(node):
+	pass
 
 func get_connection_list():
 	var connection_list = []
