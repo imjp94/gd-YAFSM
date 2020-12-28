@@ -1,17 +1,23 @@
 tool
 extends "res://addons/imjp94.yafsm/scenes/flowchart/FlowChart.gd"
+const StateMachine = preload("../src/states/StateMachine.gd")
 const Transition = preload("../src/transitions/Transition.gd")
 const State = preload("../src/states/State.gd")
 const StateNode = preload("state_nodes/StateNode.tscn")
 const TransitionLine = preload("transition_editors/TransitionLine.tscn")
 const StateNodeScript = preload("state_nodes/StateNode.gd")
 
+signal inspector_changed(property)
+
 onready var ContextMenu = $ContextMenu
 onready var SaveDialog = $SaveDialog
+onready var CreateNewStateMachineContainer = $MarginContainer
+onready var CreateNewStateMachine = $MarginContainer/CreateNewStateMachine
 
 var undo_redo
 
-var state_machine setget set_state_machine
+var state_machine_player setget set_state_machine_player
+export(Resource) var state_machine setget set_state_machine
 
 var _to_free
 
@@ -19,9 +25,30 @@ var _to_free
 func _init():
 	_to_free = []
 
+
 func _ready():
+	CreateNewStateMachineContainer.visible = false
+	CreateNewStateMachine.connect("pressed", self, "_on_CreateNewStateMachine_pressed")
 	ContextMenu.connect("index_pressed", self, "_on_ContextMenu_index_pressed")
 	SaveDialog.connect("confirmed", self, "_on_SaveDialog_confirmed")
+
+func _on_state_machine_player_changed(new_state_machine_player):
+	if new_state_machine_player:
+		CreateNewStateMachineContainer.visible = !new_state_machine_player.state_machine
+	else:
+		CreateNewStateMachineContainer.visible = false
+
+func _on_CreateNewStateMachine_pressed():
+	var new_state_machine = StateMachine.new()
+	state_machine_player.state_machine = new_state_machine
+	state_machine = new_state_machine
+	CreateNewStateMachineContainer.visible = false
+	emit_signal("inspector_changed", "state_machine")
+
+func set_state_machine_player(smp):
+	if state_machine_player != smp:
+		state_machine_player = smp
+		_on_state_machine_player_changed(smp)
 
 func _unhandled_key_input(event):
 	._unhandled_key_input(event)
@@ -61,9 +88,9 @@ func save():
 
 func clear_graph():
 	clear_connections()
-	for child in get_children():
+	for child in _content.get_children():
 		if child is StateNodeScript:
-			remove_child(child)
+			_content.remove_child(child)
 			_to_free.append(child)
 	
 func draw_graph():
@@ -92,6 +119,7 @@ func draw_graph():
 			for transition in from_transitions.values():
 				connect_node(transition.from, transition.to)
 				_connections[transition.from][transition.to].line.transition = transition
+	update()
 
 func _on_ContextMenu_index_pressed(index):
 	var new_node = StateNode.instance()
@@ -140,12 +168,9 @@ func _on_disconnect_node(from, to):
 	state_machine.remove_transition(from, to)
 
 func _on_state_machine_changed(new_state_machine):
+	clear_graph()
 	if new_state_machine:
-		clear_graph()
 		draw_graph()
-	else:
-		clear_graph()
-		# OverlayContainer.show()
 
 func _on_node_name_edit_entered(new_name, node):
 	var old = node.state.name

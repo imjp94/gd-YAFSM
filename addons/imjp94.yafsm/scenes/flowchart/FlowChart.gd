@@ -1,6 +1,6 @@
 tool
 extends Control
-const FlowChartContainer = preload("FlowChartContainer.gd")
+
 const FlowChartNode = preload("FlowChartNode.gd")
 const FlowChartNodeScene = preload("FlowChartNode.tscn")
 const FlowChartLine = preload("FlowChartLine.gd")
@@ -16,6 +16,10 @@ signal drag_end(node)
 export var scroll_margin = 100
 export var interconnection_offset = 10
 
+var h_scroll
+var v_scroll
+
+var _content
 var _Lines # Node that hold all lines
 var _connections = {}
 var _is_connecting = false
@@ -24,16 +28,68 @@ var _moving_node
 var _mouse_offset = Vector2.ZERO
 var _selection = []
 var _mouse_start = Vector2.ZERO
-
-
-func _init():
-	mouse_filter = MOUSE_FILTER_PASS # Let FlowChartContainer handle scrolling
+	
 
 func _ready():
+	h_scroll = HScrollBar.new()
+	add_child(h_scroll)
+	h_scroll.set_anchors_and_margins_preset(PRESET_BOTTOM_WIDE)
+	h_scroll.connect("value_changed", self, "_on_h_scroll_changed")
+	h_scroll.connect("gui_input", self, "_on_h_scroll_gui_input")
+
+	v_scroll = VScrollBar.new()
+	add_child(v_scroll)
+	v_scroll.set_anchors_and_margins_preset(PRESET_RIGHT_WIDE)
+	v_scroll.connect("value_changed", self, "_on_v_scroll_changed")
+	v_scroll.connect("gui_input", self, "_on_v_scroll_gui_input")
+
+	h_scroll.margin_right = -v_scroll.rect_size.x
+	v_scroll.margin_bottom = -h_scroll.rect_size.y
+
+	_content = Control.new()
+	_content.mouse_filter = MOUSE_FILTER_IGNORE
+	add_child(_content)
 	_Lines = Control.new()
 	_Lines.name = "Lines"
-	add_child(_Lines)
-	move_child(_Lines, 0) # Make sure lines always behind nodes
+	_content.add_child(_Lines)
+	_content.move_child(_Lines, 0) # Make sure lines always behind nodes
+
+func _on_h_scroll_gui_input(event):
+	if event is InputEventMouseButton:
+		var v = (h_scroll.max_value - h_scroll.min_value) * 0.01 # Scroll at 0.1% step
+		match event.button_index:
+			BUTTON_WHEEL_UP:
+				h_scroll.value -= v
+			BUTTON_WHEEL_DOWN:
+				h_scroll.value += v
+
+func _on_v_scroll_gui_input(event):
+	if event is InputEventMouseButton:
+		var v = (v_scroll.max_value - v_scroll.min_value) * 0.01 # Scroll at 0.1% step
+		match event.button_index:
+			BUTTON_WHEEL_UP:
+				v_scroll.value -= v # scroll left
+			BUTTON_WHEEL_DOWN:
+				v_scroll.value += v # scroll right
+
+func _notification(what):
+	match what:
+		NOTIFICATION_DRAW:
+			var content_rect = get_scroll_rect()
+			if not get_rect().encloses(content_rect):
+				h_scroll.min_value = content_rect.position.x
+				h_scroll.max_value = content_rect.size.x + content_rect.position.x - rect_size.x
+				# h_scroll.page = 10 # TODO: Dynamically update page with non-zero value
+				v_scroll.min_value = content_rect.position.y
+				v_scroll.max_value = content_rect.size.y + content_rect.position.y - rect_size.y
+				# v_scroll.page = 10 # TODO: Dynamically update page with non-zero value
+
+func _on_h_scroll_changed(value):
+	_content.rect_position.x = -value
+
+func _on_v_scroll_changed(value):
+	_content.rect_position.y = -value
+
 
 func _unhandled_key_input(event):
 	match event.scancode:
@@ -55,11 +111,26 @@ func _unhandled_key_input(event):
 
 func _gui_input(event):
 	if event is InputEventMouseButton:
+		match event.button_index:
+			BUTTON_MIDDLE:
+				if event.doubleclick:
+					_content.rect_scale = Vector2.ONE
+			BUTTON_WHEEL_UP:
+				_content.rect_scale += Vector2.ONE * 0.01
+			BUTTON_WHEEL_DOWN:
+				_content.rect_scale -= Vector2.ONE * 0.01
+	if event is InputEventMouseMotion:
+		match event.button_mask:
+			BUTTON_MASK_MIDDLE:
+				h_scroll.value -= event.relative.x
+				v_scroll.value -= event.relative.y
+
+	if event is InputEventMouseButton:
 		var hit_node
-		for i in get_child_count():
-			var child = get_child(get_child_count()-1 - i) # Inverse order to check from top to bottom of canvas
+		for i in _content.get_child_count():
+			var child = _content.get_child(_content.get_child_count()-1 - i) # Inverse order to check from top to bottom of canvas
 			if child is FlowChartNode:
-				if child.get_rect().has_point(event.position):
+				if child.get_rect().has_point(content_position(event.position)):
 					hit_node = child
 					break
 		if not hit_node:
@@ -70,8 +141,8 @@ func _gui_input(event):
 			var connection_list = get_connection_list()
 			for i in connection_list.size():
 				var connection = _connections[connection_list[i].from][connection_list[i].to]
-				var cp = Geometry.get_closest_point_to_segment_2d(event.position, connection.get_from_pos(), connection.get_to_pos())
-				var d = cp.distance_to(event.position)
+				var cp = Geometry.get_closest_point_to_segment_2d(content_position(event.position), connection.get_from_pos(), connection.get_to_pos())
+				var d = cp.distance_to(content_position(event.position))
 				if d > connection.line.rect_size.y * 2:
 					continue
 				if d < closest_d:
@@ -90,7 +161,7 @@ func _gui_input(event):
 					if hit_node:
 						select(hit_node)
 						if hit_node is FlowChartNode:
-							move_child(hit_node, get_child_count()-1) # Raise selected node to top
+							_content.move_child(hit_node, get_child_count()-1) # Raise selected node to top
 							if event.shift:
 								# Connection start
 								var line = create_line_instance()
@@ -100,7 +171,7 @@ func _gui_input(event):
 							else:
 								# Move node
 								_moving_node = hit_node
-								_mouse_offset = _moving_node.rect_position - event.position
+								_mouse_offset = _moving_node.rect_position - content_position(event.position)
 								_on_drag_end(_moving_node)
 								emit_signal("drag_start", _moving_node)
 							accept_event()
@@ -124,12 +195,10 @@ func _gui_input(event):
 
 func _process(_delta):
 	if _current_connection:
-		_current_connection.line.join(_current_connection.get_from_pos(), get_local_mouse_position())
+		_current_connection.line.join(_current_connection.get_from_pos(), content_position(get_local_mouse_position()))
 	if _moving_node: # TODO: Immediate dragging right after selected, cause ScrollContainer unable focus properly
-		_moving_node.rect_position =  get_local_mouse_position() + _mouse_offset
-		rect_min_size = get_minimum_size() # Update minimum size so ScrollContainer can handle scrolling
-		if get_parent() is FlowChartContainer:
-			get_parent().update()
+		_moving_node.rect_position =  content_position(get_local_mouse_position() + _mouse_offset)
+		update()
 		for from in _connections:
 			var connections_from = _connections[from]
 			for to in connections_from:
@@ -139,19 +208,19 @@ func _process(_delta):
 
 func get_scroll_rect():
 	var rect = Rect2()
-	for child in get_children():
+	for child in _content.get_children():
 		var child_rect = child.get_rect()
 		rect = rect.merge(child_rect)
 	return rect.grow(scroll_margin)
 
 func add_node(node):
-	add_child(node)
+	_content.add_child(node)
 	_on_node_added(node)
 
 func remove_node(node_name):
-	var node = get_node_or_null(node_name)
+	var node = _content.get_node_or_null(node_name)
 	if node:
-		remove_child(node)
+		_content.remove_child(node)
 		node.queue_free() # TODO: add to _to_free instead
 		_on_node_removed(node_name)
 
@@ -192,7 +261,7 @@ func connect_node(from, to):
 		if to in connections_from:
 			return # Connection existed
 	var line = create_line_instance()
-	var connection = Connection.new(line, get_node(from), get_node(to))
+	var connection = Connection.new(line, _content.get_node(from), _content.get_node(to))
 	if not connections_from:
 		connections_from = {}
 		_connections[from] = connections_from
@@ -269,6 +338,10 @@ func _on_drag_start(node):
 
 func _on_drag_end(node):
 	pass
+
+# Convert position in FlowChart space to content(takes translation/scale of content into account)
+func content_position(pos):
+	return (pos - _content.rect_position) * 1.0/_content.rect_scale
 
 func get_connection_list():
 	var connection_list = []
