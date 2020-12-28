@@ -164,8 +164,10 @@ func _gui_input(event):
 
 					if hit_node:
 						select(hit_node)
+						if hit_node is FlowChartLine:
+							_Lines.move_child(hit_node, _Lines.get_child_count()-1) # Raise selected line to top
 						if hit_node is FlowChartNode:
-							_content.move_child(hit_node, get_child_count()-1) # Raise selected node to top
+							_content.move_child(hit_node, _content.get_child_count()-1) # Raise selected node to top
 							if event.shift:
 								# Connection start
 								var line = create_line_instance()
