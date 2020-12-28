@@ -8,6 +8,7 @@ const State = YAFSM.State
 
 const StateMachineEditor = preload("scenes/StateMachineEditor.tscn")
 const TransitionInspector = preload("scenes/transition_editors/TransitionInspector.gd")
+const StateInspector = preload("scenes/state_nodes/StateInspector.gd")
 
 var state_machine_editor
 
@@ -15,6 +16,7 @@ var focused_object setget set_focused_object # Can be StateMachine/StateMachineP
 var editor_selection
 
 var transition_inspector = TransitionInspector.new()
+var state_inspector = StateInspector.new()
 
 
 func _enter_tree():
@@ -38,6 +40,7 @@ func _enter_tree():
 
 	transition_inspector.undo_redo = get_undo_redo()
 	add_inspector_plugin(transition_inspector)
+	add_inspector_plugin(state_inspector)
 
 func _exit_tree():
 	if state_machine_editor:
