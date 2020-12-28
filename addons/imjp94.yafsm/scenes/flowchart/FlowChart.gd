@@ -262,6 +262,8 @@ func rename_node(old, new):
 					from_connection[new] = value
 
 func connect_node(from, to):
+	if from == to:
+		return # Connect to self
 	var connections_from = _connections.get(from)
 	if connections_from:
 		if to in connections_from:
