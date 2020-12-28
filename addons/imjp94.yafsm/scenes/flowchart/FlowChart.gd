@@ -10,8 +10,7 @@ signal connection(from, to, line)
 signal disconnection(from, to, line)
 signal node_selected(node)
 signal node_deselected(node)
-signal drag_start(node)
-signal drag_end(node)
+signal dragged(node, distance)
 
 export var scroll_margin = 100
 export var interconnection_offset = 10
@@ -24,8 +23,8 @@ var _Lines # Node that hold all lines
 var _connections = {}
 var _is_connecting = false
 var _current_connection
-var _moving_node
-var _mouse_offset = Vector2.ZERO
+var _is_dragging
+var _last_drag_pos = Vector2.ZERO
 var _selection = []
 var _mouse_start = Vector2.ZERO
 	
@@ -159,7 +158,7 @@ func _gui_input(event):
 		match event.button_index:
 			BUTTON_LEFT:
 				if event.pressed:
-					if not hit_node in _selection and not event.shift:
+					if not (hit_node in _selection) and not event.shift:
 						clear_selection()
 
 					if hit_node:
@@ -175,11 +174,9 @@ func _gui_input(event):
 								_connect_node(line, connection.get_from_pos(), get_local_mouse_position())
 								_current_connection = connection
 							else:
-								# Move node
-								_moving_node = hit_node
-								_mouse_offset = _moving_node.rect_position - content_position(event.position)
-								_on_drag_end(_moving_node)
-								emit_signal("drag_start", _moving_node)
+								# Drag node
+								_is_dragging = true
+								_last_drag_pos = content_position(event.position)
 							accept_event()
 				else:
 					if _current_connection:
@@ -192,25 +189,27 @@ func _gui_input(event):
 							_current_connection.line.queue_free()
 						accept_event()
 
-					if _moving_node:
-						_on_drag_end(_moving_node)
-						emit_signal("drag_end", _moving_node)
-						_moving_node = null
-						_mouse_offset = Vector2.ZERO
+					if _is_dragging:
+						_is_dragging = false
 					_current_connection = null
 
 func _process(_delta):
 	if _current_connection:
 		_current_connection.line.join(_current_connection.get_from_pos(), content_position(get_local_mouse_position()))
-	if _moving_node: # TODO: Immediate dragging right after selected, cause ScrollContainer unable focus properly
-		_moving_node.rect_position =  content_position(get_local_mouse_position() + _mouse_offset)
+	if _is_dragging:
+		var current_pos = content_position(get_local_mouse_position())
+		var dragged = current_pos - _last_drag_pos
+		for selected in _selection:
+			selected.rect_position += dragged
+			emit_signal("dragged", selected, dragged)
+			for from in _connections:
+				var connections_from = _connections[from]
+				for to in connections_from:
+					if from == selected.name or to == selected.name:
+						var connection = _connections[from][to]
+						connection.join()
 		update()
-		for from in _connections:
-			var connections_from = _connections[from]
-			for to in connections_from:
-				if from == _moving_node.name or to == _moving_node.name:
-					var connection = _connections[from][to]
-					connection.join()
+		_last_drag_pos = current_pos
 
 func get_scroll_rect():
 	var rect = Rect2()
@@ -339,12 +338,6 @@ func _on_connect_node(from, to):
 	pass
 
 func _on_disconnect_node(from, to):
-	pass
-
-func _on_drag_start(node):
-	pass
-
-func _on_drag_end(node):
 	pass
 
 # Convert position in FlowChart space to content(takes translation/scale of content into account)
