@@ -27,14 +27,14 @@ func _draw():
 	if is_upright:
 		label_margin.rect_rotation = -rect_rotation
 		if rect_rotation > 0:
-			label_margin.rect_position = Vector2(-label_margin.rect_size.y / 2, label.rect_size.x)
+			label_margin.rect_position = Vector2(-label_margin.rect_size.y / 2, -label.rect_size.x)
 		else:
-			label_margin.rect_position = Vector2(label_margin.rect_size.y / 2, label.rect_size.x)
+			label_margin.rect_position = Vector2(label_margin.rect_size.y / 2, -label.rect_size.x)
 	elif is_flip:
 		label_margin.rect_rotation = 180
-		label_margin.rect_position = Vector2(0, label_margin.rect_size.y)
-	else:
 		label_margin.rect_position = Vector2(0, 0)
+	else:
+		label_margin.rect_position = Vector2(0, -label_margin.rect_size.y)
 		
 func update_label():
 	label.text = ""

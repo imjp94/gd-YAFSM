@@ -19,7 +19,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 scroll_margin = 100
-interconnection_offset = 10
+interconnection_offset = 15
 state_machine = null
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
