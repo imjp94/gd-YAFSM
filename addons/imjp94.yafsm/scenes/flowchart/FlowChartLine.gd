@@ -42,7 +42,9 @@ func join(from, to, offset=Vector2.ZERO):
 	var dir = (to - from).normalized()
 	var rotation = Vector2.RIGHT.angle_to(dir)
 	rect_rotation = rad2deg(rotation)
-	rect_position += rect_position - get_transform().xform(Vector2.UP * offset) # offset along local Up axis
+	# offset along local down axis, so that connection from left to right will be on top,
+	# while connection from left to right will be at bottom
+	rect_position += rect_position - get_transform().xform(Vector2.DOWN * offset)
 	pivot_at_line_start()
 
 func set_selected(v):
