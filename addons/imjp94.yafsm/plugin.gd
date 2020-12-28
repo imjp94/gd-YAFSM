@@ -6,10 +6,9 @@ const StateMachinePlayer = YAFSM.StateMachinePlayer
 const StateMachine = YAFSM.StateMachine
 const State = YAFSM.State
 
-const StateMachineEditorContainer = preload("scenes/StateMachineEditorContainer.tscn")
+const StateMachineEditor = preload("scenes/StateMachineEditor.tscn")
 const TransitionInspector = preload("scenes/transition_editors/TransitionInspector.gd")
 
-var state_machine_editor_container
 var state_machine_editor
 
 var focused_object setget set_focused_object # Can be StateMachine/StateMachinePlayer
@@ -29,13 +28,11 @@ func _enter_tree():
 	add_custom_type("StateMachinePlayer", "Node", StateMachinePlayer, node_icon)
 	add_custom_type("StateMachine", "Resource", StateMachine, resource_icon)
 
-	state_machine_editor_container = StateMachineEditorContainer.instance()
-	state_machine_editor = state_machine_editor_container.get_node("StateMachineEditor")
-	state_machine_editor.undo_redo = get_undo_redo()
+	state_machine_editor = StateMachineEditor.instance()
 	# Force anti-alias for default font
 	var font = get_editor_interface().get_base_control().get_font("main", "EditorFonts")
 	font.use_filter = true
-	state_machine_editor_container.connect("inspector_changed", self, "_on_inspector_changed")
+	state_machine_editor.connect("inspector_changed", self, "_on_inspector_changed")
 	state_machine_editor.connect("node_selected", self, "_on_StateMachineEditor_node_selected")
 	state_machine_editor.connect("node_deselected", self, "_on_StateMachineEditor_node_deselected")
 
@@ -43,8 +40,8 @@ func _enter_tree():
 	add_inspector_plugin(transition_inspector)
 
 func _exit_tree():
-	if state_machine_editor_container:
-		state_machine_editor_container.queue_free()
+	if state_machine_editor:
+		state_machine_editor.queue_free()
 
 func handles(object):
 	if object is StateMachine:
@@ -54,16 +51,16 @@ func handles(object):
 func edit(object):
 	set_focused_object(object)
 
-func show_state_machine_editor_container():
-	if focused_object and state_machine_editor_container:
-		if not state_machine_editor_container.is_inside_tree():
-			add_control_to_bottom_panel(state_machine_editor_container, "StateMachine")
-		make_bottom_panel_item_visible(state_machine_editor_container)
+func show_state_machine_editor():
+	if focused_object and state_machine_editor:
+		if not state_machine_editor.is_inside_tree():
+			add_control_to_bottom_panel(state_machine_editor, "StateMachine")
+		make_bottom_panel_item_visible(state_machine_editor)
 
-func hide_state_machine_editor_container():
-	if state_machine_editor_container.is_inside_tree():
+func hide_state_machine_editor():
+	if state_machine_editor.is_inside_tree():
 		state_machine_editor.state_machine = null
-		remove_control_from_bottom_panel(state_machine_editor_container)
+		remove_control_from_bottom_panel(state_machine_editor)
 
 func _on_EditorSelection_selection_changed():
 	var selected_nodes = editor_selection.get_selected_nodes()
@@ -77,16 +74,16 @@ func _on_EditorSelection_selection_changed():
 func _on_focused_object_changed(new_obj):
 	if new_obj:
 		# Must be shown first, otherwise StateMachineEditor can't execute ui action as it is not added to scene tree
-		show_state_machine_editor_container()
+		show_state_machine_editor()
 		var state_machine
 		if focused_object is StateMachinePlayer:
 			state_machine = focused_object.state_machine
-			state_machine_editor_container.state_machine_player = focused_object
+			state_machine_editor.state_machine_player = focused_object
 		elif focused_object is StateMachine:
 			state_machine = focused_object
 		state_machine_editor.state_machine = state_machine
 	else:
-		hide_state_machine_editor_container()
+		hide_state_machine_editor()
 
 func _on_inspector_changed(property):
 	get_editor_interface().get_inspector().refresh()
