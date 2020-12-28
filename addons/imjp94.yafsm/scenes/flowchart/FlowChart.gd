@@ -141,7 +141,11 @@ func _gui_input(event):
 			var connection_list = get_connection_list()
 			for i in connection_list.size():
 				var connection = _connections[connection_list[i].from][connection_list[i].to]
-				var cp = Geometry.get_closest_point_to_segment_2d(content_position(event.position), connection.get_from_pos(), connection.get_to_pos())
+				# Line's offset along its up-vector
+				var line_local_up_offset = connection.line.rect_position - connection.line.get_transform().xform(Vector2.UP * connection.offset)
+				var from_pos = connection.get_from_pos() + line_local_up_offset
+				var to_pos = connection.get_to_pos() + line_local_up_offset
+				var cp = Geometry.get_closest_point_to_segment_2d(content_position(event.position), from_pos, to_pos)
 				var d = cp.distance_to(content_position(event.position))
 				if d > connection.line.rect_size.y * 2:
 					continue
