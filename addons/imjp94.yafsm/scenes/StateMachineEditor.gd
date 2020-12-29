@@ -16,6 +16,8 @@ onready var CreateNewStateMachine = $MarginContainer/CreateNewStateMachine
 
 var undo_redo
 
+var condition_visibility = TextureButton.new()
+
 var state_machine_player setget set_state_machine_player
 export(Resource) var state_machine setget set_state_machine
 
@@ -27,10 +29,25 @@ func _init():
 
 
 func _ready():
+	condition_visibility.hint_tooltip = "Hide/Show Conditions on Transition Line"
+	condition_visibility.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	condition_visibility.toggle_mode = true
+	condition_visibility.size_flags_vertical = SIZE_SHRINK_CENTER
+	condition_visibility.focus_mode = FOCUS_NONE
+	condition_visibility.connect("pressed", self, "_on_condition_visibility_pressed")
+	condition_visibility.pressed = true
+	gadget.add_child(condition_visibility)
+
 	CreateNewStateMachineContainer.visible = false
 	CreateNewStateMachine.connect("pressed", self, "_on_CreateNewStateMachine_pressed")
 	ContextMenu.connect("index_pressed", self, "_on_ContextMenu_index_pressed")
 	SaveDialog.connect("confirmed", self, "_on_SaveDialog_confirmed")
+
+func _on_condition_visibility_pressed():
+	for line in content_lines.get_children():
+		line.label.visible = condition_visibility.pressed
+		if line.label.visible:
+			line.update_label()
 
 func _on_state_machine_player_changed(new_state_machine_player):
 	if new_state_machine_player:
