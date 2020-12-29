@@ -75,6 +75,7 @@ func _notification(what):
 	match what:
 		NOTIFICATION_DRAW:
 			var content_rect = get_scroll_rect()
+			_content.rect_pivot_offset = get_scroll_rect().size / 2.0 # Scale from center
 			if not get_rect().encloses(content_rect):
 				h_scroll.min_value = content_rect.position.x
 				h_scroll.max_value = content_rect.size.x + content_rect.position.x - rect_size.x
@@ -342,7 +343,7 @@ func _on_disconnect_node(from, to):
 
 # Convert position in FlowChart space to content(takes translation/scale of content into account)
 func content_position(pos):
-	return (pos - _content.rect_position) * 1.0/_content.rect_scale
+	return (pos - _content.rect_position - _content.rect_pivot_offset * (Vector2.ONE - _content.rect_scale)) * 1.0/_content.rect_scale
 
 func get_connection_list():
 	var connection_list = []
