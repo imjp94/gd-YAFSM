@@ -137,7 +137,7 @@ func _on_ContextMenu_index_pressed(index):
 				return
 			new_node.name = State.EXIT_KEY
 	add_node(new_node)
-	new_node.rect_position = get_local_mouse_position()
+	new_node.rect_position = content_position(get_local_mouse_position())
 
 func _on_SaveDialog_confirmed():
 	save()
