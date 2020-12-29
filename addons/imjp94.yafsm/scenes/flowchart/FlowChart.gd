@@ -30,6 +30,7 @@ var _drag_start_pos = Vector2.ZERO
 var _drag_end_pos = Vector2.ZERO
 var _drag_origins = []
 var _selection = []
+var _copying_nodes = []
 
 var selection_stylebox = StyleBoxFlat.new()
 	
@@ -143,6 +144,18 @@ func _gui_input(event):
 									disconnect_node(connection_pair.from, connection_pair.to)
 								remove_node(node.name)
 								accept_event()
+			KEY_C:
+				if event.pressed and event.control:
+					# Copy node
+					_copying_nodes = _selection.duplicate()
+			KEY_D:
+				if event.pressed and event.control:
+					# Duplicate node directly from selection
+					duplicate_nodes(_selection.duplicate())
+			KEY_V:
+				if event.pressed and event.control:
+					# Paste node from _copying_nodes
+					duplicate_nodes(_copying_nodes)
 
 	if event is InputEventMouseButton:
 		match event.button_index:
@@ -422,6 +435,18 @@ func clear_selection():
 			continue
 		deselect(node)
 	_selection.clear()
+
+func duplicate_nodes(nodes):
+	clear_selection()
+	for i in nodes.size():
+		var node = nodes[i]
+		if not (node is FlowChartNode):
+			continue
+		var new_node = node.duplicate(DUPLICATE_SIGNALS + DUPLICATE_SCRIPTS)
+		var offset = content_position(get_local_mouse_position()) - content_position(_drag_end_pos)
+		new_node.rect_position = new_node.rect_position + offset
+		add_node(new_node)
+		select(new_node)
 
 func _on_node_dragged(node, dragged):
 	pass
