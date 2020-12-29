@@ -36,7 +36,6 @@ margin_right = 40.0
 margin_bottom = 40.0
 grow_horizontal = 2
 grow_vertical = 2
-focus_mode = 1
 theme = SubResource( 3 )
 script = ExtResource( 2 )
 __meta__ = {

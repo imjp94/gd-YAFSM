@@ -6,7 +6,7 @@ var selected = false setget set_selected
 
 
 func _init():
-	focus_mode = FOCUS_CLICK
+	focus_mode = FOCUS_NONE # Let FlowChart has the focus to handle gui_input
 	mouse_filter = MOUSE_FILTER_PASS
 
 func _draw():

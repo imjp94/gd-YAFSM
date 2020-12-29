@@ -50,16 +50,6 @@ func set_state_machine_player(smp):
 		state_machine_player = smp
 		_on_state_machine_player_changed(smp)
 
-func _unhandled_key_input(event):
-	._unhandled_key_input(event)
-	if not visible:
-		return
-
-	if event is InputEventKey:
-		if event.control:
-			if event.scancode == KEY_S and event.pressed:
-				save_request()
-
 func _gui_input(event):
 	if event is InputEventMouseButton:
 		match event.button_index:
@@ -69,6 +59,11 @@ func _gui_input(event):
 					ContextMenu.set_item_disabled(2, state_machine.has_exit())
 					ContextMenu.rect_position = get_viewport().get_mouse_position()
 					ContextMenu.popup()
+
+	if visible and event is InputEventKey:
+		if event.control:
+			if event.scancode == KEY_S and event.pressed:
+				save_request()
 
 func create_line_instance():
 	return TransitionLine.instance()

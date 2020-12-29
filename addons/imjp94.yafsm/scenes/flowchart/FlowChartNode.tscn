@@ -2,7 +2,6 @@
 
 [ext_resource path="res://addons/imjp94.yafsm/scenes/flowchart/FlowChartNode.gd" type="Script" id=1]
 
-
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0.164706, 0.164706, 0.164706, 1 )
 border_width_left = 1
@@ -33,7 +32,6 @@ FlowChartNode/styles/normal = SubResource( 2 )
 [node name="FlowChartNode" type="Container"]
 margin_right = 40.0
 margin_bottom = 40.0
-focus_mode = 1
 mouse_filter = 1
 theme = SubResource( 3 )
 script = ExtResource( 1 )
