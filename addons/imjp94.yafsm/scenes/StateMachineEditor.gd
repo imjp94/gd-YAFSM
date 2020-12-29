@@ -137,7 +137,7 @@ func _on_ContextMenu_index_pressed(index):
 func _on_SaveDialog_confirmed():
 	save()
 
-func _on_drag_end(node):
+func _on_node_dragged(node, dragged):
 	node.state.graph_offset = node.rect_position
 
 func _on_node_added(new_node):
