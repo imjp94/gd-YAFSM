@@ -31,6 +31,8 @@ func _enter_tree():
 	add_custom_type("StateMachine", "Resource", StateMachine, resource_icon)
 
 	state_machine_editor = StateMachineEditor.instance()
+	state_machine_editor.selection_stylebox.bg_color = get_editor_interface().get_base_control().get_color("box_selection_fill_color", "Editor")
+	state_machine_editor.selection_stylebox.border_color = get_editor_interface().get_base_control().get_color("box_selection_stroke_color", "Editor")
 	# Force anti-alias for default font
 	var font = get_editor_interface().get_base_control().get_font("main", "EditorFonts")
 	font.use_filter = true
