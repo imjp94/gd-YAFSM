@@ -14,6 +14,7 @@ signal dragged(node, distance)
 
 export var scroll_margin = 100
 export var interconnection_offset = 10
+export var snap = 20
 
 var h_scroll
 var v_scroll
@@ -27,6 +28,7 @@ var _is_dragging = false
 var _is_dragging_node = false
 var _drag_start_pos = Vector2.ZERO
 var _drag_end_pos = Vector2.ZERO
+var _drag_origins = []
 var _selection = []
 
 var selection_stylebox = StyleBoxFlat.new()
@@ -156,6 +158,38 @@ func _gui_input(event):
 			BUTTON_MASK_MIDDLE:
 				h_scroll.value -= event.relative.x
 				v_scroll.value -= event.relative.y
+			BUTTON_LEFT:
+				if _is_dragging:
+					if _is_connecting:
+						# Connecting
+						if _current_connection:
+							var pos = content_position(get_local_mouse_position())
+							# Snapping connecting line
+							for i in _content.get_child_count():
+								var child = _content.get_child(_content.get_child_count()-1 - i) # Inverse order to check from top to bottom of canvas
+								if child is FlowChartNode and child.name != _current_connection.from_node.name:
+									if child.get_rect().has_point(pos):
+										pos = child.rect_position + child.rect_size / 2
+										break
+							_current_connection.line.join(_current_connection.get_from_pos(), pos)
+					elif _is_dragging_node:
+						# Dragging nodes
+						var dragged = content_position(_drag_end_pos) - content_position(_drag_start_pos)
+						for i in _selection.size():
+							var selected = _selection[i]
+							if not (selected is FlowChartNode):
+								continue
+							selected.rect_position = (_drag_origins[i] + dragged).snapped(Vector2.ONE * snap)
+							emit_signal("dragged", selected, dragged)
+							# Update connection pos
+							for from in _connections:
+								var connections_from = _connections[from]
+								for to in connections_from:
+									if from == selected.name or to == selected.name:
+										var connection = _connections[from][to]
+										connection.join()
+					_drag_end_pos = get_local_mouse_position()
+					update()
 
 	if event is InputEventMouseButton:
 		var hit_node
@@ -207,7 +241,7 @@ func _gui_input(event):
 								_is_dragging_node = false
 								var line = create_line_instance()
 								var connection = Connection.new(line, hit_node, null)
-								_connect_node(line, connection.get_from_pos(), get_local_mouse_position())
+								_connect_node(line, connection.get_from_pos(), connection.get_from_pos())
 								_current_connection = connection
 							accept_event()
 					if not _is_dragging:
@@ -256,29 +290,6 @@ func _gui_input(event):
 									select(connection.line)
 						_drag_start_pos = _drag_end_pos
 						update()
-
-func _process(_delta):
-	if _is_dragging:
-		if _is_connecting:
-			if _current_connection:
-				_current_connection.line.join(_current_connection.get_from_pos(), content_position(get_local_mouse_position()))
-		elif _is_dragging_node:
-			var current_pos = content_position(get_local_mouse_position())
-			var dragged = current_pos - content_position(_drag_end_pos)
-			for selected in _selection:
-				if not (selected is FlowChartNode):
-					continue
-				selected.rect_position += dragged
-				emit_signal("dragged", selected, dragged)
-				for from in _connections:
-					var connections_from = _connections[from]
-					for to in connections_from:
-						if from == selected.name or to == selected.name:
-							var connection = _connections[from][to]
-							connection.join()
-
-		_drag_end_pos = get_local_mouse_position()
-		update()
 
 func get_selection_box_rect():
 	var pos = Vector2(min(_drag_start_pos.x, _drag_end_pos.x), min(_drag_start_pos.y, _drag_end_pos.y))
@@ -394,11 +405,13 @@ func select(node):
 
 	_selection.append(node)
 	node.selected = true
+	_drag_origins.append(node.rect_position)
 	emit_signal("node_selected", node)
 
 func deselect(node):
 	_selection.erase(node)
 	node.selected = false
+	_drag_origins.pop_back()
 	emit_signal("node_deselected", node)
 
 func clear_selection():
