@@ -87,10 +87,10 @@ func _notification(what):
 			if not get_rect().encloses(content_rect):
 				h_scroll.min_value = content_rect.position.x
 				h_scroll.max_value = content_rect.size.x + content_rect.position.x - rect_size.x
-				# h_scroll.page = 10 # TODO: Dynamically update page with non-zero value
+				h_scroll.page = content_rect.size.x / 100
 				v_scroll.min_value = content_rect.position.y
 				v_scroll.max_value = content_rect.size.y + content_rect.position.y - rect_size.y
-				# v_scroll.page = 10 # TODO: Dynamically update page with non-zero value
+				v_scroll.page = content_rect.size.y / 100
 
 			# Draw selection box
 			if not _is_dragging_node and not _is_connecting:
