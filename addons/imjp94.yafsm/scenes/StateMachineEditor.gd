@@ -83,9 +83,9 @@ func save():
 
 func clear_graph():
 	clear_connections()
-	for child in _content.get_children():
+	for child in content_nodes.get_children():
 		if child is StateNodeScript:
-			_content.remove_child(child)
+			content_nodes.remove_child(child)
 			_to_free.append(child)
 	
 func draw_graph():
