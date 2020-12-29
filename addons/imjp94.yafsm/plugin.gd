@@ -31,10 +31,14 @@ func _enter_tree():
 	add_custom_type("StateMachine", "Resource", StateMachine, resource_icon)
 
 	state_machine_editor = StateMachineEditor.instance()
-	state_machine_editor.selection_stylebox.bg_color = get_editor_interface().get_base_control().get_color("box_selection_fill_color", "Editor")
-	state_machine_editor.selection_stylebox.border_color = get_editor_interface().get_base_control().get_color("box_selection_stroke_color", "Editor")
+	state_machine_editor.selection_stylebox.bg_color = editor_base_control.get_color("box_selection_fill_color", "Editor")
+	state_machine_editor.selection_stylebox.border_color = editor_base_control.get_color("box_selection_stroke_color", "Editor")
+	state_machine_editor.zoom_minus.icon = editor_base_control.get_icon("ZoomLess", "EditorIcons")
+	state_machine_editor.zoom_reset.icon = editor_base_control.get_icon("ZoomReset", "EditorIcons")
+	state_machine_editor.zoom_plus.icon = editor_base_control.get_icon("ZoomMore", "EditorIcons")
+	state_machine_editor.snap_button.icon = editor_base_control.get_icon("SnapGrid", "EditorIcons")
 	# Force anti-alias for default font
-	var font = get_editor_interface().get_base_control().get_font("main", "EditorFonts")
+	var font = editor_base_control.get_font("main", "EditorFonts")
 	font.use_filter = true
 	state_machine_editor.connect("inspector_changed", self, "_on_inspector_changed")
 	state_machine_editor.connect("node_selected", self, "_on_StateMachineEditor_node_selected")

@@ -18,6 +18,14 @@ export var snap = 20
 
 var h_scroll
 var v_scroll
+var gadget
+var zoom_minus = Button.new()
+var zoom_reset = Button.new()
+var zoom_plus = Button.new()
+var snap_button = Button.new()
+var snap_amount = SpinBox.new()
+
+var is_snapping = true
 
 var _content
 var _Lines # Node that hold all lines
@@ -64,6 +72,40 @@ func _ready():
 	_content.add_child(_Lines)
 	_content.move_child(_Lines, 0) # Make sure lines always behind nodes
 
+	gadget = HBoxContainer.new()
+	gadget.set_anchors_and_margins_preset(PRESET_TOP_WIDE)
+	add_child(gadget)
+
+	zoom_minus.flat = true
+	zoom_minus.hint_tooltip = "Zoom Out"
+	zoom_minus.connect("pressed", self, "_on_zoom_minus_pressed")
+	zoom_minus.focus_mode = FOCUS_NONE
+	gadget.add_child(zoom_minus)
+
+	zoom_reset.flat = true
+	zoom_reset.hint_tooltip = "Zoom Reset"
+	zoom_reset.connect("pressed", self, "_on_zoom_reset_pressed")
+	zoom_reset.focus_mode = FOCUS_NONE
+	gadget.add_child(zoom_reset)
+
+	zoom_plus.flat = true
+	zoom_plus.hint_tooltip = "Zoom In"
+	zoom_plus.connect("pressed", self, "_on_zoom_plus_pressed")
+	zoom_plus.focus_mode = FOCUS_NONE
+	gadget.add_child(zoom_plus)
+
+	snap_button.flat = true
+	snap_button.toggle_mode = true
+	snap_button.hint_tooltip = "Enable snap and show grid"
+	snap_button.connect("pressed", self, "_on_snap_button_pressed")
+	snap_button.pressed = true
+	snap_button.focus_mode = FOCUS_NONE
+	gadget.add_child(snap_button)
+
+	snap_amount.value = snap
+	snap_amount.connect("value_changed", self, "_on_snap_amount_value_changed")
+	gadget.add_child(snap_amount)
+
 func _on_h_scroll_gui_input(event):
 	if event is InputEventMouseButton:
 		var v = (h_scroll.max_value - h_scroll.min_value) * 0.01 # Scroll at 0.1% step
@@ -81,6 +123,21 @@ func _on_v_scroll_gui_input(event):
 				v_scroll.value -= v # scroll left
 			BUTTON_WHEEL_DOWN:
 				v_scroll.value += v # scroll right
+
+func _on_zoom_minus_pressed():
+	_content.rect_scale -= Vector2.ONE * 0.1
+
+func _on_zoom_reset_pressed():
+	_content.rect_scale = Vector2.ONE
+
+func _on_zoom_plus_pressed():
+	_content.rect_scale += Vector2.ONE * 0.1
+
+func _on_snap_button_pressed():
+	is_snapping = snap_button.pressed
+
+func _on_snap_amount_value_changed(value):
+	snap = value
 
 func _notification(what):
 	match what:
@@ -190,7 +247,9 @@ func _gui_input(event):
 							var selected = _selection[i]
 							if not (selected is FlowChartNode):
 								continue
-							selected.rect_position = (_drag_origins[i] + dragged).snapped(Vector2.ONE * snap)
+							selected.rect_position = (_drag_origins[i] + dragged)
+							if is_snapping:
+								selected.rect_position = selected.rect_position.snapped(Vector2.ONE * snap)
 							_on_node_dragged(selected, dragged)
 							emit_signal("dragged", selected, dragged)
 							# Update connection pos
