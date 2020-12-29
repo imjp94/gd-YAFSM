@@ -128,22 +128,20 @@ func _gui_input(event):
 	if event is InputEventKey:
 		match event.scancode:
 			KEY_DELETE:
-				for node in _selection:
-					if node:
+				if event.pressed:
+					for node in _selection.duplicate():
 						if node is FlowChartLine:
 							# TODO: More efficient way to get connection from Line node
-							for connections_from in _connections.values():
-								for connection in connections_from.values():
+							for connections_from in _connections.duplicate().values():
+								for connection in connections_from.duplicate().values():
 									if connection.line == node:
 										disconnect_node(connection.from_node.name, connection.to_node.name)
-										accept_event()
-										return
 						elif node is FlowChartNode:
+							remove_node(node.name)
 							for connection_pair in get_connection_list():
 								if connection_pair.from == node.name or connection_pair.to == node.name:
 									disconnect_node(connection_pair.from, connection_pair.to)
-								remove_node(node.name)
-								accept_event()
+					accept_event()
 			KEY_C:
 				if event.pressed and event.control:
 					# Copy node
@@ -341,6 +339,8 @@ func _connect_node(line, from_pos, to_pos):
 
 func _disconnect_node(line):
 	_Lines.remove_child(line)
+	if line in _selection:
+		deselect(line)
 	line.queue_free()
 
 func create_line_instance():
