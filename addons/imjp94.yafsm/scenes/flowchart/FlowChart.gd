@@ -311,6 +311,7 @@ func add_node(node):
 func remove_node(node_name):
 	var node = _content.get_node_or_null(node_name)
 	if node:
+		deselect(node) # Must deselct before remove to make sure _drag_origins synced with _selections
 		_content.remove_child(node)
 		node.queue_free() # TODO: add to _to_free instead
 		_on_node_removed(node_name)
