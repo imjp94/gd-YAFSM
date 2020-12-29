@@ -333,7 +333,7 @@ func deselect(node):
 	emit_signal("node_deselected", node)
 
 func clear_selection():
-	for node in _selection:
+	for node in _selection.duplicate(): # duplicate _selection array as deselect() edit array
 		if not node:
 			continue
 		deselect(node)
