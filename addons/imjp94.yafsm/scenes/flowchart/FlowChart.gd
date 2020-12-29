@@ -23,14 +23,19 @@ var _Lines # Node that hold all lines
 var _connections = {}
 var _is_connecting = false
 var _current_connection
-var _is_dragging
-var _last_drag_pos = Vector2.ZERO
+var _is_dragging = false
+var _is_dragging_node = false
+var _drag_start_pos = Vector2.ZERO
+var _drag_end_pos = Vector2.ZERO
 var _selection = []
-var _mouse_start = Vector2.ZERO
+
+var selection_stylebox = StyleBoxFlat.new()
 	
 
 func _init():
 	focus_mode = FOCUS_ALL
+	selection_stylebox.bg_color = Color(0, 0, 0, 0.3)
+	selection_stylebox.set_border_width_all(1)
 
 func _ready():
 	h_scroll = HScrollBar.new()
@@ -86,6 +91,29 @@ func _notification(what):
 				v_scroll.min_value = content_rect.position.y
 				v_scroll.max_value = content_rect.size.y + content_rect.position.y - rect_size.y
 				# v_scroll.page = 10 # TODO: Dynamically update page with non-zero value
+
+			# Draw selection box
+			if not _is_dragging_node and not _is_connecting:
+				var selection_box_rect = get_selection_box_rect()
+				draw_style_box(selection_stylebox, selection_box_rect)
+
+			# Debug draw
+			# for node in _content.get_children():
+			# 	var rect = get_transform().xform(_content.get_transform().xform(node.get_rect()))
+			# 	draw_style_box(selection_stylebox, rect)
+
+			# var center = selection_box_rect.position + selection_box_rect.size / 2
+			# var radius = min(selection_box_rect.size.x, selection_box_rect.size.y) / 2
+			# draw_circle(center, radius, Color.blue)
+
+			# var connection_list = get_connection_list()
+			# for i in connection_list.size():
+			# 	var connection = _connections[connection_list[i].from][connection_list[i].to]
+			# 	# Line's offset along its down-vector
+			# 	var line_local_up_offset = connection.line.rect_position - connection.line.get_transform().xform(Vector2.UP * connection.offset)
+			# 	var from_pos = _content.get_transform().xform(connection.get_from_pos() + line_local_up_offset)
+			# 	var to_pos = _content.get_transform().xform(connection.get_to_pos() + line_local_up_offset)
+			# 	draw_line(from_pos, to_pos, Color.yellow)
 
 func _on_h_scroll_changed(value):
 	_content.rect_position.x = -value
@@ -167,6 +195,7 @@ func _gui_input(event):
 						clear_selection()
 
 					if hit_node:
+						_is_dragging_node = true
 						select(hit_node)
 						if hit_node is FlowChartLine:
 							_Lines.move_child(hit_node, _Lines.get_child_count()-1) # Raise selected line to top
@@ -174,16 +203,21 @@ func _gui_input(event):
 							_content.move_child(hit_node, _content.get_child_count()-1) # Raise selected node to top
 							if event.shift:
 								# Connection start
+								_is_connecting = true
+								_is_dragging_node = false
 								var line = create_line_instance()
 								var connection = Connection.new(line, hit_node, null)
 								_connect_node(line, connection.get_from_pos(), get_local_mouse_position())
 								_current_connection = connection
-							else:
-								# Drag node
-								_is_dragging = true
-								_last_drag_pos = content_position(event.position)
 							accept_event()
+					if not _is_dragging:
+						# Drag start
+						_is_dragging = true
+						_drag_start_pos = event.position
+						_drag_end_pos = event.position
 				else:
+					var was_connecting = _is_connecting
+					var was_dragging_node = _is_dragging_node
 					if _current_connection:
 						if hit_node is FlowChartNode:
 							# Connection end
@@ -192,29 +226,64 @@ func _gui_input(event):
 							connect_node(_current_connection.from_node.name, _current_connection.to_node.name)
 						else:
 							_current_connection.line.queue_free()
+						_is_connecting = false
+						_current_connection = null
 						accept_event()
 
 					if _is_dragging:
+						# Drag end
 						_is_dragging = false
-					_current_connection = null
+						_is_dragging_node = false
+						if not (was_connecting or was_dragging_node):
+							var selection_box_rect = get_selection_box_rect()
+							# Select node
+							for node in _content.get_children():
+								var rect = get_transform().xform(_content.get_transform().xform(node.get_rect()))
+								if selection_box_rect.intersects(rect):
+									if node is FlowChartNode:
+										select(node)
+							# Select line
+							var connection_list = get_connection_list()
+							for i in connection_list.size():
+								var connection = _connections[connection_list[i].from][connection_list[i].to]
+								# Line's offset along its down-vector
+								var line_local_up_offset = connection.line.rect_position - connection.line.get_transform().xform(Vector2.UP * connection.offset)
+								var from_pos = _content.get_transform().xform(connection.get_from_pos() + line_local_up_offset)
+								var to_pos = _content.get_transform().xform(connection.get_to_pos() + line_local_up_offset)
+								var center = selection_box_rect.position + selection_box_rect.size / 2
+								var radius = min(selection_box_rect.size.x, selection_box_rect.size.y) / 2
+								if Geometry.segment_intersects_circle(from_pos, to_pos, center, radius) >= 0:
+									select(connection.line)
+						_drag_start_pos = _drag_end_pos
+						update()
 
 func _process(_delta):
-	if _current_connection:
-		_current_connection.line.join(_current_connection.get_from_pos(), content_position(get_local_mouse_position()))
 	if _is_dragging:
-		var current_pos = content_position(get_local_mouse_position())
-		var dragged = current_pos - _last_drag_pos
-		for selected in _selection:
-			selected.rect_position += dragged
-			emit_signal("dragged", selected, dragged)
-			for from in _connections:
-				var connections_from = _connections[from]
-				for to in connections_from:
-					if from == selected.name or to == selected.name:
-						var connection = _connections[from][to]
-						connection.join()
+		if _is_connecting:
+			if _current_connection:
+				_current_connection.line.join(_current_connection.get_from_pos(), content_position(get_local_mouse_position()))
+		elif _is_dragging_node:
+			var current_pos = content_position(get_local_mouse_position())
+			var dragged = current_pos - content_position(_drag_end_pos)
+			for selected in _selection:
+				if not (selected is FlowChartNode):
+					continue
+				selected.rect_position += dragged
+				emit_signal("dragged", selected, dragged)
+				for from in _connections:
+					var connections_from = _connections[from]
+					for to in connections_from:
+						if from == selected.name or to == selected.name:
+							var connection = _connections[from][to]
+							connection.join()
+
+		_drag_end_pos = get_local_mouse_position()
 		update()
-		_last_drag_pos = current_pos
+
+func get_selection_box_rect():
+	var pos = Vector2(min(_drag_start_pos.x, _drag_end_pos.x), min(_drag_start_pos.y, _drag_end_pos.y))
+	var size = (_drag_end_pos - _drag_start_pos).abs()
+	return Rect2(pos, size)
 
 func get_scroll_rect():
 	var rect = Rect2()
