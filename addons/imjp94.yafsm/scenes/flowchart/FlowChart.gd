@@ -180,6 +180,7 @@ func _gui_input(event):
 							if not (selected is FlowChartNode):
 								continue
 							selected.rect_position = (_drag_origins[i] + dragged).snapped(Vector2.ONE * snap)
+							_on_node_dragged(selected, dragged)
 							emit_signal("dragged", selected, dragged)
 							# Update connection pos
 							for from in _connections:
@@ -420,6 +421,9 @@ func clear_selection():
 			continue
 		deselect(node)
 	_selection.clear()
+
+func _on_node_dragged(node, dragged):
+	pass
 
 func _on_connect_node(from, to):
 	pass
