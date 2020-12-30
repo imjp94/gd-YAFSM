@@ -11,16 +11,31 @@ var condition setget set_condition
 
 func _ready():
 	Name.connect("text_entered", self, "_on_Name_text_entered")
+	Name.connect("focus_entered", self, "_on_Name_focus_entered")
 	Name.connect("focus_exited", self, "_on_Name_focus_exited")
 	Name.connect("text_changed", self, "_on_Name_text_changed")
+	set_process_input(false)
+
+func _input(event):
+	if event is InputEventMouseButton:
+		if event.pressed:
+			if get_focus_owner() == Name:
+				var local_event = Name.make_input_local(event)
+				if not Name.get_rect().has_point(local_event.position):
+					Name.release_focus()
 
 func _on_Name_text_entered(new_text):
+	Name.release_focus()
 	if condition.name == new_text: # Avoid infinite loop
 		return
 
 	rename_action(new_text)
 
+func _on_Name_focus_entered():
+	set_process_input(true)
+
 func _on_Name_focus_exited():
+	set_process_input(false)
 	if condition.name == Name.text:
 		return
 
