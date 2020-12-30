@@ -148,8 +148,8 @@ func _on_ContextMenu_index_pressed(index):
 				push_warning("Exit node already exist")
 				return
 			new_node.name = State.EXIT_KEY
-	add_node(new_node)
 	new_node.rect_position = content_position(get_local_mouse_position())
+	add_node(new_node)
 
 func _on_SaveDialog_confirmed():
 	save()
@@ -160,6 +160,7 @@ func _on_node_dragged(node, dragged):
 func _on_node_added(new_node):
 	new_node.undo_redo = undo_redo
 	new_node.state.name = new_node.name
+	new_node.state.graph_offset = new_node.rect_position
 	new_node.connect("name_edit_entered", self, "_on_node_name_edit_entered", [new_node])
 	state_machine.add_state(new_node.state)
 
