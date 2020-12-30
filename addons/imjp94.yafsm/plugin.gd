@@ -111,7 +111,7 @@ func _on_StateMachineEditor_node_selected(node):
 	get_editor_interface().inspect_object(to_inspect)
 
 func _on_StateMachineEditor_node_deselected(node):
-	get_editor_interface().inspect_object(null)
+	get_editor_interface().inspect_object(state_machine_editor.state_machine)
 
 func set_focused_object(obj):
 	if focused_object != obj:
