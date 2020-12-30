@@ -224,6 +224,20 @@ func _on_connect_node(from, to):
 func _on_disconnect_node(from, to):
 	state_machine.remove_transition(from, to)
 
+func _on_duplicated(old_nodes, new_nodes):
+	# Duplicate condition as well
+	for i in old_nodes.size():
+		var from_node = old_nodes[i]
+		for connection_pair in get_connection_list():
+			if from_node.name == connection_pair.from:
+				for j in old_nodes.size():
+					var to_node = old_nodes[j]
+					if to_node.name == connection_pair.to:
+						var old_connection = _connections[connection_pair.from][connection_pair.to]
+						var new_connection = _connections[new_nodes[i].name][new_nodes[j].name]
+						for condition in old_connection.line.transition.conditions.values():
+							new_connection.line.transition.add_condition(condition.duplicate())
+
 func _on_state_machine_changed(new_state_machine):
 	clear_graph()
 	if new_state_machine:
