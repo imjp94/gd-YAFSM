@@ -14,6 +14,8 @@ onready var SaveDialog = $SaveDialog
 onready var CreateNewStateMachineContainer = $MarginContainer
 onready var CreateNewStateMachine = $MarginContainer/CreateNewStateMachine
 
+var editor_accent_color = Color.white
+
 var undo_redo
 
 var condition_visibility = TextureButton.new()
@@ -26,7 +28,6 @@ var _to_free
 
 func _init():
 	_to_free = []
-
 
 func _ready():
 	condition_visibility.hint_tooltip = "Hide/Show Conditions on Transition Line"
@@ -83,7 +84,9 @@ func _gui_input(event):
 				save_request()
 
 func create_line_instance():
-	return TransitionLine.instance()
+	var line = TransitionLine.instance()
+	line.theme.get_stylebox("focus", "FlowChartLine").shadow_color = editor_accent_color
+	return line
 
 func save_request():
 	if not can_save():
@@ -118,6 +121,7 @@ func draw_graph():
 		# 	new_node = ExitStateNode.instance()
 		# else:
 		# 	new_node = StateNode.instance()
+		new_node.theme.get_stylebox("focus", "FlowChartNode").border_color = editor_accent_color
 
 		new_node.name = state_key # Set before add_node to let engine handle duplicate name
 		add_node(new_node)
@@ -135,6 +139,7 @@ func draw_graph():
 
 func _on_ContextMenu_index_pressed(index):
 	var new_node = StateNode.instance()
+	new_node.theme.get_stylebox("focus", "FlowChartNode").border_color = editor_accent_color
 	match index:
 		0: # Add State
 			new_node.name = "State"

@@ -39,6 +39,7 @@ func _enter_tree():
 	state_machine_editor.snap_button.icon = editor_base_control.get_icon("SnapGrid", "EditorIcons")
 	state_machine_editor.condition_visibility.texture_pressed = editor_base_control.get_icon("GuiVisibilityVisible", "EditorIcons")
 	state_machine_editor.condition_visibility.texture_normal = editor_base_control.get_icon("GuiVisibilityHidden", "EditorIcons")
+	state_machine_editor.editor_accent_color = editor_base_control.get_color("accent_color", "Editor")
 	# Force anti-alias for default font
 	var font = editor_base_control.get_font("main", "EditorFonts")
 	font.use_filter = true
