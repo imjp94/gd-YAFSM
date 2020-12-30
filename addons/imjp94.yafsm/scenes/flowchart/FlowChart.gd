@@ -574,6 +574,7 @@ func duplicate_nodes(nodes):
 					var to_node = nodes[j]
 					if to_node.name == connection_pair.to:
 						connect_node(new_nodes[i].name, new_nodes[j].name)
+	_on_duplicated(nodes, new_nodes)
 
 func _on_node_dragged(node, dragged):
 	pass
@@ -582,6 +583,9 @@ func _on_connect_node(from, to):
 	pass
 
 func _on_disconnect_node(from, to):
+	pass
+
+func _on_duplicated(old_nodes, new_nodes):
 	pass
 
 # Convert position in FlowChart space to content(takes translation/scale of content into account)
