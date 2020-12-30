@@ -15,6 +15,7 @@ onready var CreateNewStateMachineContainer = $MarginContainer
 onready var CreateNewStateMachine = $MarginContainer/CreateNewStateMachine
 
 var editor_accent_color = Color.white
+var transition_arrow_icon
 
 var undo_redo
 
@@ -86,6 +87,7 @@ func _gui_input(event):
 func create_line_instance():
 	var line = TransitionLine.instance()
 	line.theme.get_stylebox("focus", "FlowChartLine").shadow_color = editor_accent_color
+	line.theme.set_icon("arrow", "FlowChartLine", transition_arrow_icon)
 	return line
 
 func save_request():
