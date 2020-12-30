@@ -1,6 +1,8 @@
 tool
 extends Control
 
+const Utils = preload("res://addons/imjp94.yafsm/scripts/Utils.gd")
+const CohenSutherland = Utils.CohenSutherland
 const FlowChartNode = preload("FlowChartNode.gd")
 const FlowChartNodeScene = preload("FlowChartNode.tscn")
 const FlowChartLine = preload("FlowChartLine.gd")
@@ -212,10 +214,6 @@ func _notification(what):
 			# 	var rect = get_transform().xform(content.get_transform().xform(node.get_rect()))
 			# 	draw_style_box(selection_stylebox, rect)
 
-			# var center = selection_box_rect.position + selection_box_rect.size / 2
-			# var radius = min(selection_box_rect.size.x, selection_box_rect.size.y) / 2
-			# draw_circle(center, radius, Color.blue)
-
 			# var connection_list = get_connection_list()
 			# for i in connection_list.size():
 			# 	var connection = _connections[connection_list[i].from][connection_list[i].to]
@@ -409,9 +407,7 @@ func _gui_input(event):
 								var line_local_up_offset = connection.line.rect_position - connection.line.get_transform().xform(Vector2.UP * connection.offset)
 								var from_pos = content.get_transform().xform(connection.get_from_pos() + line_local_up_offset)
 								var to_pos = content.get_transform().xform(connection.get_to_pos() + line_local_up_offset)
-								var center = selection_box_rect.position + selection_box_rect.size / 2
-								var radius = min(selection_box_rect.size.x, selection_box_rect.size.y) / 2
-								if Geometry.segment_intersects_circle(from_pos, to_pos, center, radius) >= 0:
+								if CohenSutherland.line_intersect_rectangle(from_pos, to_pos, selection_box_rect):
 									select(connection.line)
 						_drag_start_pos = _drag_end_pos
 						update()
