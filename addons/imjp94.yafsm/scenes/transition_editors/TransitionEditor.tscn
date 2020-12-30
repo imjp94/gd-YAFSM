@@ -5,10 +5,6 @@
 [ext_resource path="res://addons/imjp94.yafsm/scenes/transition_editors/TransitionEditor.gd" type="Script" id=3]
 [ext_resource path="res://addons/imjp94.yafsm/assets/icons/compare_arrows-white-18dp.svg" type="Texture" id=4]
 
-
-
-
-
 [sub_resource type="StyleBoxTexture" id=1]
 
 [node name="TransitionEditor" type="VBoxContainer"]
@@ -22,7 +18,7 @@ __meta__ = {
 }
 
 [node name="HeaderContainer" type="MarginContainer" parent="."]
-margin_right = 173.0
+margin_right = 180.0
 margin_bottom = 32.0
 custom_constants/margin_right = 4
 custom_constants/margin_top = 4
@@ -32,42 +28,52 @@ custom_constants/margin_bottom = 4
 [node name="Panel" type="Panel" parent="HeaderContainer"]
 margin_left = 4.0
 margin_top = 4.0
-margin_right = 169.0
+margin_right = 176.0
 margin_bottom = 28.0
 
 [node name="Header" type="HBoxContainer" parent="HeaderContainer"]
 margin_left = 4.0
 margin_top = 4.0
-margin_right = 169.0
+margin_right = 176.0
 margin_bottom = 28.0
 
 [node name="Title" type="HBoxContainer" parent="HeaderContainer/Header"]
-margin_right = 54.0
+margin_right = 74.0
 margin_bottom = 24.0
 hint_tooltip = "Next State"
 
-[node name="Icon" type="TextureRect" parent="HeaderContainer/Header/Title"]
-margin_right = 18.0
-margin_bottom = 24.0
-texture = ExtResource( 2 )
-
-[node name="Label" type="Label" parent="HeaderContainer/Header/Title"]
-margin_left = 22.0
+[node name="From" type="Label" parent="HeaderContainer/Header/Title"]
 margin_top = 5.0
-margin_right = 54.0
+margin_right = 33.0
 margin_bottom = 19.0
 size_flags_horizontal = 3
 custom_styles/normal = SubResource( 1 )
-text = "State"
+text = "From"
+
+[node name="Icon" type="TextureRect" parent="HeaderContainer/Header/Title"]
+margin_left = 37.0
+margin_right = 55.0
+margin_bottom = 24.0
+texture = ExtResource( 2 )
+stretch_mode = 6
+
+[node name="To" type="Label" parent="HeaderContainer/Header/Title"]
+margin_left = 59.0
+margin_top = 5.0
+margin_right = 74.0
+margin_bottom = 19.0
+size_flags_horizontal = 3
+custom_styles/normal = SubResource( 1 )
+text = "To"
 
 [node name="VSeparator" type="VSeparator" parent="HeaderContainer/Header"]
-margin_left = 58.0
-margin_right = 62.0
+margin_left = 78.0
+margin_right = 82.0
 margin_bottom = 24.0
 
 [node name="ConditionCount" type="HBoxContainer" parent="HeaderContainer/Header"]
-margin_left = 66.0
-margin_right = 110.0
+margin_left = 86.0
+margin_right = 130.0
 margin_bottom = 24.0
 hint_tooltip = "Number of Condition"
 
@@ -87,13 +93,13 @@ margin_bottom = 19.0
 text = "No."
 
 [node name="VSeparator2" type="VSeparator" parent="HeaderContainer/Header"]
-margin_left = 114.0
-margin_right = 118.0
+margin_left = 134.0
+margin_right = 138.0
 margin_bottom = 24.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HeaderContainer/Header"]
-margin_left = 135.0
-margin_right = 165.0
+margin_left = 142.0
+margin_right = 172.0
 margin_bottom = 24.0
 size_flags_horizontal = 10
 
@@ -114,7 +120,7 @@ __meta__ = {
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 margin_top = 36.0
-margin_right = 173.0
+margin_right = 180.0
 margin_bottom = 44.0
 custom_constants/margin_right = 4
 custom_constants/margin_top = 4
@@ -124,7 +130,7 @@ custom_constants/margin_bottom = 4
 [node name="Panel" type="Panel" parent="MarginContainer"]
 margin_left = 16.0
 margin_top = 4.0
-margin_right = 169.0
+margin_right = 176.0
 margin_bottom = 4.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -132,5 +138,5 @@ size_flags_vertical = 3
 [node name="Conditions" type="VBoxContainer" parent="MarginContainer"]
 margin_left = 16.0
 margin_top = 4.0
-margin_right = 169.0
+margin_right = 176.0
 margin_bottom = 4.0
