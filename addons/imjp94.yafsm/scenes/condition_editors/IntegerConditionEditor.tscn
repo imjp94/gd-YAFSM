@@ -6,9 +6,6 @@
 [node name="IntegerConditionEditor" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
 
-[node name="PopupMenu" parent="Comparation" index="0"]
-items = [ "==", null, 0, false, false, 0, 0, null, "", false, ">", null, 0, false, false, 1, 0, null, "", false, "<", null, 0, false, false, 2, 0, null, "", false ]
-
 [node name="MarginContainer" parent="." index="2"]
 margin_right = 152.0
 size_flags_horizontal = 3

@@ -15,7 +15,7 @@ margin_top = 10.0
 margin_bottom = 30.0
 
 [node name="PopupMenu" parent="Comparation" index="0"]
-items = [ "==", null, 0, false, false, 0, 0, null, "", false, ">", null, 0, false, false, 1, 0, null, "", false, "<", null, 0, false, false, 2, 0, null, "", false ]
+items = [ "==", null, 0, false, false, 0, 0, null, "", false, "!=", null, 0, false, false, 1, 0, null, "", false ]
 
 [node name="MarginContainer" parent="." index="2"]
 margin_right = 170.0
