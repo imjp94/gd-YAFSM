@@ -9,6 +9,11 @@ const StateNodeScript = preload("state_nodes/StateNode.gd")
 
 signal inspector_changed(property)
 
+const ENTRY_STATE_MISSING_MSG = {
+	"key": "entry_state_missing",
+	"text": "Entry State is required for StateMachine to work properly. Right-click then select \"Add Entry\"."
+}
+
 onready var ContextMenu = $ContextMenu
 onready var SaveDialog = $SaveDialog
 onready var CreateNewStateMachineContainer = $MarginContainer
@@ -20,10 +25,12 @@ var transition_arrow_icon
 var undo_redo
 
 var condition_visibility = TextureButton.new()
+var message_box = VBoxContainer.new()
 
 var state_machine_player setget set_state_machine_player
 export(Resource) var state_machine setget set_state_machine
 
+var _message_box_dict = {}
 var _to_free
 
 
@@ -39,6 +46,10 @@ func _ready():
 	condition_visibility.connect("pressed", self, "_on_condition_visibility_pressed")
 	condition_visibility.pressed = true
 	gadget.add_child(condition_visibility)
+
+	message_box.set_anchors_and_margins_preset(PRESET_BOTTOM_WIDE)
+	message_box.grow_vertical = GROW_DIRECTION_BEGIN
+	add_child(message_box)
 
 	CreateNewStateMachineContainer.visible = false
 	CreateNewStateMachine.connect("pressed", self, "_on_CreateNewStateMachine_pressed")
@@ -139,6 +150,29 @@ func draw_graph():
 				_connections[transition.from][transition.to].line.transition = transition
 	update()
 
+func add_message(key, text):
+	var label = Label.new()
+	label.text = text
+	_message_box_dict[key] = label
+	message_box.add_child(label)
+	return label
+
+func remove_message(key):
+	var control = _message_box_dict.get(key)
+	if control:
+		_message_box_dict.erase(key)
+		message_box.remove_child(control)
+		return true
+	return false
+
+func check_has_entry():
+	if not state_machine.has_entry():
+		if not (ENTRY_STATE_MISSING_MSG.key in _message_box_dict):
+			add_message(ENTRY_STATE_MISSING_MSG.key, ENTRY_STATE_MISSING_MSG.text)
+	else:
+		if ENTRY_STATE_MISSING_MSG.key in  _message_box_dict:
+			remove_message(ENTRY_STATE_MISSING_MSG.key)
+
 func _on_ContextMenu_index_pressed(index):
 	var new_node = StateNode.instance()
 	new_node.theme.get_stylebox("focus", "FlowChartNode").border_color = editor_accent_color
@@ -170,9 +204,12 @@ func _on_node_added(new_node):
 	new_node.state.graph_offset = new_node.rect_position
 	new_node.connect("name_edit_entered", self, "_on_node_name_edit_entered", [new_node])
 	state_machine.add_state(new_node.state)
+	check_has_entry()
 
 func _on_node_removed(node_name):
-	return state_machine.remove_state(node_name)
+	var result = state_machine.remove_state(node_name)
+	check_has_entry()
+	return result
 
 func _on_connect_node(from, to):
 	if state_machine.transitions.has(from):
@@ -191,6 +228,7 @@ func _on_state_machine_changed(new_state_machine):
 	clear_graph()
 	if new_state_machine:
 		draw_graph()
+		check_has_entry()
 
 func _on_node_name_edit_entered(new_name, node):
 	var old = node.state.name
