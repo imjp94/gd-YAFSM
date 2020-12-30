@@ -205,8 +205,8 @@ func clear_param():
 	_is_param_edited = true
 
 # Get value of param
-func get_param(name):
-	return _parameters[name]
+func get_param(name, default=null):
+	return _parameters.get(name, default)
 
 # Get duplicate of whole parameter dictionary
 func get_params():
