@@ -251,14 +251,17 @@ func _gui_input(event):
 				if event.pressed and event.control:
 					# Copy node
 					_copying_nodes = _selection.duplicate()
+					accept_event()
 			KEY_D:
 				if event.pressed and event.control:
 					# Duplicate node directly from selection
 					duplicate_nodes(_selection.duplicate())
+					accept_event()
 			KEY_V:
 				if event.pressed and event.control:
 					# Paste node from _copying_nodes
 					duplicate_nodes(_copying_nodes)
+					accept_event()
 
 	if event is InputEventMouseButton:
 		match event.button_index:
@@ -547,6 +550,7 @@ func clear_selection():
 
 func duplicate_nodes(nodes):
 	clear_selection()
+	var new_nodes = []
 	for i in nodes.size():
 		var node = nodes[i]
 		if not (node is FlowChartNode):
@@ -554,8 +558,18 @@ func duplicate_nodes(nodes):
 		var new_node = node.duplicate(DUPLICATE_SIGNALS + DUPLICATE_SCRIPTS)
 		var offset = content_position(get_local_mouse_position()) - content_position(_drag_end_pos)
 		new_node.rect_position = new_node.rect_position + offset
+		new_nodes.append(new_node)
 		add_node(new_node)
 		select(new_node)
+	# Duplicate connection within selection
+	for i in nodes.size():
+		var from_node = nodes[i]
+		for connection_pair in get_connection_list():
+			if from_node.name == connection_pair.from:
+				for j in nodes.size():
+					var to_node = nodes[j]
+					if to_node.name == connection_pair.to:
+						connect_node(new_nodes[i].name, new_nodes[j].name)
 
 func _on_node_dragged(node, dragged):
 	pass
