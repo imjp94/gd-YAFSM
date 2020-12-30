@@ -412,6 +412,10 @@ func _gui_input(event):
 								var to_pos = content.get_transform().xform(connection.get_to_pos() + line_local_up_offset)
 								if CohenSutherland.line_intersect_rectangle(from_pos, to_pos, selection_box_rect):
 									select(connection.line)
+						if was_dragging_node:
+							# Update _drag_origins with new position after dragged
+							for i in _selection.size():
+								_drag_origins[i] = _selection[i].rect_position
 						_drag_start_pos = _drag_end_pos
 						update()
 
