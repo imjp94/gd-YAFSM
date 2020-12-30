@@ -18,7 +18,7 @@ text = "=="
 [node name="PopupMenu" type="PopupMenu" parent="Comparation" index="0"]
 margin_right = 20.0
 margin_bottom = 20.0
-items = [ "==", null, 0, false, false, 0, 0, null, "", false, ">", null, 0, false, false, 1, 0, null, "", false, "<", null, 0, false, false, 2, 0, null, "", false ]
+items = [ "==", null, 0, false, false, 0, 0, null, "", false, "!=", null, 0, false, false, 1, 0, null, "", false, ">", null, 0, false, false, 2, 0, null, "", false, "<", null, 0, false, false, 3, 0, null, "", false, "≥", null, 0, false, false, 4, 0, null, "", false, "≤", null, 0, false, false, 5, 0, null, "", false ]
 
 [node name="MarginContainer" type="MarginContainer" parent="." index="2"]
 margin_left = 94.0

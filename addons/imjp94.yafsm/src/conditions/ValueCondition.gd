@@ -6,10 +6,22 @@ signal value_changed(new_value) # Value changed
 
 # Enum to define how to compare value
 enum Comparation {
-	LESSER = -1,
-	EQUAL = 0,
-	GREATER = 1
+	EQUAL,
+	INEQUAL
+	GREATER,
+	LESSER,
+	GREATER_OR_EQUAL,
+	LESSER_OR_EQUAL
 }
+# Comparation symbols arranged in order as enum Comparation
+const COMPARATION_SYMBOLS = [
+	"==",
+	"!=",
+	">",
+	"<",
+	"≥",
+	"≤"
+]
 
 export(Comparation) var comparation = Comparation.EQUAL setget set_comparation
 
@@ -41,21 +53,18 @@ func compare(v):
 		return false
 
 	match comparation:
-		Comparation.LESSER:
-			return v < get_value()
 		Comparation.EQUAL:
 			return v == get_value()
+		Comparation.INEQUAL:
+			return v != get_value()
 		Comparation.GREATER:
 			return v > get_value()
-
-static func comparation_to_symbol(v):
-	match v:
 		Comparation.LESSER:
-			return "<"
-		Comparation.EQUAL:
-			return "=="
-		Comparation.GREATER:
-			return ">"
+			return v < get_value()
+		Comparation.GREATER_OR_EQUAL:
+			return v >= get_value()
+		Comparation.LESSER_OR_EQUAL:
+			return v <= get_value()
 
 func display_string():
-	return "%s %s %s" % [.display_string(), comparation_to_symbol(comparation), get_value_string()]
+	return "%s %s %s" % [.display_string(), COMPARATION_SYMBOLS[comparation], get_value_string()]
