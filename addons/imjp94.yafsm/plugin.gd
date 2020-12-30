@@ -49,6 +49,7 @@ func _enter_tree():
 	state_machine_editor.connect("node_deselected", self, "_on_StateMachineEditor_node_deselected")
 
 	transition_inspector.undo_redo = get_undo_redo()
+	transition_inspector.transition_icon = editor_base_control.get_icon("ToolConnect", "EditorIcons")
 	add_inspector_plugin(transition_inspector)
 	add_inspector_plugin(state_inspector)
 

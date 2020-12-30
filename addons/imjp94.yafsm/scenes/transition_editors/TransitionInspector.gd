@@ -6,6 +6,7 @@ const TransitionEditor = preload("res://addons/imjp94.yafsm/scenes/transition_ed
 
 var undo_redo
 
+var transition_icon
 
 func can_handle(object):
 	return object is Transition
@@ -26,3 +27,5 @@ func parse_property(object, type, path, hint, hint_text, usage):
 
 func _on_transition_editor_tree_entered(editor, transition):
 	editor.transition = transition
+	if transition_icon:
+		editor.TitleIcon.texture = transition_icon

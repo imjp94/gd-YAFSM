@@ -13,7 +13,10 @@ const FloatConditionEditor = preload("../condition_editors/FloatConditionEditor.
 
 onready var Header = $HeaderContainer/Header
 onready var Title = $HeaderContainer/Header/Title
-onready var TitleLabel = $HeaderContainer/Header/Title/Label
+onready var TitleIcon = $HeaderContainer/Header/Title/Icon
+onready var From = $HeaderContainer/Header/Title/From
+onready var To = $HeaderContainer/Header/Title/To
+onready var ConditionCountIcon = $HeaderContainer/Header/ConditionCount/Icon
 onready var ConditionCountLabel = $HeaderContainer/Header/ConditionCount/Label
 onready var Add = $HeaderContainer/Header/HBoxContainer/Add
 onready var AddPopupMenu = $HeaderContainer/Header/HBoxContainer/Add/PopupMenu
@@ -92,7 +95,8 @@ func remove_condition_editor(editor):
 	update_condition_count()
 
 func update_title():
-	TitleLabel.text = transition.to
+	From.text = transition.from
+	To.text = transition.to
 
 func update_condition_count():
 	var count = transition.conditions.size()
