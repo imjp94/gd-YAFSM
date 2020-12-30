@@ -15,10 +15,16 @@ func _draw():
 	from.y += rect_size.y / 2.0
 	var to = rect_size
 	to.y -= rect_size.y / 2.0
+	var arrow = get_icon("arrow", "FlowChartLine")
+	var tint = Color.white
 	if selected:
+		tint = get_stylebox("focus", "FlowChartLine").shadow_color
 		draw_style_box(get_stylebox("focus", "FlowChartLine"), Rect2(Vector2.ZERO, rect_size))
 	else:
 		draw_style_box(get_stylebox("normal", "FlowChartLine"), Rect2(Vector2.ZERO, rect_size))
+	
+	
+	draw_texture(arrow, Vector2.ZERO - arrow.get_size() / 2 + rect_size / 2, tint)
 
 func _notification(what):
 	match what:
