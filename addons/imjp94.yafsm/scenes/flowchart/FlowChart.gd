@@ -159,11 +159,21 @@ func _notification(what):
 			var content_rect = get_scroll_rect()
 			content.rect_pivot_offset = get_scroll_rect().size / 2.0 # Scale from center
 			if not get_rect().encloses(content_rect):
-				h_scroll.min_value = content_rect.position.x
-				h_scroll.max_value = content_rect.size.x + content_rect.position.x - rect_size.x
+				var h_min = content_rect.position.x
+				var h_max = content_rect.size.x + content_rect.position.x - rect_size.x
+				var v_min = content_rect.position.y
+				var v_max = content_rect.size.y + content_rect.position.y - rect_size.y
+				if h_min == h_max: # Otherwise scroll bar will complain no ratio
+					h_min -= 0.1
+					h_max += 0.1
+				if v_min == v_max: # Otherwise scroll bar will complain no ratio
+					v_min -= 0.1
+					v_max += 0.1
+				h_scroll.min_value = h_min
+				h_scroll.max_value = h_max
 				h_scroll.page = content_rect.size.x / 100
-				v_scroll.min_value = content_rect.position.y
-				v_scroll.max_value = content_rect.size.y + content_rect.position.y - rect_size.y
+				v_scroll.min_value = v_min
+				v_scroll.max_value = v_max
 				v_scroll.page = content_rect.size.y / 100
 
 			# Draw selection box
