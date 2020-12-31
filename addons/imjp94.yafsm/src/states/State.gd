@@ -11,7 +11,7 @@ const META_GRAPH_OFFSET = "graph_offset" # Meta key for graph_offset
 
 export(String) var name = "" setget set_name # Name of state, unique within StateMachine
 
-var graph_offset setget set_graph_offset, get_graph_offset # Position in GraphEdit stored as meta, for editor only
+var graph_offset setget set_graph_offset, get_graph_offset # Position in FlowChart stored as meta, for editor only
 
 
 func _init(p_name=""):

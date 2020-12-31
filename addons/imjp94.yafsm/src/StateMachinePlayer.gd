@@ -115,9 +115,11 @@ func _transition():
 	_is_param_edited = false
 	_flush_trigger()
 
+# Called internally if process_mode is PHYSICS/IDLE to unlock update()
 func _update_start():
 	_is_update_locked = false
 
+# Called internally if process_mode is PHYSICS/IDLE to lock update() from external call
 func _update_end():
 	_is_update_locked = true
 
@@ -163,15 +165,19 @@ func reset(to=-1, event=ResetEventTrigger.LAST_TO_DEST):
 	.reset(to, event)
 	_was_transited = true # Make sure to call _transition on next update
 
+# Manually start the player, automatically called if autostart is true
 func start():
 	push(State.ENTRY_KEY)
 	_was_transited = true
 
+# Restart player
 func restart(is_active=true):
 	reset()
 	set_active(is_active)
 	start()
 
+# Update player to, first initiate transition, then call _on_update, finally emit "update" signal
+# Can only be called manually if process_mode is MANUAL, otherwise, assertion error will be raised
 func update(delta):
 	if not active:
 		return
@@ -212,9 +218,11 @@ func get_param(name, default=null):
 func get_params():
 	return _parameters.duplicate()
 
+# Return if player started
 func is_entered():
 	return State.ENTRY_KEY in stack
 
+# Return if player ended
 func is_exited():
 	return get_current() == State.EXIT_KEY
 

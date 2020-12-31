@@ -66,5 +66,6 @@ func compare(v):
 		Comparation.LESSER_OR_EQUAL:
 			return v <= get_value()
 
+# Return human readable display string, for example, "condition_name == True"
 func display_string():
 	return "%s %s %s" % [.display_string(), COMPARATION_SYMBOLS[comparation], get_value_string()]
