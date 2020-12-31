@@ -26,13 +26,6 @@ func _draw():
 	
 	draw_texture(arrow, Vector2.ZERO - arrow.get_size() / 2 + rect_size / 2, tint)
 
-func _notification(what):
-	match what:
-		NOTIFICATION_SORT_CHILDREN:
-			for child in get_children():
-				if child is Control:
-					fit_child_in_rect(child, Rect2(Vector2.ZERO, rect_size))
-
 func _get_minimum_size():
 	return Vector2(0, 5)
 

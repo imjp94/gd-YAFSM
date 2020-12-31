@@ -5,17 +5,13 @@
 
 [node name="TransitionLine" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
-upright_angle_range = 10.0
 
-[node name="MarginContainer" type="MarginContainer" parent="." index="1"]
-margin_right = 95.0
-margin_bottom = 46.0
+[node name="MarginContainer" type="MarginContainer" parent="." index="0"]
+margin_left = -47.5
+margin_top = -46.0
+margin_right = 47.5
 rect_pivot_offset = Vector2( 0, 2.5 )
 mouse_filter = 2
-custom_constants/margin_right = 16
-custom_constants/margin_top = 16
-custom_constants/margin_left = 16
-custom_constants/margin_bottom = 16
 
 [node name="Label" type="Label" parent="MarginContainer" index="0"]
 margin_left = 16.0
