@@ -40,7 +40,8 @@ func _draw():
 		else:
 			label_margin.rect_rotation = 0
 			label_margin.rect_position = Vector2((rect_size.x - x_offset) / 2, y_offset)
-		
+
+# Update overlay text
 func update_label():
 	label.text = ""
 	if transition:

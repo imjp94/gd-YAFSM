@@ -1,19 +1,19 @@
 tool
 extends "ValueConditionEditor.gd"
 
-onready var BooleanValue = $MarginContainer/BooleanValue
+onready var boolean_value = $MarginContainer/BooleanValue
 
 func _ready():
-	BooleanValue.connect("pressed", self, "_on_BooleanValue_pressed")
+	boolean_value.connect("pressed", self, "_on_boolean_value_pressed")
 
 func _on_value_changed(new_value):
-	if BooleanValue.pressed != new_value:
-		BooleanValue.pressed = new_value
+	if boolean_value.pressed != new_value:
+		boolean_value.pressed = new_value
 
-func _on_BooleanValue_pressed():
-	change_value_action(condition.value, BooleanValue.pressed)
+func _on_boolean_value_pressed():
+	change_value_action(condition.value, boolean_value.pressed)
 
 func _on_condition_changed(new_condition):
 	._on_condition_changed(new_condition)
 	if new_condition:
-		BooleanValue.pressed = new_condition.value
+		boolean_value.pressed = new_condition.value

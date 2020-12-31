@@ -10,13 +10,12 @@ const StateMachineEditor = preload("scenes/StateMachineEditor.tscn")
 const TransitionInspector = preload("scenes/transition_editors/TransitionInspector.gd")
 const StateInspector = preload("scenes/state_nodes/StateInspector.gd")
 
-var state_machine_editor
+var state_machine_editor = StateMachineEditor.instance()
+var transition_inspector = TransitionInspector.new()
+var state_inspector = StateInspector.new()
 
 var focused_object setget set_focused_object # Can be StateMachine/StateMachinePlayer
 var editor_selection
-
-var transition_inspector = TransitionInspector.new()
-var state_inspector = StateInspector.new()
 
 
 func _enter_tree():
@@ -30,7 +29,6 @@ func _enter_tree():
 	add_custom_type("StateMachinePlayer", "Node", StateMachinePlayer, node_icon)
 	add_custom_type("StateMachine", "Resource", StateMachine, resource_icon)
 
-	state_machine_editor = StateMachineEditor.instance()
 	state_machine_editor.selection_stylebox.bg_color = editor_base_control.get_color("box_selection_fill_color", "Editor")
 	state_machine_editor.selection_stylebox.border_color = editor_base_control.get_color("box_selection_stroke_color", "Editor")
 	state_machine_editor.zoom_minus.icon = editor_base_control.get_icon("ZoomLess", "EditorIcons")
@@ -41,12 +39,12 @@ func _enter_tree():
 	state_machine_editor.condition_visibility.texture_normal = editor_base_control.get_icon("GuiVisibilityHidden", "EditorIcons")
 	state_machine_editor.editor_accent_color = editor_base_control.get_color("accent_color", "Editor")
 	state_machine_editor.transition_arrow_icon = editor_base_control.get_icon("TransitionImmediateBig", "EditorIcons")
-	# Force anti-alias for default font
-	var font = editor_base_control.get_font("main", "EditorFonts")
-	font.use_filter = true
 	state_machine_editor.connect("inspector_changed", self, "_on_inspector_changed")
 	state_machine_editor.connect("node_selected", self, "_on_StateMachineEditor_node_selected")
 	state_machine_editor.connect("node_deselected", self, "_on_StateMachineEditor_node_deselected")
+	# Force anti-alias for default font, so rotated text will looks smoother
+	var font = editor_base_control.get_font("main", "EditorFonts")
+	font.use_filter = true
 
 	transition_inspector.undo_redo = get_undo_redo()
 	transition_inspector.transition_icon = editor_base_control.get_icon("ToolConnect", "EditorIcons")

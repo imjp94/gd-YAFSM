@@ -1,41 +1,41 @@
 tool
 extends "ValueConditionEditor.gd"
 
-onready var IntegerValue = $MarginContainer/IntegerValue
+onready var integer_value = $MarginContainer/IntegerValue
 
 var _old_value = 0
 
 
 func _ready():
-	IntegerValue.connect("text_entered", self, "_on_IntegerValue_text_entered")
-	IntegerValue.connect("focus_entered", self, "_on_IntegerValue_focus_entered")
-	IntegerValue.connect("focus_exited", self, "_on_IntegerValue_focus_exited")
+	integer_value.connect("text_entered", self, "_on_integer_value_text_entered")
+	integer_value.connect("focus_entered", self, "_on_integer_value_focus_entered")
+	integer_value.connect("focus_exited", self, "_on_integer_value_focus_exited")
 	set_process_input(false)
 
 func _input(event):
 	if event is InputEventMouseButton:
 		if event.pressed:
-			if get_focus_owner() == IntegerValue:
-				var local_event = IntegerValue.make_input_local(event)
-				if not IntegerValue.get_rect().has_point(local_event.position):
-					IntegerValue.release_focus()
+			if get_focus_owner() == integer_value:
+				var local_event = integer_value.make_input_local(event)
+				if not integer_value.get_rect().has_point(local_event.position):
+					integer_value.release_focus()
 
 func _on_value_changed(new_value):
-	IntegerValue.text = str(new_value)
+	integer_value.text = str(new_value)
 
-func _on_IntegerValue_text_entered(new_text):
+func _on_integer_value_text_entered(new_text):
 	change_value_action(_old_value, int(new_text))
-	IntegerValue.release_focus()
+	integer_value.release_focus()
 
-func _on_IntegerValue_focus_entered():
+func _on_integer_value_focus_entered():
 	set_process_input(true)
-	_old_value = int(IntegerValue.text)
+	_old_value = int(integer_value.text)
 
-func _on_IntegerValue_focus_exited():
+func _on_integer_value_focus_exited():
 	set_process_input(false)
-	change_value_action(_old_value, int(IntegerValue.text))
+	change_value_action(_old_value, int(integer_value.text))
 
 func _on_condition_changed(new_condition):
 	._on_condition_changed(new_condition)
 	if new_condition:
-		IntegerValue.text = str(new_condition.value)
+		integer_value.text = str(new_condition.value)

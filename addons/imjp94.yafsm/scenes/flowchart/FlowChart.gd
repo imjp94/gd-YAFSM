@@ -8,22 +8,25 @@ const FlowChartNodeScene = preload("FlowChartNode.tscn")
 const FlowChartLine = preload("FlowChartLine.gd")
 const FlowChartLineScene = preload("FlowChartLine.tscn")
 
-signal connection(from, to, line)
-signal disconnection(from, to, line)
-signal node_selected(node)
-signal node_deselected(node)
-signal dragged(node, distance)
+signal connection(from, to, line) # When a connection established
+signal disconnection(from, to, line) # When a connection broken
+signal node_selected(node) # When a node selected
+signal node_deselected(node) # When a node deselected
+signal dragged(node, distance) # When a node dragged
 
-export var scroll_margin = 100
+# Margin of content from edge of FlowChart
+export var scroll_margin = 100 
+# Offset between two line that interconnecting
 export var interconnection_offset = 10
+# Snap amount
 export var snap = 20
 
-var content = Control.new()
+var content = Control.new() # Root node that hold anything drawn in the flowchart
 var content_lines = Control.new() # Node that hold all flowchart lines
 var content_nodes = Control.new() # Node that hold all flowchart nodes
-var h_scroll
-var v_scroll
-var gadget
+var h_scroll = HScrollBar.new()
+var v_scroll = VScrollBar.new()
+var gadget = HBoxContainer.new() # Root node of top overlay controls
 var zoom_minus = Button.new()
 var zoom_reset = Button.new()
 var zoom_plus = Button.new()
@@ -53,14 +56,11 @@ func _init():
 	selection_stylebox.bg_color = Color(0, 0, 0, 0.3)
 	selection_stylebox.set_border_width_all(1)
 
-func _ready():
-	h_scroll = HScrollBar.new()
 	add_child(h_scroll)
 	h_scroll.set_anchors_and_margins_preset(PRESET_BOTTOM_WIDE)
 	h_scroll.connect("value_changed", self, "_on_h_scroll_changed")
 	h_scroll.connect("gui_input", self, "_on_h_scroll_gui_input")
 
-	v_scroll = VScrollBar.new()
 	add_child(v_scroll)
 	v_scroll.set_anchors_and_margins_preset(PRESET_RIGHT_WIDE)
 	v_scroll.connect("value_changed", self, "_on_v_scroll_changed")
@@ -81,7 +81,6 @@ func _ready():
 	content_nodes.mouse_filter = MOUSE_FILTER_IGNORE
 	content.add_child(content_nodes)
 
-	gadget = HBoxContainer.new()
 	gadget.set_anchors_and_margins_preset(PRESET_TOP_WIDE)
 	add_child(gadget)
 
@@ -133,6 +132,12 @@ func _on_v_scroll_gui_input(event):
 			BUTTON_WHEEL_DOWN:
 				v_scroll.value += v # scroll right
 
+func _on_h_scroll_changed(value):
+	content.rect_position.x = -value
+
+func _on_v_scroll_changed(value):
+	content.rect_position.y = -value
+
 func _on_zoom_minus_pressed():
 	content.rect_scale -= Vector2.ONE * 0.1
 	update()
@@ -153,97 +158,91 @@ func _on_snap_amount_value_changed(value):
 	snap = value
 	update()
 
-func _notification(what):
-	match what:
-		NOTIFICATION_DRAW:
-			var content_rect = get_scroll_rect()
-			content.rect_pivot_offset = get_scroll_rect().size / 2.0 # Scale from center
-			if not get_rect().encloses(content_rect):
-				var h_min = content_rect.position.x
-				var h_max = content_rect.size.x + content_rect.position.x - rect_size.x
-				var v_min = content_rect.position.y
-				var v_max = content_rect.size.y + content_rect.position.y - rect_size.y
-				if h_min == h_max: # Otherwise scroll bar will complain no ratio
-					h_min -= 0.1
-					h_max += 0.1
-				if v_min == v_max: # Otherwise scroll bar will complain no ratio
-					v_min -= 0.1
-					v_max += 0.1
-				h_scroll.min_value = h_min
-				h_scroll.max_value = h_max
-				h_scroll.page = content_rect.size.x / 100
-				v_scroll.min_value = v_min
-				v_scroll.max_value = v_max
-				v_scroll.page = content_rect.size.y / 100
+func _draw():
+	# Update scrolls
+	var content_rect = get_scroll_rect()
+	content.rect_pivot_offset = get_scroll_rect().size / 2.0 # Scale from center
+	if not get_rect().encloses(content_rect):
+		var h_min = content_rect.position.x
+		var h_max = content_rect.size.x + content_rect.position.x - rect_size.x
+		var v_min = content_rect.position.y
+		var v_max = content_rect.size.y + content_rect.position.y - rect_size.y
+		if h_min == h_max: # Otherwise scroll bar will complain no ratio
+			h_min -= 0.1
+			h_max += 0.1
+		if v_min == v_max: # Otherwise scroll bar will complain no ratio
+			v_min -= 0.1
+			v_max += 0.1
+		h_scroll.min_value = h_min
+		h_scroll.max_value = h_max
+		h_scroll.page = content_rect.size.x / 100
+		v_scroll.min_value = v_min
+		v_scroll.max_value = v_max
+		v_scroll.page = content_rect.size.y / 100
 
-			# Draw selection box
-			if not _is_dragging_node and not _is_connecting:
-				var selection_box_rect = get_selection_box_rect()
-				draw_style_box(selection_stylebox, selection_box_rect)
+	# Draw selection box
+	if not _is_dragging_node and not _is_connecting:
+		var selection_box_rect = get_selection_box_rect()
+		draw_style_box(selection_stylebox, selection_box_rect)
 
-			# Draw grid
-			# Refer GraphEdit(https://github.com/godotengine/godot/blob/6019dab0b45e1291e556e6d9e01b625b5076cc3c/scene/gui/graph_edit.cpp#L442)
-			if is_snapping:
-				var zoom = (Vector2.ONE/content.rect_scale).length()
-				var scroll_offset = Vector2(h_scroll.get_value(), v_scroll.get_value());
-				var offset = scroll_offset / zoom
-				var size = rect_size / zoom
+	# Draw grid
+	# Refer GraphEdit(https://github.com/godotengine/godot/blob/6019dab0b45e1291e556e6d9e01b625b5076cc3c/scene/gui/graph_edit.cpp#L442)
+	if is_snapping:
+		var zoom = (Vector2.ONE/content.rect_scale).length()
+		var scroll_offset = Vector2(h_scroll.get_value(), v_scroll.get_value());
+		var offset = scroll_offset / zoom
+		var size = rect_size / zoom
 
-				var from = (offset / float(snap)).floor()
-				var l = (size / float(snap)).floor() + Vector2(1, 1)
+		var from = (offset / float(snap)).floor()
+		var l = (size / float(snap)).floor() + Vector2(1, 1)
 
-				var  grid_minor = grid_minor_color
-				var  grid_major = grid_major_color
+		var  grid_minor = grid_minor_color
+		var  grid_major = grid_major_color
 
-				# for (int i = from.x; i < from.x + len.x; i++) {
-				for i in range(from.x, from.x + l.x):
-					var color
+		# for (int i = from.x; i < from.x + len.x; i++) {
+		for i in range(from.x, from.x + l.x):
+			var color
 
-					if (int(abs(i)) % 10 == 0):
-						color = grid_major
-					else:
-						color = grid_minor
+			if (int(abs(i)) % 10 == 0):
+				color = grid_major
+			else:
+				color = grid_minor
 
-					var base_ofs = i * snap * zoom - offset.x * zoom
-					draw_line(Vector2(base_ofs, 0), Vector2(base_ofs, rect_size.y), color)
+			var base_ofs = i * snap * zoom - offset.x * zoom
+			draw_line(Vector2(base_ofs, 0), Vector2(base_ofs, rect_size.y), color)
 
-				# for (int i = from.y; i < from.y + len.y; i++) {
-				for i in range(from.y, from.y + l.y):
-					var color;
+		# for (int i = from.y; i < from.y + len.y; i++) {
+		for i in range(from.y, from.y + l.y):
+			var color;
 
-					if (int(abs(i)) % 10 == 0):
-						color = grid_major
-					else:
-						color = grid_minor
+			if (int(abs(i)) % 10 == 0):
+				color = grid_major
+			else:
+				color = grid_minor
 
-					var base_ofs = i * snap * zoom - offset.y * zoom
-					draw_line(Vector2(0, base_ofs), Vector2(rect_size.x, base_ofs), color)
+			var base_ofs = i * snap * zoom - offset.y * zoom
+			draw_line(Vector2(0, base_ofs), Vector2(rect_size.x, base_ofs), color)
 
-			# Debug draw
-			# for node in content_nodes.get_children():
-			# 	var rect = get_transform().xform(content.get_transform().xform(node.get_rect()))
-			# 	draw_style_box(selection_stylebox, rect)
+	# Debug draw
+	# for node in content_nodes.get_children():
+	# 	var rect = get_transform().xform(content.get_transform().xform(node.get_rect()))
+	# 	draw_style_box(selection_stylebox, rect)
 
-			# var connection_list = get_connection_list()
-			# for i in connection_list.size():
-			# 	var connection = _connections[connection_list[i].from][connection_list[i].to]
-			# 	# Line's offset along its down-vector
-			# 	var line_local_up_offset = connection.line.rect_position - connection.line.get_transform().xform(Vector2.UP * connection.offset)
-			# 	var from_pos = content.get_transform().xform(connection.get_from_pos() + line_local_up_offset)
-			# 	var to_pos = content.get_transform().xform(connection.get_to_pos() + line_local_up_offset)
-			# 	draw_line(from_pos, to_pos, Color.yellow)
-
-func _on_h_scroll_changed(value):
-	content.rect_position.x = -value
-
-func _on_v_scroll_changed(value):
-	content.rect_position.y = -value
+	# var connection_list = get_connection_list()
+	# for i in connection_list.size():
+	# 	var connection = _connections[connection_list[i].from][connection_list[i].to]
+	# 	# Line's offset along its down-vector
+	# 	var line_local_up_offset = connection.line.rect_position - connection.line.get_transform().xform(Vector2.UP * connection.offset)
+	# 	var from_pos = content.get_transform().xform(connection.get_from_pos() + line_local_up_offset)
+	# 	var to_pos = content.get_transform().xform(connection.get_to_pos() + line_local_up_offset)
+	# 	draw_line(from_pos, to_pos, Color.yellow)
 
 func _gui_input(event):
 	if event is InputEventKey:
 		match event.scancode:
 			KEY_DELETE:
 				if event.pressed:
+					# Delete nodes
 					for node in _selection.duplicate():
 						if node is FlowChartLine:
 							# TODO: More efficient way to get connection from Line node
@@ -273,25 +272,15 @@ func _gui_input(event):
 					duplicate_nodes(_copying_nodes)
 					accept_event()
 
-	if event is InputEventMouseButton:
-		match event.button_index:
-			BUTTON_MIDDLE:
-				if event.doubleclick:
-					content.rect_scale = Vector2.ONE
-					update()
-			BUTTON_WHEEL_UP:
-				content.rect_scale += Vector2.ONE * 0.01
-				update()
-			BUTTON_WHEEL_DOWN:
-				content.rect_scale -= Vector2.ONE * 0.01
-				update()
 	if event is InputEventMouseMotion:
 		match event.button_mask:
 			BUTTON_MASK_MIDDLE:
+				# Panning
 				h_scroll.value -= event.relative.x
 				v_scroll.value -= event.relative.y
 				update()
 			BUTTON_LEFT:
+				# Dragging
 				if _is_dragging:
 					if _is_connecting:
 						# Connecting
@@ -328,43 +317,57 @@ func _gui_input(event):
 					update()
 
 	if event is InputEventMouseButton:
-		var hit_node
-		for i in content_nodes.get_child_count():
-			var child = content_nodes.get_child(content_nodes.get_child_count()-1 - i) # Inverse order to check from top to bottom of canvas
-			if child is FlowChartNode:
-				if child.get_rect().has_point(content_position(event.position)):
-					hit_node = child
-					break
-		if not hit_node:
-			# Test Line
-			# Refer https://github.com/godotengine/godot/blob/master/editor/plugins/animation_state_machine_editor.cpp#L187
-			var closest = -1
-			var closest_d = 1e20
-			var connection_list = get_connection_list()
-			for i in connection_list.size():
-				var connection = _connections[connection_list[i].from][connection_list[i].to]
-				# Line's offset along its down-vector
-				var line_local_up_offset = connection.line.rect_position - connection.line.get_transform().xform(Vector2.DOWN * connection.offset)
-				var from_pos = connection.get_from_pos() + line_local_up_offset
-				var to_pos = connection.get_to_pos() + line_local_up_offset
-				var cp = Geometry.get_closest_point_to_segment_2d(content_position(event.position), from_pos, to_pos)
-				var d = cp.distance_to(content_position(event.position))
-				if d > connection.line.rect_size.y * 2:
-					continue
-				if d < closest_d:
-					closest = i
-					closest_d = d
-
-			if closest >= 0:
-				hit_node = _connections[connection_list[closest].from][connection_list[closest].to].line
-
 		match event.button_index:
+			BUTTON_MIDDLE:
+				# Reset zoom
+				if event.doubleclick:
+					content.rect_scale = Vector2.ONE
+					update()
+			BUTTON_WHEEL_UP:
+				# Zoom in
+				content.rect_scale += Vector2.ONE * 0.01
+				update()
+			BUTTON_WHEEL_DOWN:
+				# Zoom out
+				content.rect_scale -= Vector2.ONE * 0.01
+				update()
 			BUTTON_LEFT:
+				# Hit detection
+				var hit_node
+				for i in content_nodes.get_child_count():
+					var child = content_nodes.get_child(content_nodes.get_child_count()-1 - i) # Inverse order to check from top to bottom of canvas
+					if child is FlowChartNode:
+						if child.get_rect().has_point(content_position(event.position)):
+							hit_node = child
+							break
+				if not hit_node:
+					# Test Line
+					# Refer https://github.com/godotengine/godot/blob/master/editor/plugins/animation_state_machine_editor.cpp#L187
+					var closest = -1
+					var closest_d = 1e20
+					var connection_list = get_connection_list()
+					for i in connection_list.size():
+						var connection = _connections[connection_list[i].from][connection_list[i].to]
+						# Line's offset along its down-vector
+						var line_local_up_offset = connection.line.rect_position - connection.line.get_transform().xform(Vector2.DOWN * connection.offset)
+						var from_pos = connection.get_from_pos() + line_local_up_offset
+						var to_pos = connection.get_to_pos() + line_local_up_offset
+						var cp = Geometry.get_closest_point_to_segment_2d(content_position(event.position), from_pos, to_pos)
+						var d = cp.distance_to(content_position(event.position))
+						if d > connection.line.rect_size.y * 2:
+							continue
+						if d < closest_d:
+							closest = i
+							closest_d = d
+					if closest >= 0:
+						hit_node = _connections[connection_list[closest].from][connection_list[closest].to].line
+
 				if event.pressed:
 					if not (hit_node in _selection) and not event.shift:
+						# Click on empty space
 						clear_selection()
-
 					if hit_node:
+						# Click on node(can be a line)
 						_is_dragging_node = true
 						select(hit_node)
 						if hit_node is FlowChartLine:
@@ -429,11 +432,13 @@ func _gui_input(event):
 						_drag_start_pos = _drag_end_pos
 						update()
 
+# Get selection box rect
 func get_selection_box_rect():
 	var pos = Vector2(min(_drag_start_pos.x, _drag_end_pos.x), min(_drag_start_pos.y, _drag_end_pos.y))
 	var size = (_drag_end_pos - _drag_start_pos).abs()
 	return Rect2(pos, size)
 
+# Get required scroll rect base on content
 func get_scroll_rect():
 	var rect = Rect2()
 	for child in content_nodes.get_children():
@@ -441,10 +446,12 @@ func get_scroll_rect():
 		rect = rect.merge(child_rect)
 	return rect.grow(scroll_margin)
 
+# Add node
 func add_node(node):
 	content_nodes.add_child(node)
 	_on_node_added(node)
 
+# Remove node
 func remove_node(node_name):
 	var node = content_nodes.get_node_or_null(node_name)
 	if node:
@@ -453,25 +460,23 @@ func remove_node(node_name):
 		node.queue_free() # TODO: add to _to_free instead
 		_on_node_removed(node_name)
 
-func _on_node_added(node):
-	pass
-
-func _on_node_removed(node):
-	pass
-
+# Called after connection established
 func _connect_node(line, from_pos, to_pos):
 	content_lines.add_child(line)
 	line.join(from_pos, to_pos)
 
+# Called after connection broken
 func _disconnect_node(line):
 	content_lines.remove_child(line)
 	if line in _selection:
 		deselect(line)
 	line.queue_free()
 
+# Return new line instance to use, called when connecting node
 func create_line_instance():
 	return FlowChartLineScene.instance()
 
+# Rename node
 func rename_node(old, new):
 	for from in _connections.keys():
 		if from == old: # Connection from
@@ -486,6 +491,7 @@ func rename_node(old, new):
 					from_connection.erase(old)
 					from_connection[new] = value
 
+# Connect two nodes with a line
 func connect_node(from, to):
 	if from == to:
 		return # Connect to self
@@ -510,9 +516,10 @@ func connect_node(from, to):
 			inv_connection.offset = interconnection_offset
 			connection.join()
 			inv_connection.join()
-	_on_connect_node(from, to)
+	_on_node_connected(from, to)
 	emit_signal("connection", from, to, line)
 
+# Break a connection between two node
 func disconnect_node(from, to):
 	var connections_from = _connections.get(from)
 	var connection = connections_from.get(to)
@@ -531,15 +538,17 @@ func disconnect_node(from, to):
 		if inv_connection:
 			inv_connection.offset = 0
 			inv_connection.join()
-	_on_disconnect_node(from, to)
+	_on_node_disconnected(from, to)
 	emit_signal("disconnection", from, to)
 
+# Clear all connections
 func clear_connections():
 	for connections_from in _connections.values():
 		for connection in connections_from.values():
 			connection.line.queue_free()
 	_connections.clear()
 
+# Select a node(can be a line)
 func select(node):
 	if node in _selection:
 		return
@@ -549,12 +558,14 @@ func select(node):
 	_drag_origins.append(node.rect_position)
 	emit_signal("node_selected", node)
 
+# Deselect a node
 func deselect(node):
 	_selection.erase(node)
 	node.selected = false
 	_drag_origins.pop_back()
 	emit_signal("node_deselected", node)
 
+# Clear all selection
 func clear_selection():
 	for node in _selection.duplicate(): # duplicate _selection array as deselect() edit array
 		if not node:
@@ -562,6 +573,7 @@ func clear_selection():
 		deselect(node)
 	_selection.clear()
 
+# Duplicate given nodes in editor
 func duplicate_nodes(nodes):
 	clear_selection()
 	var new_nodes = []
@@ -586,15 +598,28 @@ func duplicate_nodes(nodes):
 						connect_node(new_nodes[i].name, new_nodes[j].name)
 	_on_duplicated(nodes, new_nodes)
 
+
+# Called after a node added
+func _on_node_added(node):
+	pass
+
+# Called after a node removed
+func _on_node_removed(node):
+	pass
+
+# Called when a node dragged
 func _on_node_dragged(node, dragged):
 	pass
 
-func _on_connect_node(from, to):
+# Called when connection established between two nodes
+func _on_node_connected(from, to):
 	pass
 
-func _on_disconnect_node(from, to):
+# Called when connection broken
+func _on_node_disconnected(from, to):
 	pass
 
+# Called when nodes duplicated
 func _on_duplicated(old_nodes, new_nodes):
 	pass
 
@@ -602,6 +627,7 @@ func _on_duplicated(old_nodes, new_nodes):
 func content_position(pos):
 	return (pos - content.rect_position - content.rect_pivot_offset * (Vector2.ONE - content.rect_scale)) * 1.0/content.rect_scale
 
+# Return array of dictionary of connection as such [{"from1": "to1"}, {"from2": "to2"}]
 func get_connection_list():
 	var connection_list = []
 	for connections_from in _connections.values():
@@ -609,22 +635,26 @@ func get_connection_list():
 			connection_list.append({"from": connection.from_node.name, "to": connection.to_node.name})
 	return connection_list
 
+# Class that describe Connection between two nodes
 class Connection:
 	var line # Control node that draw line
 	var from_node
 	var to_node
-	var offset = 0
+	var offset = 0 # line's y offset to make space for two interconnecting lines
 
 	func _init(p_line, p_from_node, p_to_node):
 		line = p_line
 		from_node = p_from_node
 		to_node = p_to_node
 
+	# Update line position
 	func join():
 		line.join(get_from_pos(), get_to_pos(), offset)
 
+	# Return start position of line
 	func get_from_pos():
 		return from_node.rect_position + from_node.rect_size / 2
 
+	# Return destination position of line
 	func get_to_pos():
 		return to_node.rect_position + to_node.rect_size / 2 if to_node else line.rect_position

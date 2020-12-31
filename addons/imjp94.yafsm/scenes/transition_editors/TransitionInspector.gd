@@ -28,4 +28,4 @@ func parse_property(object, type, path, hint, hint_text, usage):
 func _on_transition_editor_tree_entered(editor, transition):
 	editor.transition = transition
 	if transition_icon:
-		editor.TitleIcon.texture = transition_icon
+		editor.title_icon.texture = transition_icon
