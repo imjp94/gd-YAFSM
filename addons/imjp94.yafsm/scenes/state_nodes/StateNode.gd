@@ -31,6 +31,7 @@ func _gui_input(event):
 func _input(event):
 	if event is InputEventMouseButton:
 		if event.pressed:
+			# Detect click outside rect
 			if get_focus_owner() == name_edit:
 				var local_event = name_edit.make_input_local(event)
 				if not name_edit.get_rect().has_point(local_event.position):
@@ -59,6 +60,7 @@ func _on_state_changed(new_state):
 
 func _on_NameEdit_focus_exited():
 	enable_name_edit(false)
+	name_edit.deselect()
 	emit_signal("name_edit_entered", name_edit.text)
 
 func _on_NameEdit_text_entered(new_text):

@@ -1,6 +1,6 @@
 tool
 extends Container
-# Custom style normal, focus
+# Custom style normal, focus, arrow
 
 var selected = false setget set_selected
 

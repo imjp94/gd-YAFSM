@@ -11,17 +11,17 @@ const BoolConditionEditor = preload("../condition_editors/BoolConditionEditor.ts
 const IntegerConditionEditor = preload("../condition_editors/IntegerConditionEditor.tscn")
 const FloatConditionEditor = preload("../condition_editors/FloatConditionEditor.tscn")
 
-onready var Header = $HeaderContainer/Header
-onready var Title = $HeaderContainer/Header/Title
-onready var TitleIcon = $HeaderContainer/Header/Title/Icon
-onready var From = $HeaderContainer/Header/Title/From
-onready var To = $HeaderContainer/Header/Title/To
-onready var ConditionCountIcon = $HeaderContainer/Header/ConditionCount/Icon
-onready var ConditionCountLabel = $HeaderContainer/Header/ConditionCount/Label
-onready var Add = $HeaderContainer/Header/HBoxContainer/Add
-onready var AddPopupMenu = $HeaderContainer/Header/HBoxContainer/Add/PopupMenu
-onready var ContentContainer = $MarginContainer
-onready var Conditions = $MarginContainer/Conditions
+onready var header = $HeaderContainer/Header
+onready var title = $HeaderContainer/Header/Title
+onready var title_icon = $HeaderContainer/Header/Title/Icon
+onready var from = $HeaderContainer/Header/Title/From
+onready var to = $HeaderContainer/Header/Title/To
+onready var condition_count_icon = $HeaderContainer/Header/ConditionCount/Icon
+onready var condition_count_label = $HeaderContainer/Header/ConditionCount/Label
+onready var add = $HeaderContainer/Header/HBoxContainer/Add
+onready var add_popup_menu = $HeaderContainer/Header/HBoxContainer/Add/PopupMenu
+onready var content_container = $MarginContainer
+onready var condition_list = $MarginContainer/Conditions
 
 var undo_redo
 
@@ -34,19 +34,19 @@ func _init():
 	_to_free = []
 
 func _ready():
-	Header.connect("gui_input", self, "_on_Header_gui_input")
-	Add.connect("pressed", self, "_on_Add_pressed")
-	AddPopupMenu.connect("index_pressed", self, "_on_AddPopupMenu_index_pressed")
+	header.connect("gui_input", self, "_on_header_gui_input")
+	add.connect("pressed", self, "_on_add_pressed")
+	add_popup_menu.connect("index_pressed", self, "_on_add_popup_menu_index_pressed")
 
-func _on_Header_gui_input(event):
+func _on_header_gui_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed:
 			toggle_conditions()
 
-func _on_Add_pressed():
-	Utils.popup_on_target(AddPopupMenu, Add)
+func _on_add_pressed():
+	Utils.popup_on_target(add_popup_menu, add)
 
-func _on_AddPopupMenu_index_pressed(index):
+func _on_add_popup_menu_index_pressed(index):
 	var condition
 	match index:
 		0: # Trigger
@@ -78,42 +78,42 @@ func _on_transition_changed(new_transition):
 
 func _on_condition_editor_added(editor):
 	editor.undo_redo = undo_redo
-	if not editor.Remove.is_connected("pressed", self, "_on_ConditionEditorRemove_pressed"):
-		editor.Remove.connect("pressed", self, "_on_ConditionEditorRemove_pressed", [editor])
+	if not editor.remove.is_connected("pressed", self, "_on_ConditionEditorRemove_pressed"):
+		editor.remove.connect("pressed", self, "_on_ConditionEditorRemove_pressed", [editor])
 	transition.add_condition(editor.condition)
 	update_condition_count()
 
 func add_condition_editor(editor, condition):
-	Conditions.add_child(editor)
+	condition_list.add_child(editor)
 	editor.condition = condition # Must be assigned after enter tree, as assignment would trigger ui code
 	_on_condition_editor_added(editor)
 
 func remove_condition_editor(editor):
 	transition.remove_condition(editor.condition.name)
-	Conditions.remove_child(editor)
+	condition_list.remove_child(editor)
 	_to_free.append(editor) # Freeing immediately after removal will break undo/redo
 	update_condition_count()
 
 func update_title():
-	From.text = transition.from
-	To.text = transition.to
+	from.text = transition.from
+	to.text = transition.to
 
 func update_condition_count():
 	var count = transition.conditions.size()
-	ConditionCountLabel.text = str(count)
+	condition_count_label.text = str(count)
 	if count == 0:
 		hide_conditions()
 	else:
 		show_conditions()
 
 func show_conditions():
-	ContentContainer.visible = true
+	content_container.visible = true
 
 func hide_conditions():
-	ContentContainer.visible = false
+	content_container.visible = false
 
 func toggle_conditions():
-	ContentContainer.visible = !ContentContainer.visible
+	content_container.visible = !content_container.visible
 
 func create_condition_editor(condition):
 	var editor
