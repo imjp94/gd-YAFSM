@@ -20,21 +20,26 @@ func _init():
 func _draw():
 	._draw()
 
-	label_margin.rect_pivot_offset = rect_size / 2
 	var abs_rect_rotation = abs(rect_rotation)
 	var is_flip = abs_rect_rotation > 90.0
 	var is_upright = abs_rect_rotation > 90.0 - upright_angle_range and abs_rect_rotation < 90.0 + upright_angle_range
 	if is_upright:
+		var x_offset = label_margin.rect_size.x / 2
+		var y_offset = -label_margin.rect_size.y
 		label_margin.rect_rotation = -rect_rotation
 		if rect_rotation > 0:
-			label_margin.rect_position = Vector2(-label_margin.rect_size.y / 2, -label.rect_size.x)
+			label_margin.rect_position = Vector2((rect_size.x - x_offset) / 2, 0)
 		else:
-			label_margin.rect_position = Vector2(label_margin.rect_size.y / 2, -label.rect_size.x)
-	elif is_flip:
-		label_margin.rect_rotation = 180
-		label_margin.rect_position = Vector2(0, 0)
+			label_margin.rect_position = Vector2((rect_size.x + x_offset) / 2, y_offset * 2)
 	else:
-		label_margin.rect_position = Vector2(0, -label_margin.rect_size.y)
+		var x_offset = label_margin.rect_size.x
+		var y_offset = -label_margin.rect_size.y
+		if is_flip:
+			label_margin.rect_rotation = 180
+			label_margin.rect_position = Vector2((rect_size.x + x_offset) / 2, 0)
+		else:
+			label_margin.rect_rotation = 0
+			label_margin.rect_position = Vector2((rect_size.x - x_offset) / 2, y_offset)
 		
 func update_label():
 	label.text = ""
@@ -44,7 +49,6 @@ func update_label():
 				label.text = str(label.text, "\n")
 			label.text = str(label.text, condition.display_string())
 	update()
-	call_deferred("call_deferred", "update") # Trigger _draw, no ides why it only works after 2 frames
 
 func _on_transition_changed(new_transition):
 	if not is_inside_tree():
