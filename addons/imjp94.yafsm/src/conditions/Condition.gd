@@ -4,7 +4,7 @@ extends Resource
 signal name_changed(old, new)
 signal display_string_changed(new)
 
-export(String) var name = "" setget set_name
+export(String) var name = "" setget set_name # Name of condition, unique to Transition
 
 
 func _init(p_name=""):
