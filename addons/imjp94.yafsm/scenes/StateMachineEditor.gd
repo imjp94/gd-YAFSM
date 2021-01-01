@@ -82,6 +82,7 @@ func _on_create_new_state_machine_pressed():
 	state_machine_player.state_machine = new_state_machine
 	state_machine = new_state_machine
 	create_new_state_machine_container.visible = false
+	check_has_entry()
 	emit_signal("inspector_changed", "state_machine")
 
 func _on_condition_visibility_pressed():
