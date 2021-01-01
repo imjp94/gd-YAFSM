@@ -2,11 +2,10 @@ tool
 extends "StackPlayer.gd"
 const State = preload("states/State.gd")
 
-signal transit_in(to) # Transit to state, exclude Entry/Exit state
-signal transit_out(from) # Transit from state, exclude Entry/Exit state
-signal entry(state_machine) # Entry of state machine
-signal exit(state_machine) # Exit of state machine
-signal update(state, delta) # Update of state machine, only emitted if process_mode is PHYSICS/IDLE
+signal transited(from, to) # Transition of state
+signal entered() # Entry of state machine
+signal exited() # Exit of state machine
+signal updated(state, delta) # Time to update(based on process_mode), up to user to handle any logic, for example, update movement of KinematicBody
 
 # Enum to define how state machine should be updated
 enum ProcessMode {
@@ -31,7 +30,7 @@ func _init():
 		return
 
 	_parameters = {}
-	_was_transited = true # Trigger _transition on _ready
+	_was_transited = true # Trigger _transit on _ready
 
 func _get_configuration_warning():
 	if state_machine:
@@ -66,39 +65,23 @@ func _physics_process(delta):
 	update(delta)
 	_update_end()
 
-func _on_push(from, to):
-	_transit_out(from)
-	_transit_in(to)
+func _on_pushed(from, to):
+	_on_state_changed(from, to)
 
-func _on_pop(from, to):
-	_transit_out(from)
-	_transit_in(to)
+func _on_popped(from, to):
+	_on_state_changed(from, to)
 
-func _transit_in(to):
+func _on_state_changed(from, to):
 	match to:
 		State.ENTRY_KEY:
-			emit_signal("entry", state_machine)
+			emit_signal("entered")
 		State.EXIT_KEY:
 			set_active(false) # Disable on exit
-			emit_signal("exit", state_machine)
-		"":
-			return # Ignore empty state
-		_:
-			emit_signal("transit_in", to)
-
-func _transit_out(from):
-	match from:
-		State.ENTRY_KEY:
-			return
-		State.EXIT_KEY:
-			return
-		"":
-			return # Ignore empty state
-		_:
-			emit_signal("transit_out", from)
+			emit_signal("exited")
+	emit_signal("transited", from, to)
 
 # Only get called in 2 condition, _parameters edited or last transition was successful
-func _transition():
+func _transit():
 	if not active:
 		return
 	# Attempt to transit if parameter edited or last transition was successful
@@ -124,7 +107,7 @@ func _update_end():
 	_is_update_locked = true
 
 # Called after update() which is dependant on process_mode, override to process current state
-func _on_update(delta, state):
+func _on_updated(delta, state):
 	pass
 
 func _on_process_mode_changed():
@@ -149,12 +132,12 @@ func _on_active_changed():
 	if active:
 		_flush_trigger()
 		_on_process_mode_changed()
-		_transition()
+		_transit()
 	else:
 		set_physics_process(false)
 		set_process(false)
 
-# Remove all trigger(param with null value) in _parameters, only get called after _transition
+# Remove all trigger(param with null value) in _parameters, only get called after _transit
 func _flush_trigger():
 	for param_key in _parameters.keys():
 		var value = _parameters[param_key]
@@ -163,7 +146,7 @@ func _flush_trigger():
 
 func reset(to=-1, event=ResetEventTrigger.LAST_TO_DEST):
 	.reset(to, event)
-	_was_transited = true # Make sure to call _transition on next update
+	_was_transited = true # Make sure to call _transit on next update
 
 # Manually start the player, automatically called if autostart is true
 func start():
@@ -176,39 +159,54 @@ func restart(is_active=true):
 	set_active(is_active)
 	start()
 
-# Update player to, first initiate transition, then call _on_update, finally emit "update" signal
-# Can only be called manually if process_mode is MANUAL, otherwise, assertion error will be raised
-func update(delta):
+# Update player to, first initiate transition, then call _on_updated, finally emit "update" signal, delta will be given based on process_mode.
+# Can only be called manually if process_mode is MANUAL, otherwise, assertion error will be raised.
+# *delta provided will be reflected in signal updated(state, delta)
+func update(delta=get_physics_process_delta_time()):
 	if not active:
 		return
 	if process_mode != ProcessMode.MANUAL:
 		assert(not _is_update_locked, "Attempting to update manually with ProcessMode.%s" % ProcessMode.keys()[process_mode])
 
-	_transition()
+	_transit()
 	var current_state = get_current()
-	_on_update(current_state, delta)
-	emit_signal("update", current_state, delta)
+	_on_updated(current_state, delta)
+	emit_signal("updated", current_state, delta)
+	if process_mode == ProcessMode.MANUAL:
+		# Make sure to auto advance even in MANUAL mode
+		if _was_transited:
+			call_deferred("update")
 
-# Set trigger to be tested with condition, then trigger _transition on next update
-func set_trigger(name):
-	_parameters[name] = null
-	_is_param_edited = true
+# Set trigger to be tested with condition, then trigger _transit on next update, 
+# automatically call update() if process_mode set to MANUAL and auto_update true
+func set_trigger(name, auto_update=false):
+	set_param(name, null)
+	_on_param_edited(auto_update)
 
-# Set param(null value treated as trigger) to be tested with condition, then trigger _transition on next update
-func set_param(name, value):
+# Set param(null value treated as trigger) to be tested with condition, then trigger _transit on next update, 
+# automatically call update() if process_mode set to MANUAL and auto_update true
+func set_param(name, value, auto_update=false):
 	_parameters[name] = value
-	_is_param_edited = true
+	_on_param_edited(auto_update)
 
-# Remove param, then trigger _transition on next update
-func erase_param(name):
+# Remove param, then trigger _transit on next update, 
+# automatically call update() if process_mode set to MANUAL and auto_update true
+func erase_param(name, auto_update=false):
 	var result = _parameters.erase(name)
-	_is_param_edited = true
+	_on_param_edited(auto_update)
 	return result
 
-# Clear all param , then trigger _transition on next update
-func clear_param():
+# Clear all param , then trigger _transit on next update, 
+# automatically call update() if process_mode set to MANUAL and auto_update true
+func clear_param(auto_update=false):
 	_parameters.clear()
+	_on_param_edited(auto_update)
+
+# Called when param edited, automatically call update() if process_mode set to MANUAL and auto_update true
+func _on_param_edited(auto_update=false):
 	_is_param_edited = true
+	if process_mode == ProcessMode.MANUAL and auto_update:
+		update()
 
 # Get value of param
 func get_param(name, default=null):
@@ -242,7 +240,7 @@ func set_process_mode(mode):
 
 func get_current():
 	var v = .get_current()
-	return v if v  else ""
+	return v if v else ""
 
 func get_previous():
 	var v = .get_previous()
