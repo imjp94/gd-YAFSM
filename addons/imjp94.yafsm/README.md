@@ -28,7 +28,7 @@ const State = YAFSM.State
   - `autostart # Automatically enter Entry state on ready if true`
   - `process_mode # ProcessMode of player`
   - signals:
-    - `transited # Transition of state`
+    - `transited(from, to) # Transition of state`
     - `entered() # Entry of state machine`
     - `exited() # Exit of state machine`
     - `updated(state, delta) # Time to update(based on process_mode), up to user to handle any logic, for example, update movement of KinematicBody`
@@ -52,19 +52,19 @@ var condition = transition.conditions[condition_name] # keyed by condition name
 > For normal usage, you really don't have to access any `Resource` during runtime as they only store static data that describe the state machine, accessing `StackPlayer`/`StateMachinePlayer` alone should be sufficient.
 
 - [State](src/states/State.gd)
-  > Container of `Transition`s from this state to another
+  > Resource that represent a state
   - `name`
-  - `transitions`
 - [StateMachine](src/states/StateMachine.gd)(`extends State`)
-  > `StateMachine` is also a `State`, but mainly used as container of `State`s
+  > `StateMachine` is also a `State`, but mainly used as container of `State`s and `Transitions`s
   - `states`
+  - `transitions`
 - [Transition](src/transitions/Transition.gd)
-  > Describing connection from one state to another, all condition must be fulfilled to transit to next state
+  > Describing connection from one state to another, all conditions must be fulfilled to transit to next state
   - `from`
   - `to`
   - `conditions`
 - [Condition](src/conditions/Condition.gd)
-  > Empty condition, treated as trigger
+  > Empty condition with just a name, treated as trigger
   - `name`
 - [ValueCondition](src/conditions/ValueCondition.gd)(`extends Condition`)
   > Condition with value, fulfilled by comparing values based on comparation
