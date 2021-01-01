@@ -1,5 +1,7 @@
 # gd-YAFSM (**g**o**d**ot-**Y**et **A**nother **F**inite **S**tate **M**achine)
 
+![Editor Showcase](screenshots/yafsm_editor_showcase.gif)
+
 Designer-friendly Finite State Machine implemented in "Godotic" way
 
 ⚠️ **Warning**
@@ -11,7 +13,9 @@ Designer-friendly Finite State Machine implemented in "Godotic" way
 - Designer-friendly
   > Design `StateMachine` in a flowchart-like editor
 - Self-explanatory
-  > Understand what the `StateMachine` trying to achieve from flowchart
+
+  ![Sample State Machine](screenshots/yafsm_sample_fsm.png)
+  > Visualize game/UI state from flowchart
 - Zero learning curve
   > Similar workflow as using `AnimationTree`, and not required to inherit any custom class, just plug and play
 - Reusability
@@ -31,9 +35,11 @@ or
   1. Move `addons/imjp94.yafsm` to your `{project_dir}`
   2. Enable it from Project -> Settings -> Plugins
 
-## Usage
+## Getting Started
 
 ### Editor
+
+![Getting Started](screenshots/yafsm_getting_started.gif)
 
 1. Add `StateMachinePlayer` node from "Create New Node" window.
 
@@ -53,7 +59,10 @@ Special states:
 After setup `StateMachine` with editor, you can connect to the following signals from a `StateMachinePlayer`:
 
 - `transited(from, to)`: Transition of state
-- `update(state, delta)`: Time to update(defined by `process_mode`), up to user to handle anything, for example, update movement of `KinematicBody`
+- `updated(state, delta)`: Time to update(defined by `process_mode`), up to user to handle anything, for example, update movement of `KinematicBody`
+
+![Signal Example](screenshots/yafsm_state_machine_player_signal_example.png)
+*Example code snippet of KinematicBody connect "updated" signal*
 
 That's it!
 
