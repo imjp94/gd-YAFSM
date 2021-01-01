@@ -16,23 +16,22 @@ const State = YAFSM.State
 
 - [StackPlayer](src/StackPlayer.gd)
   > Manage stack of item, use push/pop function to set current item on top of stack
-  - `current`
+  - `current # Current item on top of stack`
   - `stack`
   - signals:
-    - `current_changed(from, to) # When stack pushed/popped`
-    - `push(to) # When item pushed to stack`
-    - `pop(from) # When item popped from stack`
+    - `pushed(to) # When item pushed to stack`
+    - `popped(from) # When item popped from stack`
 - [StateMachinePlayer](src/StateMachinePlayer.gd)(extends StackPlayer)
   > Manage state based on `StateMachine` and parameters inputted
-  - `state_machine`
-  - `active`
-  - `process_mode`
+  - `state_machine # StateMachine being played`
+  - `active # Activeness of player`
+  - `autostart # Automatically enter Entry state on ready if true`
+  - `process_mode # ProcessMode of player`
   - signals:
-    - `transit_in(to) # Transit to state, exclude Entry/Exit state`
-    - `transit_out(from) # Transit from state, exclude Entry/Exit state`
-    - `entry(state_machine) # Entry of state machine`
-    - `exit(state_machine) # Exit of state machine`
-    - `update(state, delta) # Update of state machine`
+    - `transited # Transition of state`
+    - `entered() # Entry of state machine`
+    - `exited() # Exit of state machine`
+    - `updated(state, delta) # Time to update(based on process_mode), up to user to handle any logic, for example, update movement of KinematicBody`
 
 ### Control
 

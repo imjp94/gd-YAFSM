@@ -1,19 +1,23 @@
 # gd-YAFSM (**g**o**d**ot-**Y**et **A**nother **F**inite **S**tate **M**achine)
 
-Simple Finite State Machine implemented in "Godotic" way
+Designer-friendly Finite State Machine implemented in "Godotic" way
 
 ⚠️ **Warning**
-> This project is still in early development and breaking changes are expected, thus, it is not recommended to be used in production.
+> It is not recommended to be used in production yet, as api might be changed before v1.0.
 > Testing & reporting bugs are greatly appreciated.
 
 ## Feature
 
+- Designer-friendly
+  > Design `StateMachine` in a flowchart-like editor
+- Self-explanatory
+  > Understand what the `StateMachine` trying to achieve from flowchart
 - Zero learning curve
   > Similar workflow as using `AnimationTree`, and not required to inherit any custom class, just plug and play
-- Lightweight
-  > Compact data structure
-- Reusable
-  > Same `StateMachine` reference can be used repeatedly in different `StateMachinePlayer`
+- Reusability
+  > As a `Resource`, `StateMachine` can be used repeatedly in different scenarios(`StateMachinePlayer`) and provide different outcome based on the input.
+- Minimal
+  > Compact data structure for `StateMachine` resource file
 
 For more detail, see [CHANGELOG.md](CHANGELOG.md)
 
@@ -39,13 +43,16 @@ or
 
 Finally, right-click on graph to add state node.
 
+Special states:
+
+- Entry: Entry point of a `StateMachine`, always required
+- Exit: `State` that break the flow of `StateMachine`, unless restarted with `StateMachinePlayer.restart()`, mainly used in nested-`StateMachine`.
+
 ### Code
 
 After setup `StateMachine` with editor, you can connect to the following signals from a `StateMachinePlayer`:
 
-- `current_changed(from, to)`: Current state name changed
-- `transit_out(from)`: State name transit out from
-- `transit_in(to)`: State name transit into
+- `transited(from, to)`: Transition of state
 - `update(state, delta)`: Time to update(defined by `process_mode`), up to user to handle anything, for example, update movement of `KinematicBody`
 
 That's it!
