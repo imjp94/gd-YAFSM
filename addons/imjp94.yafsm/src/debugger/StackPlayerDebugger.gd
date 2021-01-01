@@ -15,21 +15,21 @@ func _ready():
 	if Engine.editor_hint:
 		return
 
-	get_parent().connect("push", self, "_on_StackPlayer_push")
-	get_parent().connect("pop", self, "_on_StackPlayer_pop")
+	get_parent().connect("pushed", self, "_on_StackPlayer_pushed")
+	get_parent().connect("popped", self, "_on_StackPlayer_popped")
 	sync_stack()
 
 # Override to handle custom object presentation
 func _on_set_label(label, obj):
 	label.text = obj
 
-func _on_StackPlayer_push(to):
+func _on_StackPlayer_pushed(to):
 	var stack_item = StackItem.instance()
 	_on_set_label(stack_item.get_node("Label"), to)
 	Stack.add_child(stack_item)
 	Stack.move_child(stack_item, 0)
 
-func _on_StackPlayer_pop(from):
+func _on_StackPlayer_popped(from):
 	# Sync whole stack instead of just popping top item, as ResetEventTrigger passed to reset() may be varied
 	sync_stack()
 

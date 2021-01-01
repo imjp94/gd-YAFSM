@@ -1,10 +1,9 @@
 extends Node
 
-signal current_changed(from, to) # When stack pushed/popped
-signal push(to) # When item pushed to stack
-signal pop(from) # When item popped from stack
+signal pushed(to) # When item pushed to stack
+signal popped(from) # When item popped from stack
 
-# Enum to specify how reseting state stack should trigger event(current_changed, push, pop etc.)
+# Enum to specify how reseting state stack should trigger event(transit, push, pop etc.)
 enum ResetEventTrigger {
 	NONE = -1, # No event
 	ALL = 0, # All removed state will emit event
@@ -22,28 +21,26 @@ func _init():
 func push(to):
 	var from = get_current()
 	stack.push_back(to)
-	_on_push(from, to)
-	emit_signal("current_changed", from, to)
-	emit_signal("push", to)
+	_on_pushed(from, to)
+	emit_signal("pushed", to)
 
 # Remove the current item on top of stack
 func pop():
 	var to = get_previous()
 	var from = stack.pop_back()
-	_on_pop(from, to)
-	emit_signal("current_changed", from, to)
-	emit_signal("pop", from)
+	_on_popped(from, to)
+	emit_signal("popped", from)
 
 # Called when item pushed
-func _on_push(from, to):
+func _on_pushed(from, to):
 	pass
 
 # Called when item popped
-func _on_pop(from, to):
+func _on_popped(from, to):
 	pass
 
 # Reset stack to given index, -1 to clear all item by default
-# Use ResetEventTrigger to define how _on_pop should be called
+# Use ResetEventTrigger to define how _on_popped should be called
 func reset(to=-1, event=ResetEventTrigger.ALL):
 	assert(to > -2 and to < stack.size(), "Reset to index(%d) out of bounds(%d)" % [to, stack.size()])
 	var last_index = stack.size() - 1
