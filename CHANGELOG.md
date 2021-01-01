@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0
+
+- Features:
+  - Switch from GraphEdit to FlowChart editor
+
 ## 0.2.0
 
 - Improves
