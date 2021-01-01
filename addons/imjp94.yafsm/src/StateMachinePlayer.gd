@@ -44,6 +44,9 @@ func _ready():
 	if Engine.editor_hint:
 		return
 
+	call_deferred("_initiate") # Make sure connection of signals can be done in _ready to receive all signal callback
+
+func _initiate():
 	if autostart:
 		start()
 	_on_active_changed()
