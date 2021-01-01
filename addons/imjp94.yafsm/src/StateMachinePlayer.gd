@@ -157,9 +157,11 @@ func start():
 	_was_transited = true
 
 # Restart player
-func restart(is_active=true):
+func restart(is_active=true, preserve_params=false):
 	reset()
 	set_active(is_active)
+	if not preserve_params:
+		clear_param()
 	start()
 
 # Update player to, first initiate transition, then call _on_updated, finally emit "update" signal, delta will be given based on process_mode.
