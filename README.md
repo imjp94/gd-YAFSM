@@ -74,6 +74,10 @@ For most of the case, you don't have to inherit from any custom class by this pl
 
 - Stack
   > Add `res://addons/imjp94.yafsm/src/debugger/StackPlayerDebugger.tscn` to `StackPlayer`(so as `StateMachinePlayer`) to visualize the stack on screen.
+  
+## Demo
+
+Check out [gd-YAFSM-demo](https://github.com/imjp94/gd-yafsm-demo) for how you can integrate gd-YAFSM into you project.
 
 ## Documentation
 
