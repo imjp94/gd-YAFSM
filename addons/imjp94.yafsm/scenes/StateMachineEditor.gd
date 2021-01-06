@@ -86,7 +86,7 @@ func _on_create_new_state_machine_pressed():
 	emit_signal("inspector_changed", "state_machine")
 
 func _on_condition_visibility_pressed():
-	for line in content_lines.get_children():
+	for line in current_layer.content_lines.get_children():
 		line.label.visible = condition_visibility.pressed
 
 func _on_state_machine_player_changed(new_state_machine_player):
@@ -141,9 +141,9 @@ func save():
 # Clear editor
 func clear_graph():
 	clear_connections()
-	for child in content_nodes.get_children():
+	for child in current_layer.content_nodes.get_children():
 		if child is StateNodeScript:
-			content_nodes.remove_child(child)
+			current_layer.content_nodes.remove_child(child)
 			_to_free.append(child)
 
 # Intialize editor with current editing StateMachine
@@ -164,7 +164,7 @@ func draw_graph():
 		if from_transitions:
 			for transition in from_transitions.values():
 				connect_node(transition.from, transition.to)
-				_connections[transition.from][transition.to].line.transition = transition
+				current_layer._connections[transition.from][transition.to].line.transition = transition
 	update()
 
 # Add message to message_box(overlay text at bottom of editor)
@@ -214,7 +214,7 @@ func _on_node_connected(from, to):
 		if state_machine.transitions[from].has(to):
 			return # Already existed as it is loaded from file
 
-	var line = _connections[from][to].line
+	var line = current_layer._connections[from][to].line
 	var new_transition = Transition.new(from, to)
 	line.transition = new_transition
 	state_machine.add_transition(new_transition)
@@ -231,8 +231,8 @@ func _on_duplicated(old_nodes, new_nodes):
 				for j in old_nodes.size():
 					var to_node = old_nodes[j]
 					if to_node.name == connection_pair.to:
-						var old_connection = _connections[connection_pair.from][connection_pair.to]
-						var new_connection = _connections[new_nodes[i].name][new_nodes[j].name]
+						var old_connection = current_layer._connections[connection_pair.from][connection_pair.to]
+						var new_connection = current_layer._connections[new_nodes[i].name][new_nodes[j].name]
 						for condition in old_connection.line.transition.conditions.values():
 							new_connection.line.transition.add_condition(condition.duplicate())
 
