@@ -16,13 +16,65 @@ func _init(p_name="", p_transitions={}, p_states={}):
 
 # Attempt to transit with parameters given
 func transit(current_state, param={}):
-	var from_transitions = transitions.get(current_state)
+	var nested_states = current_state.split("/")
+	var is_nested = nested_states.size() > 1
+	var end_state_machine = self
+	var base_path = ""
+	for i in nested_states.size() - 1: # Ignore last one, to get its parent StateMachine
+		var state = nested_states[i]
+		# Construct absolute base path
+		base_path = join_path(base_path, [state])
+		if end_state_machine != self:
+			end_state_machine = end_state_machine.states[state]
+		else:
+			end_state_machine = states[state] # First level state
+
+	# Nested StateMachine in Exit state
+	if is_nested:
+		var is_nested_exit = nested_states[nested_states.size()-1] == State.EXIT_KEY
+		if is_nested_exit:
+			# Normalize path to transit again with parent of end_state_machine
+			var end_state_machine_parent_path = ""
+			for i in nested_states.size() - 2: # Ignore last two state(which is end_state_machine/end_state)
+				end_state_machine_parent_path = join_path(end_state_machine_parent_path, [nested_states[i]])
+			var end_state_machine_parent = get_state(end_state_machine_parent_path)
+			var normalized_current_state = end_state_machine.name
+			var next_state = end_state_machine_parent.transit(normalized_current_state, param)
+			if next_state:
+				# Construct next state into absolute path
+				next_state = join_path(end_state_machine_parent_path, [next_state])
+			return next_state
+
+	# Transit with current running nested state machine
+	var from_transitions = end_state_machine.transitions.get(nested_states[nested_states.size()-1])
 	if from_transitions:
 		for transition in from_transitions.values():
 			var next_state = transition.transit(param)
 			if next_state:
+				if "states" in end_state_machine.states[next_state]:
+					# Next state is a StateMachine, return entry state of the state machine in absolute path
+					next_state = join_path(base_path, [next_state, State.ENTRY_KEY])
+				else:
+					# Construct next state into absolute path
+					next_state = join_path(base_path, [next_state])
 				return next_state
 	return null
+
+# Get state from absolute path, for exmaple, "path/to/state" (root == empty string)
+# *It is impossible to get parent state machine with path like "../sibling", as StateMachine is not structed as a Tree
+func get_state(path):
+	var state
+	if path.empty():
+		state = self
+	else:
+		var nested_states = path.split("/")
+		for i in nested_states.size():
+			var dir = nested_states[i]
+			if state:
+				state = state.states[dir]
+			else:
+				state = states[dir] # First level state
+	return state
 
 # Add state, state name must be unique within this StateMachine, return state added if succeed else reutrn null
 func add_state(state):
@@ -113,3 +165,11 @@ func get_states():
 func get_transitions():
 	return transitions.duplicate()
 
+static func join_path(base, dirs):
+	var path = base
+	for dir in dirs:
+		if path.empty():
+			path = dir
+		else:
+			path = str(path, "/", dir)
+	return path
