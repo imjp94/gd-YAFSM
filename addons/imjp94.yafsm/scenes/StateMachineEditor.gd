@@ -119,6 +119,7 @@ func _on_state_node_context_menu_index_pressed(index):
 
 func _on_convert_to_state_confirmation_confirmed():
 	convert_to_state(_context_node)
+	_context_node.update() # Update outlook of node
 	# Remove layer
 	var parent_path = path_viewer.get_current_full_dir()
 	var path = get_state_node_path(_context_node.name)
