@@ -1,0 +1,9 @@
+[gd_scene format=2]
+
+[node name="StateNodeContextMenu" type="PopupMenu"]
+margin_right = 20.0
+margin_bottom = 20.0
+items = [ "Copy", null, 0, false, false, 0, 0, null, "", false, "Duplicate", null, 0, false, false, 1, 0, null, "", false, "", null, 0, false, false, 2, 0, null, "", true, "Convert to State", null, 0, false, false, 3, 0, null, "", false ]
+__meta__ = {
+"_edit_use_anchors_": false
+}

@@ -17,6 +17,8 @@ const ENTRY_STATE_MISSING_MSG = {
 }
 
 onready var context_menu = $ContextMenu
+onready var state_node_context_menu = $StateNodeContextMenu
+onready var convert_to_state_confirmation = $ConvertToStateConfirmation
 onready var save_dialog = $SaveDialog
 onready var create_new_state_machine_container = $MarginContainer
 onready var create_new_state_machine = $MarginContainer/CreateNewStateMachine
@@ -33,6 +35,7 @@ var state_machine_player setget set_state_machine_player
 var state_machine setget set_state_machine
 
 var _message_box_dict = {}
+var _context_node
 var _to_free
 
 
@@ -75,6 +78,8 @@ func _ready():
 	create_new_state_machine_container.visible = false
 	create_new_state_machine.connect("pressed", self, "_on_create_new_state_machine_pressed")
 	context_menu.connect("index_pressed", self, "_on_context_menu_index_pressed")
+	state_node_context_menu.connect("index_pressed", self, "_on_state_node_context_menu_index_pressed")
+	convert_to_state_confirmation.connect("confirmed", self, "_on_convert_to_state_confirmation_confirmed")
 	save_dialog.connect("confirmed", self, "_on_save_dialog_confirmed")
 
 func _on_context_menu_index_pressed(index):
@@ -95,6 +100,33 @@ func _on_context_menu_index_pressed(index):
 			new_node.name = State.EXIT_KEY
 	new_node.rect_position = content_position(get_local_mouse_position())
 	add_node(new_node)
+
+func _on_state_node_context_menu_index_pressed(index):
+	if not _context_node:
+		return
+
+	match index:
+		0: # Copy
+			_copying_nodes = [_context_node]
+			_context_node = null
+		1: # Duplicate
+			duplicate_nodes([_context_node])
+			_context_node = null
+		2: # Separator
+			_context_node = null
+		3: # Convert
+			convert_to_state_confirmation.popup_centered()
+
+func _on_convert_to_state_confirmation_confirmed():
+	convert_to_state(_context_node)
+	# Remove layer
+	var parent_path = path_viewer.get_current_full_dir()
+	var path = get_state_node_path(_context_node.name)
+	path = format_path(path)
+	var layer = get_layer(path)
+	if layer:
+		layer.queue_free()
+	_context_node = null
 
 func _on_save_dialog_confirmed():
 	save()
@@ -159,18 +191,7 @@ func _on_state_node_gui_input(event, node):
 			BUTTON_LEFT:
 				if event.pressed:
 					if event.doubleclick:
-						# Convert State to StateMachine
-						var new_state_machine
-						if node.state is StateMachine:
-							new_state_machine = node.state
-						else:
-							new_state_machine = StateMachine.new()
-							new_state_machine.name = node.state.name
-							new_state_machine.graph_offset = node.state.graph_offset
-							current_layer.state_machine.remove_state(node.state.name)
-							current_layer.state_machine.add_state(new_state_machine)
-							node.state = new_state_machine
-						
+						var new_state_machine = convert_to_state_machine(node)
 						# Determine current layer path
 						var parent_path = path_viewer.get_current_full_dir()
 						var path = get_state_node_path(node.name)
@@ -190,6 +211,42 @@ func _on_state_node_gui_input(event, node):
 							draw_graph()
 						path_viewer.add_dir(node.state.name)
 						accept_event()
+			BUTTON_RIGHT:
+				if event.pressed:
+					# State node context menu
+					_context_node = node
+					state_node_context_menu.rect_position = get_viewport().get_mouse_position()
+					state_node_context_menu.popup()
+					state_node_context_menu.set_item_disabled(3, not (node.state is StateMachine))
+					accept_event()
+
+func convert_to_state_machine(node):
+	# Convert State to StateMachine
+	var new_state_machine
+	if node.state is StateMachine:
+		new_state_machine = node.state
+	else:
+		new_state_machine = StateMachine.new()
+		new_state_machine.name = node.state.name
+		new_state_machine.graph_offset = node.state.graph_offset
+		current_layer.state_machine.remove_state(node.state.name)
+		current_layer.state_machine.add_state(new_state_machine)
+		node.state = new_state_machine
+	return new_state_machine
+
+func convert_to_state(node):
+	# Convert StateMachine to State
+	var new_state
+	if node.state is StateMachine:
+		new_state = State.new()
+		new_state.name = node.state.name
+		new_state.graph_offset = node.state.graph_offset
+		current_layer.state_machine.remove_state(node.state.name)
+		current_layer.state_machine.add_state(new_state)
+		node.state = new_state
+	else:
+		new_state = node.state
+	return new_state
 
 func create_layer_instance():
 	var layer = Control.new()
