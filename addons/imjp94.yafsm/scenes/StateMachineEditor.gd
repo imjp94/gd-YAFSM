@@ -338,6 +338,10 @@ func _on_node_name_edit_entered(new_name, node):
 	var new = new_name
 	if old == new:
 		return
+	if "/" in new or "\\" in new: # No back/forward-slash
+		push_warning("Illegal State Name: / and \\ are not allowed in State name(%s)" % new)
+		node.name_edit.text = old
+		return
 
 	if current_layer.state_machine.change_state_name(old, new):
 		rename_node(node.name, new)
