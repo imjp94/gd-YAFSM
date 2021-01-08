@@ -81,6 +81,13 @@ func _on_state_changed(from, to):
 		State.EXIT_KEY:
 			set_active(false) # Disable on exit
 			emit_signal("exited")
+	if to.ends_with(State.EXIT_KEY) and to.length() > State.EXIT_KEY.length():
+		# Nested Exit state, clear "local" params
+		var dir = get_current()
+		var r_slash = dir.rfind("/")
+		if r_slash >= 0:
+			dir = dir.substr(0, r_slash)
+		clear_param_at_dir(dir)
 	emit_signal("transited", from, to)
 
 # Only get called in 2 condition, _parameters edited or last transition was successful
@@ -205,6 +212,13 @@ func erase_param(name, auto_update=false):
 # automatically call update() if process_mode set to MANUAL and auto_update true
 func clear_param(auto_update=false):
 	_parameters.clear()
+	_on_param_edited(auto_update)
+
+# Clear param from specified path. For example, if "base" given, "base/param1" and "base/param2" will be removed
+func clear_param_at_dir(base_path, auto_update=false):
+	for param_key in _parameters.keys():
+		if param_key.begins_with(base_path):
+			_parameters.erase(param_key)
 	_on_param_edited(auto_update)
 
 # Called when param edited, automatically call update() if process_mode set to MANUAL and auto_update true
