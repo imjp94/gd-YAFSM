@@ -20,9 +20,10 @@ func _ready():
 	name_edit.text = "State"
 	name_edit.connect("focus_exited", self, "_on_NameEdit_focus_exited")
 	name_edit.connect("text_entered", self, "_on_NameEdit_text_entered")
+	name_edit.connect("gui_input", self, "_on_NameEdit_gui_input")
 	set_process_input(false) # _input only required when name_edit enabled to check mouse click outside
 
-func _gui_input(event):
+func _on_NameEdit_gui_input(event):
 	if event is InputEventMouseButton:
 		if event.doubleclick:
 			enable_name_edit(true)
@@ -41,12 +42,10 @@ func enable_name_edit(v):
 	if v:
 		set_process_input(true)
 		name_edit.editable = true
-		name_edit.mouse_filter = MOUSE_FILTER_PASS
 		name_edit.grab_focus()
 	else:
 		set_process_input(false)
 		name_edit.editable = false
-		name_edit.mouse_filter = MOUSE_FILTER_IGNORE
 		name_edit.release_focus()
 
 func _on_state_name_changed(new_name):

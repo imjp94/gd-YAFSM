@@ -20,6 +20,14 @@ func _init():
 	content_nodes.mouse_filter = MOUSE_FILTER_IGNORE
 	add_child(content_nodes)
 
+func hide_content():
+	content_nodes.hide()
+	content_lines.hide()
+
+func show_content():
+	content_nodes.show()
+	content_lines.show()
+
 # Get required scroll rect base on content
 func get_scroll_rect(scroll_margin=0):
 	var rect = Rect2()

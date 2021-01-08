@@ -103,6 +103,8 @@ func _on_inspector_changed(property):
 func _on_StateMachineEditor_node_selected(node):
 	var to_inspect
 	if "state" in node:
+		if node.state is StateMachine: # Ignore, inspect state machine will trigger edit()
+			return
 		to_inspect = node.state
 	elif "transition" in node:
 		to_inspect = node.transition

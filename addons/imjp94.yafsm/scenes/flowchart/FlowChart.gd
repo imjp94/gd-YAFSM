@@ -27,6 +27,7 @@ var content = Control.new() # Root node that hold anything drawn in the flowchar
 var current_layer
 var h_scroll = HScrollBar.new()
 var v_scroll = VScrollBar.new()
+var top_bar = VBoxContainer.new()
 var gadget = HBoxContainer.new() # Root node of top overlay controls
 var zoom_minus = Button.new()
 var zoom_reset = Button.new()
@@ -72,11 +73,15 @@ func _init():
 	content.mouse_filter = MOUSE_FILTER_IGNORE
 	add_child(content)
 
-	add_layer()
+	add_layer_to(content)
 	select_layer_at(0)
 
-	gadget.set_anchors_and_margins_preset(PRESET_TOP_WIDE)
-	add_child(gadget)
+	top_bar.set_anchors_and_margins_preset(PRESET_TOP_WIDE)
+	top_bar.mouse_filter = MOUSE_FILTER_IGNORE
+	add_child(top_bar)
+
+	gadget.mouse_filter = MOUSE_FILTER_IGNORE
+	top_bar.add_child(gadget)
 
 	zoom_minus.flat = true
 	zoom_minus.hint_tooltip = "Zoom Out"
@@ -246,7 +251,7 @@ func _gui_input(event):
 										disconnect_node(connection.from_node.name, connection.to_node.name)
 						elif node is FlowChartNode:
 							remove_node(node.name)
-							for connection_pair in get_connection_list():
+							for connection_pair in current_layer.get_connection_list():
 								if connection_pair.from == node.name or connection_pair.to == node.name:
 									disconnect_node(connection_pair.from, connection_pair.to)
 					accept_event()
@@ -436,11 +441,13 @@ func get_selection_box_rect():
 func get_scroll_rect():
 	return current_layer.get_scroll_rect(scroll_margin)
 
-# Add layer
-func add_layer():
-	var new_layer = Control.new()
-	new_layer.set_script(FlowChartLayer)
-	content.add_child(new_layer)
+func add_layer_to(target):
+	var layer = create_layer_instance()
+	target.add_child(layer)
+	return layer
+
+func get_layer(np):
+	return content.get_node_or_null(np)
 
 # Remove layer
 func remove_layer(layer):
@@ -450,11 +457,9 @@ func select_layer_at(i):
 	select_layer(content.get_child(i))
 
 func select_layer(layer):
-	if current_layer:
-		current_layer.hide()
+	var prev_layer = current_layer
+	_on_layer_deselected(prev_layer)
 	current_layer = layer
-	if current_layer:
-		current_layer.show()
 	_on_layer_selected(layer)
 
 # Add node
@@ -467,7 +472,7 @@ func remove_node(node_name):
 	var node = current_layer.content_nodes.get_node_or_null(node_name)
 	if node:
 		deselect(node) # Must deselct before remove to make sure _drag_origins synced with _selections
-		current_layer.content_nodes.remove_child(node)
+		current_layer.remove_node(node)
 		_on_node_removed(node_name)
 
 # Called after connection established
@@ -478,6 +483,11 @@ func _connect_node(line, from_pos, to_pos):
 func _disconnect_node(line):
 	if line in _selection:
 		deselect(line)
+
+func create_layer_instance():
+	var layer = Control.new()
+	layer.set_script(FlowChartLayer)
+	return layer
 
 # Return new line instance to use, called when connecting node
 func create_line_instance():
@@ -556,6 +566,9 @@ func duplicate_nodes(nodes):
 
 # Called after layer selected(current_layer changed)
 func _on_layer_selected(layer):
+	pass
+
+func _on_layer_deselected(layer):
 	pass
 
 # Called after a node added
