@@ -83,11 +83,7 @@ func _on_state_changed(from, to):
 			emit_signal("exited")
 	if to.ends_with(State.EXIT_KEY) and to.length() > State.EXIT_KEY.length():
 		# Nested Exit state, clear "local" params
-		var dir = get_current()
-		var r_slash = dir.rfind("/")
-		if r_slash >= 0:
-			dir = dir.substr(0, r_slash)
-		clear_param_at_dir(dir)
+		clear_param_at_dir(path_backward(get_current()))
 	emit_signal("transited", from, to)
 
 # Only get called in 2 condition, _parameters edited or last transition was successful
@@ -264,3 +260,29 @@ func get_current():
 func get_previous():
 	var v = .get_previous()
 	return v if v else ""
+
+# Convert node path to state path that can be used to query state with StateMachine.get_state.
+# Node path, "root/path/to/state", equals to State path, "path/to/state"
+static func node_path_to_state_path(node_path):
+	var p = node_path.replace("root", "")
+	if p.begins_with("/"):
+		p = p.substr(1)
+	return p
+
+# Convert state path to node path that can be used for query node in scene tree.
+# State path, "path/to/state", equals to Node path, "root/path/to/state"
+static func state_path_to_node_path(state_path):
+	var path = state_path
+	if path.empty():
+		path = "root"
+	else:
+		path = str("root/", path)
+	return path
+
+# Return parent path, "path/to/state" return "path/to"
+static func path_backward(path):
+	return path.substr(0, path.rfind("/"))
+
+# Return end directory of path, "path/to/state" returns "state"
+static func path_end_dir(path):
+	return path.right(path.rfind("/") + 1)

@@ -449,10 +449,6 @@ func add_layer_to(target):
 func get_layer(np):
 	return content.get_node_or_null(np)
 
-# Remove layer
-func remove_layer(layer):
-	content.remove_child(layer)
-
 func select_layer_at(i):
 	select_layer(content.get_child(i))
 

@@ -1,5 +1,6 @@
 tool
 extends "res://addons/imjp94.yafsm/scenes/flowchart/FlowChart.gd"
+const StateMachinePlayer = preload("../src/StateMachinePlayer.gd")
 const StateMachine = preload("../src/states/StateMachine.gd")
 const Transition = preload("../src/transitions/Transition.gd")
 const State = preload("../src/states/State.gd")
@@ -34,6 +35,8 @@ var undo_redo
 var state_machine_player setget set_state_machine_player
 var state_machine setget set_state_machine
 
+var _last_index = 0
+var _last_path = ""
 var _message_box_dict = {}
 var _context_node
 var _to_free
@@ -62,17 +65,22 @@ func _init():
 
 	content.get_child(0).name = "root"
 
-func _on_path_viewer_dir_pressed(path, dir, index):
-	path = format_path(path)
-	printt("go to", path)
-	print("select", get_layer(path))
+func _on_path_viewer_dir_pressed(path, index):
 	select_layer(get_layer(path))
 	path_viewer.remove_dir_until(index)
 
-func format_path(path):
-	if path == "/":
-		path = ""
-	return str("root", path)
+	if _last_index > index:
+		# Going backward
+		var end_state_parent_path = StateMachinePlayer.path_backward(_last_path)
+		var end_state_name = StateMachinePlayer.path_end_dir(_last_path)
+		var layer = content.get_node(end_state_parent_path)
+		var node = layer.content_nodes.get_node(end_state_name)
+		if not node.state.states:
+			# Convert state machine node back to state node
+			convert_to_state(layer, node)
+
+	_last_index = index
+	_last_path = path
 
 func _ready():
 	create_new_state_machine_container.visible = false
@@ -118,12 +126,10 @@ func _on_state_node_context_menu_index_pressed(index):
 			convert_to_state_confirmation.popup_centered()
 
 func _on_convert_to_state_confirmation_confirmed():
-	convert_to_state(_context_node)
+	convert_to_state(current_layer, _context_node)
 	_context_node.update() # Update outlook of node
 	# Remove layer
-	var parent_path = path_viewer.get_current_full_dir()
-	var path = get_state_node_path(_context_node.name)
-	path = format_path(path)
+	var path = str(path_viewer.get_cwd(), "/", _context_node.name)
 	var layer = get_layer(path)
 	if layer:
 		layer.queue_free()
@@ -157,7 +163,6 @@ func _on_state_machine_changed(new_state_machine):
 	var root_layer = get_layer("root")
 	for child in root_layer.get_children():
 		if child is FlowChartLayer:
-			printt("remove", child.name)
 			root_layer.remove_child(child)
 			child.queue_free()
 	path_viewer.remove_dir_until(0)
@@ -192,25 +197,24 @@ func _on_state_node_gui_input(event, node):
 			BUTTON_LEFT:
 				if event.pressed:
 					if event.doubleclick:
-						var new_state_machine = convert_to_state_machine(node)
+						var new_state_machine = convert_to_state_machine(current_layer, node)
 						# Determine current layer path
-						var parent_path = path_viewer.get_current_full_dir()
-						var path = get_state_node_path(node.name)
-						path = format_path(path)
+						var parent_path = path_viewer.get_cwd()
+						var path = str(parent_path, "/", node.name)
 						var layer = get_layer(path)
-						printt("cd:", path)
 						if layer:
 							# Layer already spawned
 							select_layer(layer)
 						else:
 							# New layer to spawn
-							parent_path = format_path(parent_path)
 							layer = add_layer_to(get_layer(parent_path))
 							layer.name = node.state.name
 							layer.state_machine = new_state_machine
 							select_layer(layer)
 							draw_graph()
 						path_viewer.add_dir(node.state.name)
+						_last_index = path_viewer.get_child_count()-1
+						_last_path = path
 						accept_event()
 			BUTTON_RIGHT:
 				if event.pressed:
@@ -221,7 +225,7 @@ func _on_state_node_gui_input(event, node):
 					state_node_context_menu.set_item_disabled(3, not (node.state is StateMachine))
 					accept_event()
 
-func convert_to_state_machine(node):
+func convert_to_state_machine(layer, node):
 	# Convert State to StateMachine
 	var new_state_machine
 	if node.state is StateMachine:
@@ -230,20 +234,20 @@ func convert_to_state_machine(node):
 		new_state_machine = StateMachine.new()
 		new_state_machine.name = node.state.name
 		new_state_machine.graph_offset = node.state.graph_offset
-		current_layer.state_machine.remove_state(node.state.name)
-		current_layer.state_machine.add_state(new_state_machine)
+		layer.state_machine.remove_state(node.state.name)
+		layer.state_machine.add_state(new_state_machine)
 		node.state = new_state_machine
 	return new_state_machine
 
-func convert_to_state(node):
+func convert_to_state(layer, node):
 	# Convert StateMachine to State
 	var new_state
 	if node.state is StateMachine:
 		new_state = State.new()
 		new_state.name = node.state.name
 		new_state.graph_offset = node.state.graph_offset
-		current_layer.state_machine.remove_state(node.state.name)
-		current_layer.state_machine.add_state(new_state)
+		layer.state_machine.remove_state(node.state.name)
+		layer.state_machine.add_state(new_state)
 		node.state = new_state
 	else:
 		new_state = node.state
@@ -353,12 +357,10 @@ func _on_node_added(new_node):
 	check_has_entry()
 
 func _on_node_removed(node_name):
-	var path = get_state_node_path(node_name)
-	path = format_path(path)
+	var path = str(path_viewer.get_cwd(), "/", node_name)
 	var layer = get_layer(path)
 	if layer:
-		# TODO: Remove layer recursively
-		remove_layer(layer)
+		# Remove root's direct children layers
 		layer.queue_free()
 	var result = current_layer.state_machine.remove_state(node_name)
 	check_has_entry()
@@ -405,8 +407,7 @@ func _on_node_name_edit_entered(new_name, node):
 		rename_node(node.name, new)
 		node.name = new
 		# Rename layer as well
-		var path = str(path_viewer.get_current_full_dir(), node.name)
-		path = format_path(path)
+		var path = str(path_viewer.get_cwd(), "/", node.name)
 		var layer = get_layer(path)
 		if layer:
 			layer.name = new
@@ -416,13 +417,6 @@ func _on_node_name_edit_entered(new_name, node):
 				break
 	else:
 		node.name_edit.text = old
-
-func get_state_node_path(node_name):
-	var path = path_viewer.get_current_full_dir()
-	if path.right(0) != "/":
-		path = str(path, "/")
-	path = str(path, node_name)
-	return path
 
 # Return if current editing StateMachine can be saved, ignore built-in resource
 func can_save():
