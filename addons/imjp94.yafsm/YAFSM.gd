@@ -2,6 +2,9 @@
 const StackPlayer = preload("src/StackPlayer.gd")
 const StateMachinePlayer = preload("src/StateMachinePlayer.gd")
 
+# Reference
+const StateDirectory = preload("src/StateDirectory.gd")
+
 # Resources
 # States
 const State = preload("src/states/State.gd")
