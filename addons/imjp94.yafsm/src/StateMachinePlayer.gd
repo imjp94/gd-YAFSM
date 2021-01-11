@@ -187,38 +187,38 @@ func update(delta=get_physics_process_delta_time()):
 
 # Set trigger to be tested with condition, then trigger _transit on next update, 
 # automatically call update() if process_mode set to MANUAL and auto_update true
-func set_trigger(name, auto_update=false):
+func set_trigger(name, auto_update=true):
 	set_param(name, null)
 	_on_param_edited(auto_update)
 
 # Set param(null value treated as trigger) to be tested with condition, then trigger _transit on next update, 
 # automatically call update() if process_mode set to MANUAL and auto_update true
-func set_param(name, value, auto_update=false):
+func set_param(name, value, auto_update=true):
 	_parameters[name] = value
 	_on_param_edited(auto_update)
 
 # Remove param, then trigger _transit on next update, 
 # automatically call update() if process_mode set to MANUAL and auto_update true
-func erase_param(name, auto_update=false):
+func erase_param(name, auto_update=true):
 	var result = _parameters.erase(name)
 	_on_param_edited(auto_update)
 	return result
 
 # Clear all param , then trigger _transit on next update, 
 # automatically call update() if process_mode set to MANUAL and auto_update true
-func clear_param(auto_update=false):
+func clear_param(auto_update=true):
 	_parameters.clear()
 	_on_param_edited(auto_update)
 
 # Clear param from specified path. For example, if "base" given, "base/param1" and "base/param2" will be removed
-func clear_param_at_dir(base_path, auto_update=false):
+func clear_param_at_dir(base_path, auto_update=true):
 	for param_key in _parameters.keys():
 		if param_key.begins_with(base_path):
 			_parameters.erase(param_key)
 	_on_param_edited(auto_update)
 
 # Called when param edited, automatically call update() if process_mode set to MANUAL and auto_update true
-func _on_param_edited(auto_update=false):
+func _on_param_edited(auto_update=true):
 	_is_param_edited = true
 	if process_mode == ProcessMode.MANUAL and auto_update:
 		update()
