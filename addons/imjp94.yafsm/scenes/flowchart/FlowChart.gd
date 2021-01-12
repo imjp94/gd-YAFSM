@@ -248,12 +248,12 @@ func _gui_input(event):
 							for connections_from in current_layer._connections.duplicate().values():
 								for connection in connections_from.duplicate().values():
 									if connection.line == node:
-										disconnect_node(connection.from_node.name, connection.to_node.name)
+										disconnect_node(connection.from_node.name, connection.to_node.name).queue_free()
 						elif node is FlowChartNode:
 							remove_node(node.name)
 							for connection_pair in current_layer.get_connection_list():
 								if connection_pair.from == node.name or connection_pair.to == node.name:
-									disconnect_node(connection_pair.from, connection_pair.to)
+									disconnect_node(connection_pair.from, connection_pair.to).queue_free()
 					accept_event()
 			KEY_C:
 				if event.pressed and event.control:
@@ -371,6 +371,18 @@ func _gui_input(event):
 						select(hit_node)
 						if hit_node is FlowChartLine:
 							current_layer.content_lines.move_child(hit_node, current_layer.content_lines.get_child_count()-1) # Raise selected line to top
+							if event.shift:
+								# Reconnection Start
+								for from in current_layer._connections.keys():
+									var from_connections = current_layer._connections[from]
+									for to in from_connections.keys():
+										var connection = from_connections[to]
+										if connection.line == hit_node:
+											_is_connecting = true
+											_is_dragging_node = false
+											_current_connection = connection
+											_on_node_reconnect_begin(from, to)
+											break
 						if hit_node is FlowChartNode:
 							current_layer.content_nodes.move_child(hit_node, current_layer.content_nodes.get_child_count()-1) # Raise selected node to top
 							if event.shift:
@@ -391,13 +403,34 @@ func _gui_input(event):
 					var was_connecting = _is_connecting
 					var was_dragging_node = _is_dragging_node
 					if _current_connection:
+						# Connection end
+						var from = _current_connection.from_node.name
 						if hit_node is FlowChartNode:
-							# Connection end
-							current_layer._disconnect_node(_current_connection.line)
-							_current_connection.to_node = hit_node
-							connect_node(_current_connection.from_node.name, _current_connection.to_node.name)
+							# Connection success
+							var line
+							var to = hit_node.name
+							if _current_connection.to_node:
+								# Reconnection
+								line = disconnect_node(from, _current_connection.to_node.name)
+								_current_connection.to_node = hit_node
+								_on_node_reconnect_end(from, to)
+							else:
+								# New Connection
+								current_layer.content_lines.remove_child(_current_connection.line)
+								line = _current_connection.line
+								_current_connection.to_node = hit_node
+							connect_node(from, to, line)
 						else:
-							_current_connection.line.queue_free()
+							# Connection failed
+							if _current_connection.to_node:
+								# Reconnection
+								var to = _current_connection.to_node.name
+								_current_connection.join()
+								_on_node_reconnect_failed(from, name)
+							else:
+								# New Connection
+								_current_connection.line.queue_free()
+								_on_node_connect_failed(from)
 						_is_connecting = false
 						_current_connection = null
 						accept_event()
@@ -494,17 +527,19 @@ func rename_node(old, new):
 	current_layer.rename_node(old, new)
 
 # Connect two nodes with a line
-func connect_node(from, to):
-	var line = create_line_instance()
+func connect_node(from, to, line=null):
+	if not line:
+		line = create_line_instance()
 	current_layer.connect_node(line, from, to, interconnection_offset)
 	_on_node_connected(from, to)
 	emit_signal("connection", from, to, line)
 
 # Break a connection between two node
 func disconnect_node(from, to):
-	current_layer.disconnect_node(from, to)
+	var line = current_layer.disconnect_node(from, to)
 	_on_node_disconnected(from, to)
 	emit_signal("disconnection", from, to)
+	return line
 
 # Clear all connections
 func clear_connections():
@@ -585,6 +620,18 @@ func _on_node_connected(from, to):
 
 # Called when connection broken
 func _on_node_disconnected(from, to):
+	pass
+
+func _on_node_connect_failed(from):
+	pass
+
+func _on_node_reconnect_begin(from, to):
+	pass
+
+func _on_node_reconnect_end(from, to):
+	pass
+
+func _on_node_reconnect_failed(from, to):
 	pass
 
 # Called when nodes duplicated
