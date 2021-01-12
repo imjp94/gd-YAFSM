@@ -93,6 +93,7 @@ func _on_focused_object_changed(new_obj):
 			state_machine_editor.state_machine_player = focused_object
 		elif focused_object is StateMachine:
 			state_machine = focused_object
+			state_machine_editor.state_machine_player = null
 		state_machine_editor.state_machine = state_machine
 	else:
 		hide_state_machine_editor()
