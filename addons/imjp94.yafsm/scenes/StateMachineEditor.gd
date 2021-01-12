@@ -25,6 +25,7 @@ onready var create_new_state_machine_container = $MarginContainer
 onready var create_new_state_machine = $MarginContainer/CreateNewStateMachine
 var path_viewer = HBoxContainer.new()
 var condition_visibility = TextureButton.new()
+var unsaved_indicator = Label.new()
 var message_box = VBoxContainer.new()
 
 var editor_accent_color = Color.white
@@ -58,6 +59,10 @@ func _init():
 	condition_visibility.connect("pressed", self, "_on_condition_visibility_pressed")
 	condition_visibility.pressed = true
 	gadget.add_child(condition_visibility)
+
+	unsaved_indicator.size_flags_vertical = SIZE_SHRINK_CENTER
+	unsaved_indicator.focus_mode = FOCUS_NONE
+	gadget.add_child(unsaved_indicator)
 
 	message_box.set_anchors_and_margins_preset(PRESET_BOTTOM_WIDE)
 	message_box.grow_vertical = GROW_DIRECTION_BEGIN
@@ -182,11 +187,13 @@ func _gui_input(event):
 					context_menu.rect_position = get_viewport().get_mouse_position()
 					context_menu.popup()
 
+func _input(event):
+	# Intercept save action
 	if visible and event is InputEventKey:
 		match event.scancode:
 			KEY_S:
 				if event.control and event.pressed:
-						save_request()
+					save_request()
 
 func _on_state_node_gui_input(event, node):
 	if node.state.is_entry() or node.state.is_exit():
@@ -277,6 +284,7 @@ func save():
 	if not can_save():
 		return
 	
+	unsaved_indicator.text = ""
 	ResourceSaver.save(state_machine.resource_path, state_machine)
 
 # Clear editor
@@ -286,6 +294,7 @@ func clear_graph():
 		if child is StateNodeScript:
 			current_layer.content_nodes.remove_child(child)
 			_to_free.append(child)
+	unsaved_indicator.text = "" # Clear graph is not action by user
 
 # Intialize editor with current editing StateMachine
 func draw_graph():
@@ -306,6 +315,7 @@ func draw_graph():
 				connect_node(transition.from, transition.to)
 				current_layer._connections[transition.from][transition.to].line.transition = transition
 	update()
+	unsaved_indicator.text = "" # Draw graph is not action by user
 
 # Add message to message_box(overlay text at bottom of editor)
 func add_message(key, text):
@@ -346,6 +356,7 @@ func _on_layer_deselected(layer):
 
 func _on_node_dragged(node, dragged):
 	node.state.graph_offset = node.rect_position
+	_on_edited()
 
 func _on_node_added(new_node):
 	new_node.undo_redo = undo_redo
@@ -355,6 +366,7 @@ func _on_node_added(new_node):
 	new_node.connect("gui_input", self, "_on_state_node_gui_input", [new_node])
 	current_layer.state_machine.add_state(new_node.state)
 	check_has_entry()
+	_on_edited()
 
 func _on_node_removed(node_name):
 	var path = str(path_viewer.get_cwd(), "/", node_name)
@@ -364,6 +376,7 @@ func _on_node_removed(node_name):
 		layer.queue_free()
 	var result = current_layer.state_machine.remove_state(node_name)
 	check_has_entry()
+	_on_edited()
 	return result
 
 func _on_node_connected(from, to):
@@ -375,9 +388,11 @@ func _on_node_connected(from, to):
 	var new_transition = Transition.new(from, to)
 	line.transition = new_transition
 	current_layer.state_machine.add_transition(new_transition)
+	_on_edited()
 
 func _on_node_disconnected(from, to):
 	current_layer.state_machine.remove_transition(from, to)
+	_on_edited()
 
 func _on_duplicated(old_nodes, new_nodes):
 	# Duplicate condition as well
@@ -392,6 +407,7 @@ func _on_duplicated(old_nodes, new_nodes):
 						var new_connection = current_layer._connections[new_nodes[i].name][new_nodes[j].name]
 						for condition in old_connection.line.transition.conditions.values():
 							new_connection.line.transition.add_condition(condition.duplicate())
+	_on_edited()
 
 func _on_node_name_edit_entered(new_name, node):
 	var old = node.state.name
@@ -415,14 +431,20 @@ func _on_node_name_edit_entered(new_name, node):
 			if child.text == old:
 				child.text = new
 				break
+		_on_edited()
 	else:
 		node.name_edit.text = old
+
+func _on_edited():
+	unsaved_indicator.text = "*"
 
 # Return if current editing StateMachine can be saved, ignore built-in resource
 func can_save():
 	if not state_machine:
 		return false
 	var resource_path = state_machine.resource_path
+	if resource_path.empty():
+		return false
 	if ".scn" in resource_path or ".tscn" in resource_path: # Built-in resource will be saved by scene
 		return false
 	return true
