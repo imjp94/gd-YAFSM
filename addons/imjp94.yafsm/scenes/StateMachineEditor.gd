@@ -14,7 +14,11 @@ signal inspector_changed(property) # Inform plugin to refresh inspector
 
 const ENTRY_STATE_MISSING_MSG = {
 	"key": "entry_state_missing",
-	"text": "Entry State is required for StateMachine to work properly. Right-click then select \"Add Entry\"."
+	"text": "Entry State missing, it will never get started. Right-click -> \"Add Entry\"."
+}
+const EXIT_STATE_MISSING_MSG = {
+	"key": "exit_state_missing",
+	"text": "Exit State missing, it will never exit from nested state. Right-click -> \"Add Exit\"."
 }
 
 onready var context_menu = $ContextMenu
@@ -71,8 +75,8 @@ func _init():
 	content.get_child(0).name = "root"
 
 func _on_path_viewer_dir_pressed(path, index):
+	path_viewer.remove_dir_until(index) # Before select_layer, so path_viewer will be updated in _on_layer_selected
 	select_layer(get_layer(path))
-	path_viewer.remove_dir_until(index)
 
 	if _last_index > index:
 		# Going backward
@@ -170,7 +174,7 @@ func _on_state_machine_changed(new_state_machine):
 		if child is FlowChartLayer:
 			root_layer.remove_child(child)
 			child.queue_free()
-	path_viewer.remove_dir_until(0)
+	path_viewer.remove_dir_until(0) # Before select_layer, so path_viewer will be updated in _on_layer_selected
 	select_layer(root_layer)
 	if new_state_machine:
 		current_layer.state_machine = state_machine
@@ -209,6 +213,7 @@ func _on_state_node_gui_input(event, node):
 						var parent_path = path_viewer.get_cwd()
 						var path = str(parent_path, "/", node.name)
 						var layer = get_layer(path)
+						path_viewer.add_dir(node.state.name) # Before select_layer, so path_viewer will be updated in _on_layer_selected
 						if layer:
 							# Layer already spawned
 							select_layer(layer)
@@ -219,7 +224,6 @@ func _on_state_node_gui_input(event, node):
 							layer.state_machine = new_state_machine
 							select_layer(layer)
 							draw_graph()
-						path_viewer.add_dir(node.state.name)
 						_last_index = path_viewer.get_child_count()-1
 						_last_path = path
 						accept_event()
@@ -331,6 +335,9 @@ func remove_message(key):
 	if control:
 		_message_box_dict.erase(key)
 		message_box.remove_child(control)
+		# Weird behavior of VBoxContainer, only sort children properly after changing grow_direction
+		message_box.grow_vertical = GROW_DIRECTION_END
+		message_box.grow_vertical = GROW_DIRECTION_BEGIN
 		return true
 	return false
 
@@ -345,10 +352,23 @@ func check_has_entry():
 		if ENTRY_STATE_MISSING_MSG.key in  _message_box_dict:
 			remove_message(ENTRY_STATE_MISSING_MSG.key)
 
+# Check if current editing StateMachine is nested and has exit, warns user if exit state missing
+func check_has_exit():
+	if not current_layer.state_machine:
+		return
+	if not path_viewer.get_cwd() == "root": # Nested state
+		if not current_layer.state_machine.has_exit():
+			if not (EXIT_STATE_MISSING_MSG.key in _message_box_dict):
+				add_message(EXIT_STATE_MISSING_MSG.key, EXIT_STATE_MISSING_MSG.text)
+			return
+	if EXIT_STATE_MISSING_MSG.key in _message_box_dict:
+		remove_message(EXIT_STATE_MISSING_MSG.key)
+
 func _on_layer_selected(layer):
 	if layer:
 		layer.show_content()
 		check_has_entry()
+		check_has_exit()
 
 func _on_layer_deselected(layer):
 	if layer:
@@ -366,6 +386,7 @@ func _on_node_added(new_node):
 	new_node.connect("gui_input", self, "_on_state_node_gui_input", [new_node])
 	current_layer.state_machine.add_state(new_node.state)
 	check_has_entry()
+	check_has_exit()
 	_on_edited()
 
 func _on_node_removed(node_name):
@@ -376,6 +397,7 @@ func _on_node_removed(node_name):
 		layer.queue_free()
 	var result = current_layer.state_machine.remove_state(node_name)
 	check_has_entry()
+	check_has_exit()
 	_on_edited()
 	return result
 
