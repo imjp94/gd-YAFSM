@@ -542,6 +542,7 @@ func connect_node(from, to, line=null):
 # Break a connection between two node
 func disconnect_node(from, to):
 	var line = current_layer.disconnect_node(from, to)
+	deselect(line) # Since line is selectable as well
 	_on_node_disconnected(from, to)
 	emit_signal("disconnection", from, to)
 	return line
