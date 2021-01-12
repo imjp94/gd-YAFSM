@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/imjp94.yafsm/scenes/condition_editors/ValueConditionEditor.tscn" type="PackedScene" id=1]
+[ext_resource path="res://addons/imjp94.yafsm/scenes/condition_editors/StringConditionEditor.gd" type="Script" id=2]
+
+[node name="StringConditionEditor" instance=ExtResource( 1 )]
+script = ExtResource( 2 )
+
+[node name="PopupMenu" parent="Comparation" index="0"]
+items = [ "==", null, 0, false, false, 0, 0, null, "", false, "!=", null, 0, false, false, 1, 0, null, "", false ]
+
+[node name="MarginContainer" parent="." index="2"]
+margin_right = 152.0
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="StringValue" type="LineEdit" parent="MarginContainer" index="0"]
+margin_right = 58.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+
+[node name="Remove" parent="." index="3"]
+margin_left = 156.0
+margin_right = 186.0
