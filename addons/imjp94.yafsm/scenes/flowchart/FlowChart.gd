@@ -369,7 +369,6 @@ func _gui_input(event):
 					if hit_node:
 						# Click on node(can be a line)
 						_is_dragging_node = true
-						select(hit_node)
 						if hit_node is FlowChartLine:
 							current_layer.content_lines.move_child(hit_node, current_layer.content_lines.get_child_count()-1) # Raise selected line to top
 							if event.shift:
@@ -396,6 +395,10 @@ func _gui_input(event):
 									current_layer._connect_node(line, connection.get_from_pos(), connection.get_from_pos())
 									_current_connection = connection
 							accept_event()
+						if _is_connecting:
+							clear_selection()
+						else:
+							select(hit_node)
 					if not _is_dragging:
 						# Drag start
 						_is_dragging = true
