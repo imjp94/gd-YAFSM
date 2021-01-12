@@ -53,7 +53,7 @@ func _connect_node(line, from_pos, to_pos):
 # Called after connection broken
 func _disconnect_node(line):
 	content_lines.remove_child(line)
-	line.queue_free()
+	return line
 
 # Rename node
 func rename_node(old, new):
@@ -114,6 +114,7 @@ func disconnect_node(from, to):
 		if inv_connection:
 			inv_connection.offset = 0
 			inv_connection.join()
+	return connection.line
 
 # Clear all selection
 func clear_connections():

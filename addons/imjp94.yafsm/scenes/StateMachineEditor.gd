@@ -40,6 +40,7 @@ var undo_redo
 var state_machine_player setget set_state_machine_player
 var state_machine setget set_state_machine
 
+var _reconnecting_connection
 var _last_index = 0
 var _last_path = ""
 var _message_box_dict = {}
@@ -408,6 +409,11 @@ func _on_node_removed(node_name):
 	return result
 
 func _on_node_connected(from, to):
+	if _reconnecting_connection:
+		# Reconnection will trigger _on_node_connected after _on_node_reconnect_end/_on_node_reconnect_failed
+		if _reconnecting_connection.from_node.name == from and _reconnecting_connection.to_node.name == to:
+			_reconnecting_connection = null
+			return
 	if current_layer.state_machine.transitions.has(from):
 		if current_layer.state_machine.transitions[from].has(to):
 			return # Already existed as it is loaded from file
@@ -423,6 +429,23 @@ func _on_node_connected(from, to):
 func _on_node_disconnected(from, to):
 	current_layer.state_machine.remove_transition(from, to)
 	_on_edited()
+
+func _on_node_reconnect_begin(from, to):
+	_reconnecting_connection = current_layer._connections[from][to]
+	current_layer.state_machine.remove_transition(from, to)
+
+func _on_node_reconnect_end(from, to):
+	var transition = _reconnecting_connection.line.transition
+	transition.to = to
+	current_layer.state_machine.add_transition(transition)
+	clear_selection()
+	select(_reconnecting_connection.line)
+
+func _on_node_reconnect_failed(from, to):
+	var transition = _reconnecting_connection.line.transition
+	current_layer.state_machine.add_transition(transition)
+	clear_selection()
+	select(_reconnecting_connection.line)
 
 func _on_duplicated(old_nodes, new_nodes):
 	# Duplicate condition as well
