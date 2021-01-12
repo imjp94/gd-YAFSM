@@ -208,25 +208,31 @@ func _on_state_node_gui_input(event, node):
 			BUTTON_LEFT:
 				if event.pressed:
 					if event.doubleclick:
-						var new_state_machine = convert_to_state_machine(current_layer, node)
-						# Determine current layer path
-						var parent_path = path_viewer.get_cwd()
-						var path = str(parent_path, "/", node.name)
-						var layer = get_layer(path)
-						path_viewer.add_dir(node.state.name) # Before select_layer, so path_viewer will be updated in _on_layer_selected
-						if layer:
-							# Layer already spawned
-							select_layer(layer)
+						if node.name_edit.get_rect().has_point(event.position):
+							# Edit State name if within LineEdit
+							node.enable_name_edit(true)
+							accept_event()
 						else:
-							# New layer to spawn
-							layer = add_layer_to(get_layer(parent_path))
-							layer.name = node.state.name
-							layer.state_machine = new_state_machine
-							select_layer(layer)
-							draw_graph()
-						_last_index = path_viewer.get_child_count()-1
-						_last_path = path
-						accept_event()
+							# Create/Move to new layer
+							var new_state_machine = convert_to_state_machine(current_layer, node)
+							# Determine current layer path
+							var parent_path = path_viewer.get_cwd()
+							var path = str(parent_path, "/", node.name)
+							var layer = get_layer(path)
+							path_viewer.add_dir(node.state.name) # Before select_layer, so path_viewer will be updated in _on_layer_selected
+							if layer:
+								# Layer already spawned
+								select_layer(layer)
+							else:
+								# New layer to spawn
+								layer = add_layer_to(get_layer(parent_path))
+								layer.name = node.state.name
+								layer.state_machine = new_state_machine
+								select_layer(layer)
+								draw_graph()
+							_last_index = path_viewer.get_child_count()-1
+							_last_path = path
+							accept_event()
 			BUTTON_RIGHT:
 				if event.pressed:
 					# State node context menu
