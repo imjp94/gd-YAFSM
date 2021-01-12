@@ -3,8 +3,8 @@ extends "StackPlayer.gd"
 const State = preload("states/State.gd")
 
 signal transited(from, to) # Transition of state
-signal entered() # Entry of state machine
-signal exited() # Exit of state machine
+signal entered(to) # Entry of state machine(including nested), empty string equals to root
+signal exited(from) # Exit of state machine(including nested, empty string equals to root
 signal updated(state, delta) # Time to update(based on process_mode), up to user to handle any logic, for example, update movement of KinematicBody
 
 # Enum to define how state machine should be updated
@@ -77,13 +77,21 @@ func _on_popped(from, to):
 func _on_state_changed(from, to):
 	match to:
 		State.ENTRY_KEY:
-			emit_signal("entered")
+			emit_signal("entered", "")
 		State.EXIT_KEY:
 			set_active(false) # Disable on exit
-			emit_signal("exited")
-	if to.ends_with(State.EXIT_KEY) and to.length() > State.EXIT_KEY.length():
+			emit_signal("exited", "")
+	
+	if to.ends_with(State.ENTRY_KEY) and to.length() > State.ENTRY_KEY.length():
+		# Nexted Entry state
+		var state = path_backward(get_current())
+		emit_signal("entered", state)
+	elif to.ends_with(State.EXIT_KEY) and to.length() > State.EXIT_KEY.length():
 		# Nested Exit state, clear "local" params
-		clear_param_at_dir(path_backward(get_current()))
+		var state = path_backward(get_current())
+		clear_param_at_dir(state)
+		emit_signal("exited", state)
+
 	emit_signal("transited", from, to)
 
 # Only get called in 2 condition, _parameters edited or last transition was successful
