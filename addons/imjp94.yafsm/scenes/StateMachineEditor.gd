@@ -447,6 +447,16 @@ func _on_node_reconnect_failed(from, to):
 	clear_selection()
 	select(_reconnecting_connection.line)
 
+func _request_connect_from(from):
+	if from == State.EXIT_KEY:
+		return false
+	return true
+
+func _request_connect_to(to):
+	if to == State.ENTRY_KEY:
+		return false
+	return true
+
 func _on_duplicated(old_nodes, new_nodes):
 	# Duplicate condition as well
 	for i in old_nodes.size():

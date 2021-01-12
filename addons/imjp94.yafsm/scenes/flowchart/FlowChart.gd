@@ -289,9 +289,10 @@ func _gui_input(event):
 							for i in current_layer.content_nodes.get_child_count():
 								var child = current_layer.content_nodes.get_child(current_layer.content_nodes.get_child_count()-1 - i) # Inverse order to check from top to bottom of canvas
 								if child is FlowChartNode and child.name != _current_connection.from_node.name:
-									if child.get_rect().has_point(pos):
-										pos = child.rect_position + child.rect_size / 2
-										break
+									if _request_connect_to(child.name):
+										if child.get_rect().has_point(pos):
+											pos = child.rect_position + child.rect_size / 2
+											break
 							_current_connection.line.join(_current_connection.get_from_pos(), pos)
 					elif _is_dragging_node:
 						# Dragging nodes
@@ -387,12 +388,13 @@ func _gui_input(event):
 							current_layer.content_nodes.move_child(hit_node, current_layer.content_nodes.get_child_count()-1) # Raise selected node to top
 							if event.shift:
 								# Connection start
-								_is_connecting = true
-								_is_dragging_node = false
-								var line = create_line_instance()
-								var connection = Connection.new(line, hit_node, null)
-								current_layer._connect_node(line, connection.get_from_pos(), connection.get_from_pos())
-								_current_connection = connection
+								if _request_connect_from(hit_node.name):
+									_is_connecting = true
+									_is_dragging_node = false
+									var line = create_line_instance()
+									var connection = Connection.new(line, hit_node, null)
+									current_layer._connect_node(line, connection.get_from_pos(), connection.get_from_pos())
+									_current_connection = connection
 							accept_event()
 					if not _is_dragging:
 						# Drag start
@@ -405,7 +407,7 @@ func _gui_input(event):
 					if _current_connection:
 						# Connection end
 						var from = _current_connection.from_node.name
-						if hit_node is FlowChartNode:
+						if hit_node is FlowChartNode and _request_connect_to(hit_node.name if hit_node else null):
 							# Connection success
 							var line
 							var to = hit_node.name
@@ -633,6 +635,12 @@ func _on_node_reconnect_end(from, to):
 
 func _on_node_reconnect_failed(from, to):
 	pass
+
+func _request_connect_from(from):
+	return true
+
+func _request_connect_to(to):
+	return true
 
 # Called when nodes duplicated
 func _on_duplicated(old_nodes, new_nodes):
