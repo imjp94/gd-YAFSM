@@ -416,6 +416,8 @@ func _on_node_connected(from, to):
 	var new_transition = Transition.new(from, to)
 	line.transition = new_transition
 	current_layer.state_machine.add_transition(new_transition)
+	clear_selection()
+	select(line)
 	_on_edited()
 
 func _on_node_disconnected(from, to):
