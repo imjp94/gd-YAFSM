@@ -239,6 +239,9 @@ func get_param(name, default=null):
 func get_params():
 	return _parameters.duplicate()
 
+func has_param(name):
+	return name in _parameters
+
 # Return if player started
 func is_entered():
 	return State.ENTRY_STATE in stack
