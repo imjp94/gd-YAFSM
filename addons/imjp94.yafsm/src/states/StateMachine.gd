@@ -31,7 +31,7 @@ func transit(current_state, param={}):
 
 	# Nested StateMachine in Exit state
 	if is_nested:
-		var is_nested_exit = nested_states[nested_states.size()-1] == State.EXIT_KEY
+		var is_nested_exit = nested_states[nested_states.size()-1] == State.EXIT_STATE
 		if is_nested_exit:
 			# Normalize path to transit again with parent of end_state_machine
 			var end_state_machine_parent_path = ""
@@ -53,7 +53,7 @@ func transit(current_state, param={}):
 			if next_state:
 				if "states" in end_state_machine.states[next_state]:
 					# Next state is a StateMachine, return entry state of the state machine in absolute path
-					next_state = join_path(base_path, [next_state, State.ENTRY_KEY])
+					next_state = join_path(base_path, [next_state, State.ENTRY_STATE])
 				else:
 					# Construct next state into absolute path
 					next_state = join_path(base_path, [next_state])
@@ -146,16 +146,16 @@ func remove_transition(from_state, to_state):
 			emit_signal("transition_removed", from_state, to_state)
 
 func get_entries():
-	return transitions[State.ENTRY_KEY].values()
+	return transitions[State.ENTRY_STATE].values()
 	
 func get_exits():
-	return transitions[State.EXIT_KEY].values()
+	return transitions[State.EXIT_STATE].values()
 
 func has_entry():
-	return State.ENTRY_KEY in states
+	return State.ENTRY_STATE in states
 
 func has_exit():
-	return State.EXIT_KEY in states
+	return State.EXIT_STATE in states
 
 # Get duplicate of states dictionary
 func get_states():

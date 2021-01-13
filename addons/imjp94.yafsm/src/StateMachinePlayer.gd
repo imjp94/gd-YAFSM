@@ -76,17 +76,17 @@ func _on_popped(from, to):
 
 func _on_state_changed(from, to):
 	match to:
-		State.ENTRY_KEY:
+		State.ENTRY_STATE:
 			emit_signal("entered", "")
-		State.EXIT_KEY:
+		State.EXIT_STATE:
 			set_active(false) # Disable on exit
 			emit_signal("exited", "")
 	
-	if to.ends_with(State.ENTRY_KEY) and to.length() > State.ENTRY_KEY.length():
+	if to.ends_with(State.ENTRY_STATE) and to.length() > State.ENTRY_STATE.length():
 		# Nexted Entry state
 		var state = path_backward(get_current())
 		emit_signal("entered", state)
-	elif to.ends_with(State.EXIT_KEY) and to.length() > State.EXIT_KEY.length():
+	elif to.ends_with(State.EXIT_STATE) and to.length() > State.EXIT_STATE.length():
 		# Nested Exit state, clear "local" params
 		var state = path_backward(get_current())
 		clear_param_at_dir(state)
@@ -164,7 +164,7 @@ func reset(to=-1, event=ResetEventTrigger.LAST_TO_DEST):
 
 # Manually start the player, automatically called if autostart is true
 func start():
-	push(State.ENTRY_KEY)
+	push(State.ENTRY_STATE)
 	_was_transited = true
 
 # Restart player
@@ -241,11 +241,11 @@ func get_params():
 
 # Return if player started
 func is_entered():
-	return State.ENTRY_KEY in stack
+	return State.ENTRY_STATE in stack
 
 # Return if player ended
 func is_exited():
-	return get_current() == State.EXIT_KEY
+	return get_current() == State.EXIT_STATE
 
 func set_active(v):
 	if active != v:
