@@ -2,8 +2,6 @@
 
 [ext_resource path="res://addons/imjp94.yafsm/src/debugger/StackPlayerDebugger.gd" type="Script" id=1]
 
-
-
 [node name="StackPlayerDebugger" type="Control"]
 modulate = Color( 1, 1, 1, 0.498039 )
 anchor_right = 1.0
@@ -16,6 +14,7 @@ __meta__ = {
 [node name="MarginContainer" type="MarginContainer" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 2
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -23,5 +22,6 @@ __meta__ = {
 [node name="Stack" type="VBoxContainer" parent="MarginContainer"]
 margin_top = 600.0
 margin_bottom = 600.0
+mouse_filter = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
