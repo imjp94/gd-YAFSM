@@ -107,15 +107,15 @@ func _on_context_menu_index_pressed(index):
 		0: # Add State
 			new_node.name = "State"
 		1: # Add Entry
-			if State.ENTRY_KEY in current_layer.state_machine.states:
+			if State.ENTRY_STATE in current_layer.state_machine.states:
 				push_warning("Entry node already exist")
 				return
-			new_node.name = State.ENTRY_KEY
+			new_node.name = State.ENTRY_STATE
 		2: # Add Exit
-			if State.EXIT_KEY in current_layer.state_machine.states:
+			if State.EXIT_STATE in current_layer.state_machine.states:
 				push_warning("Exit node already exist")
 				return
-			new_node.name = State.EXIT_KEY
+			new_node.name = State.EXIT_STATE
 	new_node.rect_position = content_position(get_local_mouse_position())
 	add_node(new_node)
 
@@ -448,12 +448,12 @@ func _on_node_reconnect_failed(from, to):
 	select(_reconnecting_connection.line)
 
 func _request_connect_from(from):
-	if from == State.EXIT_KEY:
+	if from == State.EXIT_STATE:
 		return false
 	return true
 
 func _request_connect_to(to):
-	if to == State.ENTRY_KEY:
+	if to == State.ENTRY_STATE:
 		return false
 	return true
 
