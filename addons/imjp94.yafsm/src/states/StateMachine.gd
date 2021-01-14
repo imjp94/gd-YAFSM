@@ -15,7 +15,7 @@ func _init(p_name="", p_transitions={}, p_states={}):
 	states = p_states
 
 # Attempt to transit with parameters given
-func transit(current_state, param={}):
+func transit(current_state, params={}, local_params={}):
 	var nested_states = current_state.split("/")
 	var is_nested = nested_states.size() > 1
 	var end_state_machine = self
@@ -39,7 +39,7 @@ func transit(current_state, param={}):
 				end_state_machine_parent_path = join_path(end_state_machine_parent_path, [nested_states[i]])
 			var end_state_machine_parent = get_state(end_state_machine_parent_path)
 			var normalized_current_state = end_state_machine.name
-			var next_state = end_state_machine_parent.transit(normalized_current_state, param)
+			var next_state = end_state_machine_parent.transit(normalized_current_state, params)
 			if next_state:
 				# Construct next state into absolute path
 				next_state = join_path(end_state_machine_parent_path, [next_state])
@@ -49,7 +49,7 @@ func transit(current_state, param={}):
 	var from_transitions = end_state_machine.transitions.get(nested_states[nested_states.size()-1])
 	if from_transitions:
 		for transition in from_transitions.values():
-			var next_state = transition.transit(param)
+			var next_state = transition.transit(params, local_params)
 			if next_state:
 				if "states" in end_state_machine.states[next_state]:
 					# Next state is a StateMachine, return entry state of the state machine in absolute path

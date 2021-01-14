@@ -20,6 +20,7 @@ export(bool) var autostart = true # Automatically enter Entry state on ready if 
 export(ProcessMode) var process_mode = ProcessMode.IDLE setget set_process_mode # ProcessMode of player
 
 var _parameters # Parameters to be passed to condition
+var _local_parameters
 var _is_update_locked = true
 var _was_transited = false # If last transition was successful
 var _is_param_edited = false
@@ -30,6 +31,7 @@ func _init():
 		return
 
 	_parameters = {}
+	_local_parameters = {}
 	_was_transited = true # Trigger _transit on _ready
 
 func _get_configuration_warning():
@@ -77,7 +79,8 @@ func _transit():
 		return
 
 	var from = get_current()
-	var next_state = state_machine.transit(get_current(), _parameters)
+	var local_params = _local_parameters.get(path_backward(from), {})
+	var next_state = state_machine.transit(get_current(), _parameters, local_params)
 	if next_state:
 		if stack.has(next_state):
 			reset(stack.find(next_state))
@@ -86,7 +89,7 @@ func _transit():
 	var to = next_state
 	_was_transited = !!next_state
 	_is_param_edited = false
-	_flush_trigger()
+	_flush_trigger(_parameters)
 
 	if _was_transited:
 		_on_state_changed(from, to)
@@ -106,7 +109,7 @@ func _on_state_changed(from, to):
 	elif to.ends_with(State.EXIT_STATE) and to.length() > State.EXIT_STATE.length():
 		# Nested Exit state, clear "local" params
 		var state = path_backward(get_current())
-		clear_param_at_dir(state, false) # Clearing params internally, do not update
+		clear_param(state, false) # Clearing params internally, do not update
 		emit_signal("exited", state)
 
 	emit_signal("transited", from, to)
@@ -143,7 +146,7 @@ func _on_active_changed():
 		return
 
 	if active:
-		_flush_trigger()
+		_flush_trigger(_parameters)
 		_on_process_mode_changed()
 		_transit()
 	else:
@@ -151,11 +154,13 @@ func _on_active_changed():
 		set_process(false)
 
 # Remove all trigger(param with null value) in _parameters, only get called after _transit
-func _flush_trigger():
-	for param_key in _parameters.keys():
-		var value = _parameters[param_key]
+func _flush_trigger(params):
+	for param_key in params.keys():
+		var value = params[param_key]
+		if value is Dictionary: # TODO: Differentiate nested params from user defined dictionary
+			_flush_trigger(value)
 		if value == null: # Param with null as value is treated as trigger
-			_parameters.erase(param_key)
+			params.erase(param_key)
 
 func reset(to=-1, event=ResetEventTrigger.LAST_TO_DEST):
 	.reset(to, event)
@@ -196,33 +201,58 @@ func update(delta=get_physics_process_delta_time()):
 # automatically call update() if process_mode set to MANUAL and auto_update true
 func set_trigger(name, auto_update=true):
 	set_param(name, null)
-	_on_param_edited(auto_update)
 
 # Set param(null value treated as trigger) to be tested with condition, then trigger _transit on next update, 
 # automatically call update() if process_mode set to MANUAL and auto_update true
 func set_param(name, value, auto_update=true):
-	_parameters[name] = value
+	var path = ""
+	if "/" in name:
+		path = path_backward(name)
+		name = path_end_dir(name)
+	_set_param(path, name, value, auto_update)
+
+func _set_param(path, name, value, auto_update=true):
+	if path.empty():
+		_parameters[name] = value
+	else:
+		var local_params = _local_parameters.get(path)
+		if local_params is Dictionary:
+			local_params[name] = value
+		else:
+			local_params = {}
+			local_params[name] = value
+			_local_parameters[path] = local_params
 	_on_param_edited(auto_update)
 
 # Remove param, then trigger _transit on next update, 
 # automatically call update() if process_mode set to MANUAL and auto_update true
 func erase_param(name, auto_update=true):
-	var result = _parameters.erase(name)
+	var path = ""
+	if "/" in name:
+		path = path_backward(name)
+		name = path_end_dir(name)
+	return _erase_param(path, name, auto_update)
+
+func _erase_param(path, name, auto_update=true):
+	var result = false
+	if path.empty():
+		result = _parameters.erase(name)
+	else:
+		result = _local_parameters.get(path, {}).erase(name)
 	_on_param_edited(auto_update)
 	return result
 
-# Clear all param , then trigger _transit on next update, 
+# Clear params from specified path, empty string to clear all, then trigger _transit on next update, 
 # automatically call update() if process_mode set to MANUAL and auto_update true
-func clear_param(auto_update=true):
-	_parameters.clear()
-	_on_param_edited(auto_update)
-
-# Clear param from specified path. For example, if "base" given, "base/param1" and "base/param2" will be removed
-func clear_param_at_dir(base_path, auto_update=true):
-	for param_key in _parameters.keys():
-		if param_key.begins_with(base_path):
-			_parameters.erase(param_key)
-	_on_param_edited(auto_update)
+func clear_param(path="", auto_update=true):
+	if path.empty():
+		_parameters.clear()
+	else:
+		_local_parameters.get(path, {}).clear()
+		# Clear nested params
+		for param_key in _local_parameters.keys():
+			if param_key.begins_with(path):
+				_local_parameters.erase(param_key)
 
 # Called when param edited, automatically call update() if process_mode set to MANUAL and auto_update true
 func _on_param_edited(auto_update=true):
@@ -232,14 +262,36 @@ func _on_param_edited(auto_update=true):
 
 # Get value of param
 func get_param(name, default=null):
-	return _parameters.get(name, default)
+	var path = ""
+	if "/" in name:
+		path = path_backward(name)
+		name = path_end_dir(name)
+	return _get_param(path, name, default)
+
+func _get_param(path, name, default=null):
+	if path.empty():
+		return _parameters.get(name, default)
+	else:
+		var local_params = _local_parameters.get(path, {})
+		return local_params.get(name, default)
 
 # Get duplicate of whole parameter dictionary
 func get_params():
 	return _parameters.duplicate()
 
 func has_param(name):
-	return name in _parameters
+	var path = ""
+	if "/" in name:
+		path = path_backward(name)
+		name = path_end_dir(name)
+	return _has_param(path, name)
+
+func _has_param(path, name):
+	if path.empty():
+		return name in _parameters
+	else:
+		var local_params = _local_parameters.get(path, {})
+		return name in local_params
 
 # Return if player started
 func is_entered():
