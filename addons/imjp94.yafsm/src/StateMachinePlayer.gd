@@ -68,11 +68,28 @@ func _physics_process(delta):
 	update(delta)
 	_update_end()
 
-func _on_pushed(from, to):
-	_on_state_changed(from, to)
+# Only get called in 2 condition, _parameters edited or last transition was successful
+func _transit():
+	if not active:
+		return
+	# Attempt to transit if parameter edited or last transition was successful
+	if not _is_param_edited and not _was_transited:
+		return
 
-func _on_popped(from, to):
-	_on_state_changed(from, to)
+	var from = get_current()
+	var next_state = state_machine.transit(get_current(), _parameters)
+	if next_state:
+		if stack.has(next_state):
+			reset(stack.find(next_state))
+		else:
+			push(next_state)
+	var to = next_state
+	_was_transited = !!next_state
+	_is_param_edited = false
+	_flush_trigger()
+
+	if _was_transited:
+		_on_state_changed(from, to)
 
 func _on_state_changed(from, to):
 	match to:
@@ -89,28 +106,10 @@ func _on_state_changed(from, to):
 	elif to.ends_with(State.EXIT_STATE) and to.length() > State.EXIT_STATE.length():
 		# Nested Exit state, clear "local" params
 		var state = path_backward(get_current())
-		clear_param_at_dir(state)
+		clear_param_at_dir(state, false) # Clearing params internally, do not update
 		emit_signal("exited", state)
 
 	emit_signal("transited", from, to)
-
-# Only get called in 2 condition, _parameters edited or last transition was successful
-func _transit():
-	if not active:
-		return
-	# Attempt to transit if parameter edited or last transition was successful
-	if not _is_param_edited and not _was_transited:
-		return
-
-	var next_state = state_machine.transit(get_current(), _parameters)
-	if next_state:
-		if stack.has(next_state):
-			reset(stack.find(next_state))
-		else:
-			push(next_state)
-	_was_transited = !!next_state
-	_is_param_edited = false
-	_flush_trigger()
 
 # Called internally if process_mode is PHYSICS/IDLE to unlock update()
 func _update_start():
@@ -172,7 +171,7 @@ func restart(is_active=true, preserve_params=false):
 	reset()
 	set_active(is_active)
 	if not preserve_params:
-		clear_param()
+		clear_param(false)
 	start()
 
 # Update player to, first initiate transition, then call _on_updated, finally emit "update" signal, delta will be given based on process_mode.
