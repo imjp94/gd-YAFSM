@@ -1,4 +1,4 @@
-# gd-YAFSM (**g**o**d**ot-**Y**et **A**nother **F**inite **S**tate **M**achine)
+# ![gd-YAFSM icon](icon.png)gd-YAFSM (**g**o**d**ot-**Y**et **A**nother **F**inite **S**tate **M**achine)
 
 ![Editor Showcase](screenshots/yafsm_editor_showcase.gif)
 
@@ -41,7 +41,7 @@ or
 
 ![Getting Started](screenshots/yafsm_getting_started.gif)
 
-1. Add `StateMachinePlayer` node from "Create New Node" window.
+1. Add ![StateMachinePlayer icon](addons/imjp94.yafsm/assets/icons/state_machine_player_icon.png)`StateMachinePlayer` node from "Create New Node" window.
 
 2. Select created node and the state machine editor should shows up.
 
