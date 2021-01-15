@@ -2,7 +2,7 @@
 
 ## Classes
 
-All of the classes are located in `res://addons/imjp94.yafsm/src` but you can just preload `res://addons/imjp94.yafsm/YAFSM.gd` to import all classes available:
+All of the class are located in `res://addons/imjp94.yafsm/src` but you can just preload `res://addons/imjp94.yafsm/YAFSM.gd` to import all class available:
 
 ```gdscript
 const YAFSM = preload("res://addons/imjp94.yafsm/YAFSM.gd")
@@ -29,14 +29,19 @@ const State = YAFSM.State
   - `process_mode # ProcessMode of player`
   - signals:
     - `transited(from, to) # Transition of state`
-    - `entered() # Entry of state machine`
-    - `exited() # Exit of state machine`
+    - `entered(to) # Entry of state machine(including nested), empty string equals to root`
+    - `exited(from) # Exit of state machine(including nested, empty string equals to root`
     - `updated(state, delta) # Time to update(based on process_mode), up to user to handle any logic, for example, update movement of KinematicBody`
 
 ### Control
 
 - [StackPlayerDebugger](src/debugger/StackPlayerDebugger.gd)
   > Visualize stack of parent StackPlayer on screen
+
+### Reference
+
+- [StateDirectory](src/StateDirectory.gd)
+  > Convert state path to directory object for traversal, mainly used for nested state
 
 ### Resource
 
@@ -73,3 +78,4 @@ var condition = transition.conditions[condition_name] # keyed by condition name
 - [BooleanCondition](src/conditions/BooleanCondition.gd)(`extends ValueCondition`)
 - [IntegerCondition](src/conditions/IntegerCondition.gd)(`extends ValueCondition`)
 - [FloatCondition](src/conditions/FloatCondition.gd)(`extends ValueCondition`)
+- [StringCondition](src/conditions/StringCondition.gd)(`extends ValueCondition`)
