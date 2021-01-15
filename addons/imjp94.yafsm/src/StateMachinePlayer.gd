@@ -199,11 +199,13 @@ func update(delta=get_physics_process_delta_time()):
 
 # Set trigger to be tested with condition, then trigger _transit on next update, 
 # automatically call update() if process_mode set to MANUAL and auto_update true
+# Nested trigger can be accessed through path "path/to/param_name", for example, "App/Game/is_playing"
 func set_trigger(name, auto_update=true):
 	set_param(name, null)
 
 # Set param(null value treated as trigger) to be tested with condition, then trigger _transit on next update, 
 # automatically call update() if process_mode set to MANUAL and auto_update true
+# Nested param can be accessed through path "path/to/param_name", for example, "App/Game/is_playing"
 func set_param(name, value, auto_update=true):
 	var path = ""
 	if "/" in name:
@@ -226,6 +228,7 @@ func _set_param(path, name, value, auto_update=true):
 
 # Remove param, then trigger _transit on next update, 
 # automatically call update() if process_mode set to MANUAL and auto_update true
+# Nested param can be accessed through path "path/to/param_name", for example, "App/Game/is_playing"
 func erase_param(name, auto_update=true):
 	var path = ""
 	if "/" in name:
@@ -244,6 +247,7 @@ func _erase_param(path, name, auto_update=true):
 
 # Clear params from specified path, empty string to clear all, then trigger _transit on next update, 
 # automatically call update() if process_mode set to MANUAL and auto_update true
+# Nested param can be accessed through path "path/to/param_name", for example, "App/Game/is_playing"
 func clear_param(path="", auto_update=true):
 	if path.empty():
 		_parameters.clear()
@@ -261,6 +265,7 @@ func _on_param_edited(auto_update=true):
 		update()
 
 # Get value of param
+# Nested param can be accessed through path "path/to/param_name", for example, "App/Game/is_playing"
 func get_param(name, default=null):
 	var path = ""
 	if "/" in name:
@@ -279,6 +284,8 @@ func _get_param(path, name, default=null):
 func get_params():
 	return _parameters.duplicate()
 
+# Return true if param exists
+# Nested param can be accessed through path "path/to/param_name", for example, "App/Game/is_playing"
 func has_param(name):
 	var path = ""
 	if "/" in name:
