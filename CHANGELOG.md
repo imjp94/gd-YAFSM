@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.4.0
+
+- Breaking changes:
+  - `set_param`/`set_trigger`/`clear_param`/`erase_param`/etc... always `auto_update` by default
+  - `StateMachinePlayer` enter/exit signals now pass one argument(base state that entry/exit)
+  - Rename `State.ENTRY`/`EXIT_KEY` to `ENTRY`/`EXIT_STATE`
+- Feature:
+  - Support Nested `StateMachine`
+  - Added `StateDirectory` class to traverse state path like file directory
+  - Added `StringCondition`
+  - Reconnection of transition line in FlowChart
+  - Add unsaved indicator in `StateMachineEditor`
+  - Add has_param function to `StateMachinePlayer`
+  - Add logo
+- Improves:
+  - Disallow connection to Entry and connection from Exit
+  - Avoid selecting node when connecting
+  - Make StackPlayerDebugger ignore mouse
+- Bugfixes:
+  - Fix `StateMachineEditor` is not cleared when `StateMachinePlayer` changed
+  - Fix `StateMachineEditor` trying to save built-in resource(StateMachine)
+  - Fix `StateMachienEditor` doesn't save external resouce(StateMachine) when saving scene
+  - Fix dragging node with weird mouse offset after delete connection
+  - Fix recursive transition when `update()` called in transited signal
+
 ## 0.3.0
 
 - Features:
