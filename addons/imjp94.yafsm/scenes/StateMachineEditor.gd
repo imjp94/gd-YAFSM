@@ -75,6 +75,14 @@ func _init():
 
 	content.get_child(0).name = "root"
 
+func _ready():
+	create_new_state_machine_container.visible = false
+	create_new_state_machine.connect("pressed", self, "_on_create_new_state_machine_pressed")
+	context_menu.connect("index_pressed", self, "_on_context_menu_index_pressed")
+	state_node_context_menu.connect("index_pressed", self, "_on_state_node_context_menu_index_pressed")
+	convert_to_state_confirmation.connect("confirmed", self, "_on_convert_to_state_confirmation_confirmed")
+	save_dialog.connect("confirmed", self, "_on_save_dialog_confirmed")
+
 func _on_path_viewer_dir_pressed(path, index):
 	path_viewer.remove_dir_until(index) # Before select_layer, so path_viewer will be updated in _on_layer_selected
 	select_layer(get_layer(path))
@@ -91,14 +99,6 @@ func _on_path_viewer_dir_pressed(path, index):
 
 	_last_index = index
 	_last_path = path
-
-func _ready():
-	create_new_state_machine_container.visible = false
-	create_new_state_machine.connect("pressed", self, "_on_create_new_state_machine_pressed")
-	context_menu.connect("index_pressed", self, "_on_context_menu_index_pressed")
-	state_node_context_menu.connect("index_pressed", self, "_on_state_node_context_menu_index_pressed")
-	convert_to_state_confirmation.connect("confirmed", self, "_on_convert_to_state_confirmation_confirmed")
-	save_dialog.connect("confirmed", self, "_on_save_dialog_confirmed")
 
 func _on_context_menu_index_pressed(index):
 	var new_node = StateNode.instance()

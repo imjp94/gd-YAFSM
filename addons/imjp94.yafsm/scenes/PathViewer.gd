@@ -7,6 +7,7 @@ signal dir_pressed(path, index)
 func _init():
 	add_dir("root")
 
+# Add directory button
 func add_dir(dir):
 	var button = Button.new()
 	button.flat = true
@@ -15,6 +16,7 @@ func add_dir(dir):
 	button.connect("pressed", self, "_on_button_pressed", [button])
 	return button
 
+# Remove directory until index(exclusive)
 func remove_dir_until(index):
 	var to_remove = []
 	for i in get_child_count():
@@ -24,9 +26,12 @@ func remove_dir_until(index):
 		to_remove.append(child)
 	for n in to_remove:
 		remove_child(n)
+
+# Return current working directory
 func get_cwd():
 	return get_dir_until(get_child_count()-1)
 
+# Return path until index(inclusive) of directory
 func get_dir_until(index):
 	var path = ""
 	for i in get_child_count():
