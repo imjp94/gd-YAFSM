@@ -14,14 +14,14 @@ const State = YAFSM.State
 
 ### Node
 
-- [StackPlayer](src/StackPlayer.gd)
+- [StackPlayer](src/StackPlayer.gd) ![StackPlayer icon](assets/icons/stack_player_icon.png)
   > Manage stack of item, use push/pop function to set current item on top of stack
   - `current # Current item on top of stack`
   - `stack`
   - signals:
     - `pushed(to) # When item pushed to stack`
     - `popped(from) # When item popped from stack`
-- [StateMachinePlayer](src/StateMachinePlayer.gd)(extends StackPlayer)
+- [StateMachinePlayer](src/StateMachinePlayer.gd)(extends StackPlayer) ![StateMachinePlayer icon](assets/icons/state_machine_player_icon.png)
   > Manage state based on `StateMachine` and parameters inputted
   - `state_machine # StateMachine being played`
   - `active # Activeness of player`
@@ -54,7 +54,7 @@ var condition = transition.conditions[condition_name] # keyed by condition name
 - [State](src/states/State.gd)
   > Resource that represent a state
   - `name`
-- [StateMachine](src/states/StateMachine.gd)(`extends State`)
+- [StateMachine](src/states/StateMachine.gd)(`extends State`) ![StateMachine icon](assets/icons/state_machine_icon.png)
   > `StateMachine` is also a `State`, but mainly used as container of `State`s and `Transitions`s
   - `states`
   - `transitions`
