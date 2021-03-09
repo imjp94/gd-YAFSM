@@ -410,26 +410,26 @@ func _gui_input(event):
 					if _current_connection:
 						# Connection end
 						var from = _current_connection.from_node.name
-						if hit_node is FlowChartNode and _request_connect_to(hit_node.name if hit_node else null):
+						var to = hit_node.name if hit_node else null
+						if hit_node is FlowChartNode and _request_connect_to(to) and from != to:
 							# Connection success
 							var line
-							var to = hit_node.name
 							if _current_connection.to_node:
 								# Reconnection
 								line = disconnect_node(from, _current_connection.to_node.name)
 								_current_connection.to_node = hit_node
 								_on_node_reconnect_end(from, to)
+								connect_node(from, to, line)
 							else:
 								# New Connection
 								current_layer.content_lines.remove_child(_current_connection.line)
 								line = _current_connection.line
 								_current_connection.to_node = hit_node
-							connect_node(from, to, line)
+								connect_node(from, to, line)
 						else:
 							# Connection failed
 							if _current_connection.to_node:
 								# Reconnection
-								var to = _current_connection.to_node.name
 								_current_connection.join()
 								_on_node_reconnect_failed(from, name)
 							else:
