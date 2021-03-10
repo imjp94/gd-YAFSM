@@ -179,6 +179,9 @@ func _on_state_machine_changed(new_state_machine):
 	select_layer(root_layer)
 	if new_state_machine:
 		current_layer.state_machine = state_machine
+		var validated = StateMachine.validate(new_state_machine)
+		if validated:
+			print("gd-YAFSM: Corrupted StateMachine Resource fixed, save to apply the fix.")
 		draw_graph()
 		check_has_entry()
 

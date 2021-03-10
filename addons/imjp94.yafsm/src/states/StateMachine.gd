@@ -173,3 +173,42 @@ static func join_path(base, dirs):
 		else:
 			path = str(path, "/", dir)
 	return path
+
+# Validate state machine resource to identify and fix error
+static func validate(state_machine):
+	var validated = false
+	for from_key in state_machine.transitions.keys():
+		# Non-existing state found in StateMachine.transitions
+		# See https://github.com/imjp94/gd-YAFSM/issues/6
+		if not (from_key in state_machine.states):
+			validated = true
+			push_warning("gd-YAFSM ValidationError: Non-existing state(%s) found in transition" % from_key)
+			state_machine.transitions.erase(from_key)
+			continue
+
+		var from_transition = state_machine.transitions[from_key]
+		for to_key in from_transition.keys():
+			# Non-existing state found in StateMachine.transitions
+			# See https://github.com/imjp94/gd-YAFSM/issues/6
+			if not (to_key in state_machine.states):
+				validated = true
+				push_warning("gd-YAFSM ValidationError: Non-existing state(%s) found in transition(%s -> %s)" % [to_key, from_key, to_key])
+				from_transition.erase(to_key)
+				continue
+
+			# Mismatch of StateMachine.transitions with Transition.to 
+			# See https://github.com/imjp94/gd-YAFSM/issues/6
+			var to_transition = from_transition[to_key]
+			if to_key != to_transition.to:
+				validated = true
+				push_warning("gd-YAFSM ValidationError: Mismatch of StateMachine.transitions key(%s) with Transition.to(%s)" % [to_key, to_transition.to])
+				to_transition.to = to_key
+
+			# Self connecting transition
+			# See https://github.com/imjp94/gd-YAFSM/issues/5
+			if to_transition.from == to_transition.to:
+				validated = true
+				push_warning("gd-YAFSM ValidationError: Self connecting transition(%s -> %s)" % [to_transition.from, to_transition.to])
+				from_transition.erase(to_key)
+	return validated
+
