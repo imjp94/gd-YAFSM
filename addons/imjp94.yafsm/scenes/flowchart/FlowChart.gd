@@ -285,6 +285,7 @@ func _gui_input(event):
 						# Connecting
 						if _current_connection:
 							var pos = content_position(get_local_mouse_position())
+							var clip_rects = [_current_connection.from_node.get_rect()]
 							# Snapping connecting line
 							for i in current_layer.content_nodes.get_child_count():
 								var child = current_layer.content_nodes.get_child(current_layer.content_nodes.get_child_count()-1 - i) # Inverse order to check from top to bottom of canvas
@@ -292,8 +293,9 @@ func _gui_input(event):
 									if _request_connect_to(child.name):
 										if child.get_rect().has_point(pos):
 											pos = child.rect_position + child.rect_size / 2
+											clip_rects.append(child.get_rect())
 											break
-							_current_connection.line.join(_current_connection.get_from_pos(), pos)
+							_current_connection.line.join_and_clip(_current_connection.get_from_pos(), pos, Vector2.ZERO, clip_rects)
 					elif _is_dragging_node:
 						# Dragging nodes
 						var dragged = content_position(_drag_end_pos) - content_position(_drag_start_pos)
@@ -392,8 +394,9 @@ func _gui_input(event):
 									_is_dragging_node = false
 									var line = create_line_instance()
 									var connection = Connection.new(line, hit_node, null)
-									current_layer._connect_node(line, connection.get_from_pos(), connection.get_from_pos())
+									current_layer._connect_node(connection)
 									_current_connection = connection
+									_current_connection.line.join(_current_connection.get_from_pos(), content_position(event.position))
 							accept_event()
 						if _is_connecting:
 							clear_selection()

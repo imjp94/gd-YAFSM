@@ -46,14 +46,14 @@ func remove_node(node):
 		content_nodes.remove_child(node)
 
 # Called after connection established
-func _connect_node(line, from_pos, to_pos):
-	content_lines.add_child(line)
-	line.join(from_pos, to_pos)
+func _connect_node(connection):
+	content_lines.add_child(connection.line)
+	connection.join()
 
 # Called after connection broken
-func _disconnect_node(line):
-	content_lines.remove_child(line)
-	return line
+func _disconnect_node(connection):
+	content_lines.remove_child(connection.line)
+	return connection.line
 
 # Rename node
 func rename_node(old, new):
@@ -83,7 +83,7 @@ func connect_node(line, from, to, interconnection_offset=0):
 		connections_from = {}
 		_connections[from] = connections_from
 	connections_from[to] = connection
-	_connect_node(line, connection.get_from_pos(), connection.get_to_pos())
+	_connect_node(connection)
 
 	# Check if connection in both ways
 	connections_from = _connections.get(to)
@@ -102,7 +102,7 @@ func disconnect_node(from, to):
 	if not connection:
 		return
 
-	_disconnect_node(connection.line)
+	_disconnect_node(connection)
 	if connections_from.size() == 1:
 		_connections.erase(from)
 	else:
@@ -144,7 +144,7 @@ class Connection:
 
 	# Update line position
 	func join():
-		line.join(get_from_pos(), get_to_pos(), offset)
+		line.join(get_from_pos(), get_to_pos(), offset, [from_node.get_rect() if from_node else Rect2(), to_node.get_rect() if to_node else Rect2()])
 
 	# Return start position of line
 	func get_from_pos():
