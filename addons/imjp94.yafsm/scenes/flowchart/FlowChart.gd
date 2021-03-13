@@ -303,9 +303,10 @@ func _gui_input(event):
 							var selected = _selection[i]
 							if not (selected is FlowChartNode):
 								continue
-							selected.rect_position = (_drag_origins[i] + dragged)
+							selected.rect_position = (_drag_origins[i] + selected.rect_size / 2.0 + dragged)
 							if is_snapping:
 								selected.rect_position = selected.rect_position.snapped(Vector2.ONE * snap)
+							selected.rect_position -= selected.rect_size / 2.0 
 							_on_node_dragged(selected, dragged)
 							emit_signal("dragged", selected, dragged)
 							# Update connection pos
