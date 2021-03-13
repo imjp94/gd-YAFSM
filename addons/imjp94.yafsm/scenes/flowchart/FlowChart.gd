@@ -22,6 +22,8 @@ export var scroll_margin = 100
 export var interconnection_offset = 10
 # Snap amount
 export var snap = 20
+# Zoom amount
+export var zoom = 1.0 setget set_zoom
 
 var content = Control.new() # Root node that hold anything drawn in the flowchart
 var current_layer
@@ -137,16 +139,20 @@ func _on_h_scroll_changed(value):
 func _on_v_scroll_changed(value):
 	content.rect_position.y = -value
 
+func set_zoom(v):
+	zoom = v
+	content.rect_scale = Vector2.ONE * zoom
+
 func _on_zoom_minus_pressed():
-	content.rect_scale -= Vector2.ONE * 0.1
+	set_zoom(zoom - 0.1)
 	update()
 
 func _on_zoom_reset_pressed():
-	content.rect_scale = Vector2.ONE
+	set_zoom(1.0)
 	update()
 
 func _on_zoom_plus_pressed():
-	content.rect_scale += Vector2.ONE * 0.1
+	set_zoom(zoom + 0.1)
 	update()
 
 func _on_snap_button_pressed():
@@ -187,7 +193,6 @@ func _draw():
 	# Draw grid
 	# Refer GraphEdit(https://github.com/godotengine/godot/blob/6019dab0b45e1291e556e6d9e01b625b5076cc3c/scene/gui/graph_edit.cpp#L442)
 	if is_snapping:
-		var zoom = (Vector2.ONE/content.rect_scale).length()
 		var scroll_offset = Vector2(h_scroll.get_value(), v_scroll.get_value());
 		var offset = scroll_offset / zoom
 		var size = rect_size / zoom
@@ -324,15 +329,15 @@ func _gui_input(event):
 			BUTTON_MIDDLE:
 				# Reset zoom
 				if event.doubleclick:
-					content.rect_scale = Vector2.ONE
+					set_zoom(1.0)
 					update()
 			BUTTON_WHEEL_UP:
 				# Zoom in
-				content.rect_scale += Vector2.ONE * 0.01
+				set_zoom(zoom + 0.01)
 				update()
 			BUTTON_WHEEL_DOWN:
 				# Zoom out
-				content.rect_scale -= Vector2.ONE * 0.01
+				set_zoom(zoom - 0.01)
 				update()
 			BUTTON_LEFT:
 				# Hit detection
