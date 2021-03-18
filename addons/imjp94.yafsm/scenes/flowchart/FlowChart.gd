@@ -309,6 +309,7 @@ func _gui_input(event):
 							if not (selected is FlowChartNode):
 								continue
 							selected.rect_position = (_drag_origins[i] + selected.rect_size / 2.0 + dragged)
+							selected.modulate.a = 0.3
 							if is_snapping:
 								selected.rect_position = selected.rect_position.snapped(Vector2.ONE * snap)
 							selected.rect_position -= selected.rect_size / 2.0 
@@ -474,7 +475,9 @@ func _gui_input(event):
 						if was_dragging_node:
 							# Update _drag_origins with new position after dragged
 							for i in _selection.size():
-								_drag_origins[i] = _selection[i].rect_position
+								var selected = _selection[i]
+								_drag_origins[i] = selected.rect_position
+								selected.modulate.a = 1.0
 						_drag_start_pos = _drag_end_pos
 						update()
 
