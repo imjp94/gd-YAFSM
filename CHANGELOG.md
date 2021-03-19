@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.1
+
+- Features:
+    - Add StateMachine.validate() function to identify & fix corrupted StateMachine Resource
+- Improves:
+    - Clip FlowChartLine by connecting nodes
+    - Position nodes by its center
+    - Add transparency when dragging nodes
+- Bugfixes:
+    - Fix self connection is possible when reconnecting line
+
 ## 0.4.0
 
 - Breaking changes:

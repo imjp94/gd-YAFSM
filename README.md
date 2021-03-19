@@ -19,7 +19,7 @@ Designer-friendly Finite State Machine implemented in "Godotic" way
   - [State](#state)
   - [Parameter](#parameter)
 - [Debug](#debug)
-- [Demo](#demo)
+- [Demo](https://github.com/imjp94/gd-yafsm-demo)
 - [Documentation](addons/imjp94.yafsm/README.md)
 
 ## Feature
@@ -94,7 +94,7 @@ That's it!
 
 For most of the case, you don't have to inherit from any custom class by this plugin, simply just connect signals to your existing node and you're good to go.
 
-> See documentation below for more details
+> See [documentation](addons/imjp94.yafsm/README.md) for more details
 
 ## Nested FSM
 
@@ -113,7 +113,7 @@ var nested_state = "App/Game/Play" # EndState can be Entry/Exit
 `StateDirectory` class is provided to traverse state path like file directory:
 
 ```gdscript
-const StateDirectory = preload("addons/imjp94.yafsm/src/StateDirectory.gd)
+const StateDirectory = preload("addons/imjp94.yafsm/src/StateDirectory.gd")
 
 # Handle "transited" signal
 func _on_normal_state_transited(from, to):
