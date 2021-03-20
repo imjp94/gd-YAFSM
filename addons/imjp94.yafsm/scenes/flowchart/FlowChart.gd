@@ -300,7 +300,7 @@ func _gui_input(event):
 											pos = child.rect_position + child.rect_size / 2
 											clip_rects.append(child.get_rect())
 											break
-							_current_connection.line.join_and_clip(_current_connection.get_from_pos(), pos, Vector2.ZERO, clip_rects)
+							_current_connection.line.join(_current_connection.get_from_pos(), pos, Vector2.ZERO, clip_rects)
 					elif _is_dragging_node:
 						# Dragging nodes
 						var dragged = content_position(_drag_end_pos) - content_position(_drag_start_pos)
