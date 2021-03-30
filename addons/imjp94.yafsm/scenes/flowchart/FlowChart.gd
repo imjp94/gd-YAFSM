@@ -38,6 +38,9 @@ var snap_button = Button.new()
 var snap_amount = SpinBox.new()
 
 var is_snapping = true
+var can_gui_select_node = true
+var can_gui_delete_node = true
+var can_gui_connect_node = true
 
 var _is_connecting = false
 var _current_connection
@@ -245,7 +248,7 @@ func _gui_input(event):
 	if event is InputEventKey:
 		match event.scancode:
 			KEY_DELETE:
-				if event.pressed:
+				if event.pressed and can_gui_delete_node:
 					# Delete nodes
 					for node in _selection.duplicate():
 						if node is FlowChartLine:
@@ -380,7 +383,7 @@ func _gui_input(event):
 						_is_dragging_node = true
 						if hit_node is FlowChartLine:
 							current_layer.content_lines.move_child(hit_node, current_layer.content_lines.get_child_count()-1) # Raise selected line to top
-							if event.shift:
+							if event.shift and can_gui_connect_node:
 								# Reconnection Start
 								for from in current_layer._connections.keys():
 									var from_connections = current_layer._connections[from]
@@ -394,7 +397,7 @@ func _gui_input(event):
 											break
 						if hit_node is FlowChartNode:
 							current_layer.content_nodes.move_child(hit_node, current_layer.content_nodes.get_child_count()-1) # Raise selected node to top
-							if event.shift:
+							if event.shift and can_gui_connect_node:
 								# Connection start
 								if _request_connect_from(hit_node.name):
 									_is_connecting = true
@@ -408,7 +411,8 @@ func _gui_input(event):
 						if _is_connecting:
 							clear_selection()
 						else:
-							select(hit_node)
+							if can_gui_select_node:
+								select(hit_node)
 					if not _is_dragging:
 						# Drag start
 						_is_dragging = true
@@ -454,7 +458,7 @@ func _gui_input(event):
 						# Drag end
 						_is_dragging = false
 						_is_dragging_node = false
-						if not (was_connecting or was_dragging_node):
+						if not (was_connecting or was_dragging_node) and can_gui_select_node:
 							var selection_box_rect = get_selection_box_rect()
 							# Select node
 							for node in current_layer.content_nodes.get_children():
@@ -547,6 +551,7 @@ func rename_node(old, new):
 func connect_node(from, to, line=null):
 	if not line:
 		line = create_line_instance()
+	line.name = "%s>%s" % [from, to] # "From>To"
 	current_layer.connect_node(line, from, to, interconnection_offset)
 	_on_node_connected(from, to)
 	emit_signal("connection", from, to, line)
