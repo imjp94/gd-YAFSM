@@ -22,6 +22,7 @@ func select_dir(dir):
 # Add directory button
 func add_dir(dir):
 	var button = Button.new()
+	button.name = dir
 	button.flat = true
 	button.text = dir
 	add_child(button)

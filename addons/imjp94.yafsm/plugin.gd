@@ -39,10 +39,12 @@ func _enter_tree():
 	state_machine_editor.condition_visibility.texture_pressed = editor_base_control.get_icon("GuiVisibilityVisible", "EditorIcons")
 	state_machine_editor.condition_visibility.texture_normal = editor_base_control.get_icon("GuiVisibilityHidden", "EditorIcons")
 	state_machine_editor.editor_accent_color = editor_base_control.get_color("accent_color", "Editor")
+	state_machine_editor.current_layer.editor_accent_color = state_machine_editor.editor_accent_color
 	state_machine_editor.transition_arrow_icon = editor_base_control.get_icon("TransitionImmediateBig", "EditorIcons")
 	state_machine_editor.connect("inspector_changed", self, "_on_inspector_changed")
 	state_machine_editor.connect("node_selected", self, "_on_StateMachineEditor_node_selected")
 	state_machine_editor.connect("node_deselected", self, "_on_StateMachineEditor_node_deselected")
+	state_machine_editor.connect("debug_mode_changed", self, "_on_StateMachineEditor_debug_mode_changed")
 	# Force anti-alias for default font, so rotated text will looks smoother
 	var font = editor_base_control.get_font("main", "EditorFonts")
 	font.use_filter = true
@@ -59,6 +61,11 @@ func _exit_tree():
 func handles(object):
 	if object is StateMachine:
 		return true
+	if object is StateMachinePlayer:
+		if object.get_class() == "ScriptEditorDebuggerInspectedObject":
+			set_focused_object(object)
+			state_machine_editor.debug_mode = true
+			return false
 	return false
 
 func edit(object):
@@ -90,7 +97,10 @@ func _on_focused_object_changed(new_obj):
 		show_state_machine_editor()
 		var state_machine
 		if focused_object is StateMachinePlayer:
-			state_machine = focused_object.state_machine
+			if focused_object.get_class() == "ScriptEditorDebuggerInspectedObject":
+				state_machine = focused_object.get("Members/state_machine")
+			else:
+				state_machine = focused_object.state_machine
 			state_machine_editor.state_machine_player = focused_object
 		elif focused_object is StateMachine:
 			state_machine = focused_object
@@ -114,6 +124,13 @@ func _on_StateMachineEditor_node_selected(node):
 
 func _on_StateMachineEditor_node_deselected(node):
 	get_editor_interface().inspect_object(state_machine_editor.state_machine)
+
+func _on_StateMachineEditor_debug_mode_changed(new_debug_mode):
+	if not new_debug_mode:
+		state_machine_editor.debug_mode = false
+		state_machine_editor.state_machine_player = null
+		set_focused_object(null)
+		hide_state_machine_editor()
 
 func set_focused_object(obj):
 	if focused_object != obj:
