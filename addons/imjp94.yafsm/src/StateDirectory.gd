@@ -32,6 +32,12 @@ func back():
 	
 	return null
 
+# Move to specified index and return state
+func goto(index):
+	assert(index > -1 and index < _dirs.size())
+	_current_index = index
+	return get_current_end()
+
 # Check if directory has next level
 func has_next():
 	return _current_index < _dirs.size() - 1
