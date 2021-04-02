@@ -33,6 +33,7 @@ onready var convert_to_state_confirmation = $ConvertToStateConfirmation
 onready var save_dialog = $SaveDialog
 onready var create_new_state_machine_container = $MarginContainer
 onready var create_new_state_machine = $MarginContainer/CreateNewStateMachine
+onready var param_panel = $ParametersPanel
 var path_viewer = HBoxContainer.new()
 var condition_visibility = TextureButton.new()
 var unsaved_indicator = Label.new()
@@ -139,6 +140,9 @@ func _process(delta):
 			for i in range(1, missing_count + 1):
 				set_current_state(stack[prev_index + i])
 	_last_stack = stack
+	var params = state_machine_player.get("Members/_parameters")
+	var local_params = state_machine_player.get("Members/_local_parameters")
+	param_panel.update_params(params, local_params)
 
 func _on_path_viewer_dir_pressed(dir, index):
 	var path = path_viewer.select_dir(dir)
@@ -220,6 +224,7 @@ func _on_condition_visibility_pressed():
 
 func _on_debug_mode_changed(new_debug_mode):
 	if new_debug_mode:
+		param_panel.show()
 		add_message(DEBUG_MODE_MSG.key, DEBUG_MODE_MSG.text)
 		set_process(true)
 		# mouse_filter = MOUSE_FILTER_IGNORE
@@ -229,6 +234,8 @@ func _on_debug_mode_changed(new_debug_mode):
 		can_gui_name_edit = false
 		can_gui_context_menu = false
 	else:
+		param_panel.clear_params()
+		param_panel.hide()
 		remove_message(DEBUG_MODE_MSG.key)
 		set_process(false)
 		can_gui_select_node = true
