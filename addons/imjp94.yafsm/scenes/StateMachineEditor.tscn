@@ -1,11 +1,15 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://addons/imjp94.yafsm/scenes/StateNodeContextMenu.tscn" type="PackedScene" id=1]
 [ext_resource path="res://addons/imjp94.yafsm/scenes/StateMachineEditor.gd" type="Script" id=2]
 [ext_resource path="res://addons/imjp94.yafsm/scenes/ContextMenu.tscn" type="PackedScene" id=3]
+[ext_resource path="res://addons/imjp94.yafsm/scenes/ParametersPanel.gd" type="Script" id=4]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0, 0, 0, 0.203922 )
+
+[sub_resource type="StyleBoxFlat" id=2]
+bg_color = Color( 0, 0, 0, 0.243137 )
 
 [node name="StateMachineEditor" type="Control"]
 anchor_right = 1.0
@@ -50,6 +54,7 @@ text = "Create new StateMachine"
 items = [ "Add State", null, 0, false, false, 0, 0, null, "", false, "Add Entry", null, 0, false, false, 1, 0, null, "", false, "Add Exit", null, 0, false, false, 2, 0, null, "", false ]
 
 [node name="StateNodeContextMenu" parent="." instance=ExtResource( 1 )]
+items = [ "Copy", null, 0, false, false, 0, 0, null, "", false, "Duplicate", null, 0, false, false, 1, 0, null, "", false, "", null, 0, false, false, 2, 0, null, "", true, "Convert to State", null, 0, false, false, 3, 0, null, "", false ]
 
 [node name="SaveDialog" type="ConfirmationDialog" parent="."]
 margin_right = 200.0
@@ -61,6 +66,70 @@ margin_bottom = 70.0
 window_title = "Convert StateMachine to State"
 dialog_text = "All nested states beneath it will be lost, are you sure about that?"
 dialog_autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ParametersPanel" type="MarginContainer" parent="."]
+visible = false
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -32.0
+margin_top = -32.0
+grow_horizontal = 0
+grow_vertical = 0
+custom_constants/margin_right = 8
+custom_constants/margin_top = 8
+custom_constants/margin_left = 8
+custom_constants/margin_bottom = 8
+script = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PanelContainer" type="PanelContainer" parent="ParametersPanel"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 42.0
+margin_bottom = 48.0
+custom_styles/panel = SubResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MarginContainer" type="MarginContainer" parent="ParametersPanel/PanelContainer"]
+margin_right = 34.0
+margin_bottom = 40.0
+custom_constants/margin_right = 8
+custom_constants/margin_top = 8
+custom_constants/margin_left = 8
+custom_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ParametersPanel/PanelContainer/MarginContainer"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 26.0
+margin_bottom = 32.0
+
+[node name="MarginContainer" type="MarginContainer" parent="ParametersPanel/PanelContainer/MarginContainer/VBoxContainer"]
+margin_right = 18.0
+margin_bottom = 20.0
+
+[node name="Button" type="Button" parent="ParametersPanel/PanelContainer/MarginContainer/VBoxContainer/MarginContainer"]
+margin_right = 18.0
+margin_bottom = 20.0
+size_flags_horizontal = 10
+text = "_"
+
+[node name="GridContainer" type="GridContainer" parent="ParametersPanel/PanelContainer/MarginContainer/VBoxContainer"]
+margin_top = 24.0
+margin_right = 18.0
+margin_bottom = 24.0
+custom_constants/vseparation = 8
+custom_constants/hseparation = 16
+columns = 4
 __meta__ = {
 "_edit_use_anchors_": false
 }
