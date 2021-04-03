@@ -19,6 +19,12 @@ static func popup_on_target(popup, target):
 	popup.set_position(cp_rect.position)
 	popup.popup()
 
+static func get_complementary_color(color):
+	var r = max(color.r, max(color.b, color.g)) + min(color.r, min(color.b, color.g)) - color.r
+	var g = max(color.r, max(color.b, color.g)) + min(color.r, min(color.b, color.g)) - color.g
+	var b = max(color.r, max(color.b, color.g)) + min(color.r, min(color.b, color.g)) - color.b
+	return Color(r, g, b)
+
 class CohenSutherland:
 	const INSIDE = 0 # 0000
 	const LEFT = 1 # 0001
