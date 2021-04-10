@@ -59,6 +59,9 @@ func _init():
 	selection_stylebox.bg_color = Color(0, 0, 0, 0.3)
 	selection_stylebox.set_border_width_all(1)
 
+	content.mouse_filter = MOUSE_FILTER_IGNORE
+	add_child(content)
+
 	add_child(h_scroll)
 	h_scroll.set_anchors_and_margins_preset(PRESET_BOTTOM_WIDE)
 	h_scroll.connect("value_changed", self, "_on_h_scroll_changed")
@@ -71,9 +74,6 @@ func _init():
 
 	h_scroll.margin_right = -v_scroll.rect_size.x
 	v_scroll.margin_bottom = -h_scroll.rect_size.y
-
-	content.mouse_filter = MOUSE_FILTER_IGNORE
-	add_child(content)
 
 	add_layer_to(content)
 	select_layer_at(0)
