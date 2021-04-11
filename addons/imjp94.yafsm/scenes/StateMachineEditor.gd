@@ -143,6 +143,7 @@ func _process(delta):
 	var params = state_machine_player.get("Members/_parameters")
 	var local_params = state_machine_player.get("Members/_local_parameters")
 	param_panel.update_params(params, local_params)
+	get_focused_layer(_current_state).debug_update(_current_state, params, local_params)
 
 func _on_path_viewer_dir_pressed(dir, index):
 	var path = path_viewer.select_dir(dir)
