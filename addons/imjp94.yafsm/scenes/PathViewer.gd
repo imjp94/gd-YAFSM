@@ -26,6 +26,7 @@ func remove_dir_until(index):
 		to_remove.append(child)
 	for n in to_remove:
 		remove_child(n)
+		n.queue_free()
 
 # Return current working directory
 func get_cwd():
