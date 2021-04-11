@@ -5,7 +5,7 @@ const Transition = preload("../../src/transitions/Transition.gd")
 export var upright_angle_range = 10.0
 
 onready var label_margin = $MarginContainer
-onready var label = $MarginContainer/Label
+onready var vbox = $MarginContainer/VBoxContainer
 
 var undo_redo
 
@@ -43,12 +43,15 @@ func _draw():
 
 # Update overlay text
 func update_label():
-	label.text = ""
 	if transition:
 		for condition in transition.conditions.values():
-			if label.text.length() > 0:
-				label.text = str(label.text, "\n")
-			label.text = str(label.text, condition.display_string())
+			var label = vbox.get_node_or_null(condition.name)
+			if not label:
+				label = Label.new()
+				label.align = label.ALIGN_CENTER
+				label.name = condition.name
+				vbox.add_child(label)
+			label.text = condition.display_string()
 	update()
 
 func _on_transition_changed(new_transition):
@@ -74,6 +77,9 @@ func _on_transition_condition_removed(condition):
 	update_label()
 
 func _on_condition_name_changed(from, to):
+	var label = vbox.get_node_or_null(from)
+	if label:
+		label.name = to
 	update_label()
 
 func _on_condition_display_string_changed(display_string):
