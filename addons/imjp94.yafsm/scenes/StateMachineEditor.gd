@@ -45,12 +45,9 @@ var _last_index = 0
 var _last_path = ""
 var _message_box_dict = {}
 var _context_node
-var _to_free
 
 
 func _init():
-	_to_free = []
-
 	path_viewer.mouse_filter = MOUSE_FILTER_IGNORE
 	path_viewer.set_script(PathViewer)
 	path_viewer.connect("dir_pressed", self, "_on_path_viewer_dir_pressed")
@@ -307,7 +304,7 @@ func clear_graph():
 	for child in current_layer.content_nodes.get_children():
 		if child is StateNodeScript:
 			current_layer.content_nodes.remove_child(child)
-			_to_free.append(child)
+			child.queue_free()
 	unsaved_indicator.text = "" # Clear graph is not action by user
 
 # Intialize editor with current editing StateMachine
