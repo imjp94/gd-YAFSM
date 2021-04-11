@@ -5,15 +5,19 @@
 
 [node name="TransitionLine" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
+upright_angle_range = 10.0
 
 [node name="MarginContainer" type="MarginContainer" parent="." index="0"]
 margin_left = -47.5
 margin_top = -46.0
 margin_right = 47.5
+grow_horizontal = 0
+grow_vertical = 0
 rect_pivot_offset = Vector2( 0, 2.5 )
 mouse_filter = 2
 
 [node name="Label" type="Label" parent="MarginContainer" index="0"]
+visible = false
 margin_left = 16.0
 margin_top = 16.0
 margin_right = 79.0
@@ -23,3 +27,11 @@ size_flags_horizontal = 6
 size_flags_vertical = 6
 text = "Transition"
 align = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" index="1"]
+margin_left = 47.0
+margin_top = 23.0
+margin_right = 47.0
+margin_bottom = 23.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
