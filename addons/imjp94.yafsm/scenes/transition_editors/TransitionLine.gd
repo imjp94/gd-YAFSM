@@ -1,6 +1,7 @@
 tool
 extends "res://addons/imjp94.yafsm/scenes/flowchart/FlowChartLine.gd"
 const Transition = preload("../../src/transitions/Transition.gd")
+const ValueCondition = preload("../../src/conditions/ValueCondition.gd")
 
 export var upright_angle_range = 10.0
 
@@ -10,7 +11,9 @@ onready var vbox = $MarginContainer/VBoxContainer
 var undo_redo
 
 var transition setget set_transition
+var template = "{condition_name} {condition_comparation} {condition_value}"
 
+var _template_var = {}
 var _to_free
 
 func _init():
@@ -44,6 +47,7 @@ func _draw():
 # Update overlay text
 func update_label():
 	if transition:
+		var template_var = {"condition_name": "", "condition_comparation": "", "condition_value": null}
 		for condition in transition.conditions.values():
 			var label = vbox.get_node_or_null(condition.name)
 			if not label:
@@ -51,7 +55,16 @@ func update_label():
 				label.align = label.ALIGN_CENTER
 				label.name = condition.name
 				vbox.add_child(label)
-			label.text = condition.display_string()
+			if "value" in condition:
+				template_var["condition_name"] = condition.name
+				template_var["condition_comparation"] = ValueCondition.COMPARATION_SYMBOLS[condition.comparation]
+				template_var["condition_value"] = condition.get_value_string()
+				label.text = template.format(template_var)
+				var override_template_var = _template_var.get(condition.name)
+				if override_template_var:
+					label.text = label.text.format(override_template_var)
+			else:
+				label.text = condition.name
 	update()
 
 func _on_transition_changed(new_transition):
