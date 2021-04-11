@@ -11,10 +11,8 @@ var undo_redo
 
 var state setget set_state
 
-var _to_free
 
 func _init():
-	_to_free = []
 	set_state(State.new("State"))
 
 func _ready():

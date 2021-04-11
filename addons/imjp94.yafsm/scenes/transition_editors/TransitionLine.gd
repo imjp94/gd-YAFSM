@@ -14,10 +14,8 @@ var transition setget set_transition
 var template = "{condition_name} {condition_comparation} {condition_value}"
 
 var _template_var = {}
-var _to_free
 
 func _init():
-	_to_free = []
 	set_transition(Transition.new())
 
 func _draw():

@@ -40,6 +40,9 @@ func _ready():
 	add.connect("pressed", self, "_on_add_pressed")
 	add_popup_menu.connect("index_pressed", self, "_on_add_popup_menu_index_pressed")
 
+func _exit_tree():
+	free_node_from_undo_redo() # Managed by EditorInspector
+
 func _on_header_gui_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed:
@@ -156,3 +159,4 @@ func free_node_from_undo_redo():
 		if is_instance_valid(node):
 			node.queue_free()
 	_to_free.clear()
+	undo_redo.clear_history(false) # TODO: Should be handled by plugin.gd (Temporary solution as only TransitionEditor support undo/redo)
