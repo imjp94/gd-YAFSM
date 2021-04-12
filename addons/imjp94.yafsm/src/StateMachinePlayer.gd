@@ -90,6 +90,7 @@ func _transit():
 	_was_transited = !!next_state
 	_is_param_edited = false
 	_flush_trigger(_parameters)
+	_flush_trigger(_local_parameters, true)
 
 	if _was_transited:
 		_on_state_changed(from, to)
@@ -147,17 +148,19 @@ func _on_active_changed():
 
 	if active:
 		_flush_trigger(_parameters)
+		_flush_trigger(_local_parameters, true)
 		_on_process_mode_changed()
 		_transit()
 	else:
 		set_physics_process(false)
 		set_process(false)
 
-# Remove all trigger(param with null value) in _parameters, only get called after _transit
-func _flush_trigger(params):
+# Remove all trigger(param with null value) from provided params, only get called after _transit
+# Trigger another call of _flush_trigger on first layer of dictionary if nested is true
+func _flush_trigger(params, nested=false):
 	for param_key in params.keys():
 		var value = params[param_key]
-		if value is Dictionary: # TODO: Differentiate nested params from user defined dictionary
+		if nested and value is Dictionary:
 			_flush_trigger(value)
 		if value == null: # Param with null as value is treated as trigger
 			params.erase(param_key)
