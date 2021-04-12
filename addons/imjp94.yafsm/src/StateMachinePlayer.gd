@@ -206,6 +206,9 @@ func update(delta=get_physics_process_delta_time()):
 func set_trigger(name, auto_update=true):
 	set_param(name, null)
 
+func set_nested_trigger(path, name, auto_update=true):
+	set_nested_param(path, name, null, auto_update)
+
 # Set param(null value treated as trigger) to be tested with condition, then trigger _transit on next update, 
 # automatically call update() if process_mode set to MANUAL and auto_update true
 # Nested param can be accessed through path "path/to/param_name", for example, "App/Game/is_playing"
@@ -214,9 +217,9 @@ func set_param(name, value, auto_update=true):
 	if "/" in name:
 		path = path_backward(name)
 		name = path_end_dir(name)
-	_set_param(path, name, value, auto_update)
+	set_nested_param(path, name, value, auto_update)
 
-func _set_param(path, name, value, auto_update=true):
+func set_nested_param(path, name, value, auto_update=true):
 	if path.empty():
 		_parameters[name] = value
 	else:
@@ -237,9 +240,9 @@ func erase_param(name, auto_update=true):
 	if "/" in name:
 		path = path_backward(name)
 		name = path_end_dir(name)
-	return _erase_param(path, name, auto_update)
+	return erase_nested_param(path, name, auto_update)
 
-func _erase_param(path, name, auto_update=true):
+func erase_nested_param(path, name, auto_update=true):
 	var result = false
 	if path.empty():
 		result = _parameters.erase(name)
@@ -274,9 +277,9 @@ func get_param(name, default=null):
 	if "/" in name:
 		path = path_backward(name)
 		name = path_end_dir(name)
-	return _get_param(path, name, default)
+	return get_nested_param(path, name, default)
 
-func _get_param(path, name, default=null):
+func get_nested_param(path, name, default=null):
 	if path.empty():
 		return _parameters.get(name, default)
 	else:
@@ -294,9 +297,9 @@ func has_param(name):
 	if "/" in name:
 		path = path_backward(name)
 		name = path_end_dir(name)
-	return _has_param(path, name)
+	return has_nested_param(path, name)
 
-func _has_param(path, name):
+func has_nested_param(path, name):
 	if path.empty():
 		return name in _parameters
 	else:
