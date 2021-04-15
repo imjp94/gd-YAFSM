@@ -1,15 +1,32 @@
 # Changelog
 
+## 0.5.0
+
+- Breaking changes:
+  - Rename StateMachinePlayer._*_param() functions to *_nested_param()
+- Features:
+  - Support remote debug when select StateMachinePlayer node in remote SceneTree
+    - View live parameters with ParameterPanel
+    - Visualize flow of StateMachine
+- Improves:
+  - Add StateDirectory.goto()
+  - Minimize size of StateNode name edit for ease of opening nested layer
+- Bugfixes:
+  - Fix graph content above scrollbars
+  - Fix StateMachineEditor & PathViewer didn't free removed child
+  - Fix StateMachinePlayer's nested trigger are not flushed
+  - Fix hard to select text in StateNode name edit
+
 ## 0.4.1
 
 - Features:
-    - Add StateMachine.validate() function to identify & fix corrupted StateMachine Resource
+  - Add StateMachine.validate() function to identify & fix corrupted StateMachine Resource
 - Improves:
-    - Clip FlowChartLine by connecting nodes
-    - Position nodes by its center
-    - Add transparency when dragging nodes
+  - Clip FlowChartLine by connecting nodes
+  - Position nodes by its center
+  - Add transparency when dragging nodes
 - Bugfixes:
-    - Fix self connection is possible when reconnecting line
+  - Fix self connection is possible when reconnecting line
 
 ## 0.4.0
 
