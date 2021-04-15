@@ -1,7 +1,5 @@
 # ![gd-YAFSM icon](icon.png)gd-YAFSM (**g**o**d**ot-**Y**et **A**nother **F**inite **S**tate **M**achine)
 
-![Editor Showcase](screenshots/yafsm_editor_showcase.gif)
-
 Designer-friendly Finite State Machine implemented in "Godotic" way
 
 ⚠️ **Warning**
@@ -25,7 +23,13 @@ Designer-friendly Finite State Machine implemented in "Godotic" way
 ## Feature
 
 - Designer-friendly
+
+  ![Editor Showcase](screenshots/yafsm_editor_showcase.gif)
   > Design `StateMachine` in a flowchart-like editor
+- Remote Debug
+
+  ![Remote Debug Showcase](screenshots/yafsm_remote_debug_showcase.gif)
+  > Visualize flow of `StateMachine` & inspect parameters in realtime
 - Self-explanatory
 
   ![Sample State Machine](screenshots/yafsm_sample_fsm.png)
@@ -83,7 +87,7 @@ After setup `StateMachine` with editor, you can connect to the following signals
 And control `StateMachinePlayer` by accessing parameter:
 
 ```gdscript
-var smp = get_node(StateMachinePlayer)
+var smp = get_node("StateMachinePlayer")
 smp.set_trigger("jump")
 smp.set_param("jump_count", 1)
 smp.get_param("on_floor", false)
@@ -123,7 +127,7 @@ func _on_normal_state_transited(from, to):
 		"Game":
 			print("Game")
 		"Exit":
-			print("Exit)
+			print("Exit")
 
 # Handle "transited" signal
 func _on_nested_state_transited(from, to):
@@ -137,7 +141,7 @@ func _on_nested_state_transited(from, to):
 				"Entry":
 					print("Game Enter") # Game/Entry
 		"Exit":
-			print("Exit)
+			print("Exit")
 ```
 
 ### Parameter
@@ -152,22 +156,27 @@ Behind the scene, `StateMachinePlayer` always differentiate parameters into 2 ty
   - Erased upon Exit, for example, "App/Game/Exit" will cause all local parameter("App/Game/{param_name}") to be erased
 
 ```gdscript
-var smp = get_node(StateMachinePlayer)
+var smp = get_node("StateMachinePlayer")
 var global_param = smp.get_param("state")
 var local_param = smp.get_param("App/Game/playing")
+local_param = smp.get_nested_param("App/Game", "playing")
+smp.set_param("App/Game/End/victory", true)
+smp.set_nested_param("App/Game", "paused", true)
 ```
 
 Besides of controlling `StateMachinePlayer`, it's useful to set arbitrary value with `set_param`
 
 ```gdscript
-var smp = get_node(StateMachinePlayer)
+var smp = get_node("StateMachinePlayer")
 smp.set_param("game", preload("game.scn"))
 var game_scn = smp.get_param("game")
 ```
 
 ### Debug
 
-- Stack
+- Editor
+  > When playing scene, select `StateMachinePlayer` node in remote scene tree to view flow of `StateMachine` in realtime
+- In-game
   > Add `res://addons/imjp94.yafsm/src/debugger/StackPlayerDebugger.tscn` to `StackPlayer`(so as `StateMachinePlayer`) to visualize the stack on screen.
   
 ## Demo
