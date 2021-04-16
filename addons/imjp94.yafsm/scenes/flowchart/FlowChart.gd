@@ -256,12 +256,12 @@ func _gui_input(event):
 							for connections_from in current_layer._connections.duplicate().values():
 								for connection in connections_from.duplicate().values():
 									if connection.line == node:
-										disconnect_node(connection.from_node.name, connection.to_node.name).queue_free()
+										disconnect_node(current_layer, connection.from_node.name, connection.to_node.name).queue_free()
 						elif node is FlowChartNode:
-							remove_node(node.name)
+							remove_node(current_layer, node.name)
 							for connection_pair in current_layer.get_connection_list():
 								if connection_pair.from == node.name or connection_pair.to == node.name:
-									disconnect_node(connection_pair.from, connection_pair.to).queue_free()
+									disconnect_node(current_layer, connection_pair.from, connection_pair.to).queue_free()
 					accept_event()
 			KEY_C:
 				if event.pressed and event.control:
@@ -271,12 +271,12 @@ func _gui_input(event):
 			KEY_D:
 				if event.pressed and event.control:
 					# Duplicate node directly from selection
-					duplicate_nodes(_selection.duplicate())
+					duplicate_nodes(current_layer, _selection.duplicate())
 					accept_event()
 			KEY_V:
 				if event.pressed and event.control:
 					# Paste node from _copying_nodes
-					duplicate_nodes(_copying_nodes)
+					duplicate_nodes(current_layer, _copying_nodes)
 					accept_event()
 
 	if event is InputEventMouseMotion:
@@ -298,7 +298,7 @@ func _gui_input(event):
 							for i in current_layer.content_nodes.get_child_count():
 								var child = current_layer.content_nodes.get_child(current_layer.content_nodes.get_child_count()-1 - i) # Inverse order to check from top to bottom of canvas
 								if child is FlowChartNode and child.name != _current_connection.from_node.name:
-									if _request_connect_to(child.name):
+									if _request_connect_to(current_layer, child.name):
 										if child.get_rect().has_point(pos):
 											pos = child.rect_position + child.rect_size / 2
 											clip_rects.append(child.get_rect())
@@ -316,7 +316,7 @@ func _gui_input(event):
 							if is_snapping:
 								selected.rect_position = selected.rect_position.snapped(Vector2.ONE * snap)
 							selected.rect_position -= selected.rect_size / 2.0 
-							_on_node_dragged(selected, dragged)
+							_on_node_dragged(current_layer, selected, dragged)
 							emit_signal("dragged", selected, dragged)
 							# Update connection pos
 							for from in current_layer._connections:
@@ -393,13 +393,13 @@ func _gui_input(event):
 											_is_connecting = true
 											_is_dragging_node = false
 											_current_connection = connection
-											_on_node_reconnect_begin(from, to)
+											_on_node_reconnect_begin(current_layer, from, to)
 											break
 						if hit_node is FlowChartNode:
 							current_layer.content_nodes.move_child(hit_node, current_layer.content_nodes.get_child_count()-1) # Raise selected node to top
 							if event.shift and can_gui_connect_node:
 								# Connection start
-								if _request_connect_from(hit_node.name):
+								if _request_connect_from(current_layer, hit_node.name):
 									_is_connecting = true
 									_is_dragging_node = false
 									var line = create_line_instance()
@@ -425,31 +425,31 @@ func _gui_input(event):
 						# Connection end
 						var from = _current_connection.from_node.name
 						var to = hit_node.name if hit_node else null
-						if hit_node is FlowChartNode and _request_connect_to(to) and from != to:
+						if hit_node is FlowChartNode and _request_connect_to(current_layer, to) and from != to:
 							# Connection success
 							var line
 							if _current_connection.to_node:
 								# Reconnection
-								line = disconnect_node(from, _current_connection.to_node.name)
+								line = disconnect_node(current_layer, from, _current_connection.to_node.name)
 								_current_connection.to_node = hit_node
-								_on_node_reconnect_end(from, to)
-								connect_node(from, to, line)
+								_on_node_reconnect_end(current_layer, from, to)
+								connect_node(current_layer, from, to, line)
 							else:
 								# New Connection
 								current_layer.content_lines.remove_child(_current_connection.line)
 								line = _current_connection.line
 								_current_connection.to_node = hit_node
-								connect_node(from, to, line)
+								connect_node(current_layer, from, to, line)
 						else:
 							# Connection failed
 							if _current_connection.to_node:
 								# Reconnection
 								_current_connection.join()
-								_on_node_reconnect_failed(from, name)
+								_on_node_reconnect_failed(current_layer, from, name)
 							else:
 								# New Connection
 								_current_connection.line.queue_free()
-								_on_node_connect_failed(from)
+								_on_node_connect_failed(current_layer, from)
 						_is_connecting = false
 						_current_connection = null
 						accept_event()
@@ -492,8 +492,8 @@ func get_selection_box_rect():
 	return Rect2(pos, size)
 
 # Get required scroll rect base on content
-func get_scroll_rect():
-	return current_layer.get_scroll_rect(scroll_margin)
+func get_scroll_rect(layer=current_layer):
+	return layer.get_scroll_rect(scroll_margin)
 
 func add_layer_to(target):
 	var layer = create_layer_instance()
@@ -513,17 +513,17 @@ func select_layer(layer):
 	_on_layer_selected(layer)
 
 # Add node
-func add_node(node):
-	current_layer.add_node(node)
-	_on_node_added(node)
+func add_node(layer, node):
+	layer.add_node(node)
+	_on_node_added(layer, node)
 
 # Remove node
-func remove_node(node_name):
-	var node = current_layer.content_nodes.get_node_or_null(node_name)
+func remove_node(layer, node_name):
+	var node = layer.content_nodes.get_node_or_null(node_name)
 	if node:
 		deselect(node) # Must deselct before remove to make sure _drag_origins synced with _selections
-		current_layer.remove_node(node)
-		_on_node_removed(node_name)
+		layer.remove_node(node)
+		_on_node_removed(layer, node_name)
 
 # Called after connection established
 func _connect_node(line, from_pos, to_pos):
@@ -544,29 +544,29 @@ func create_line_instance():
 	return FlowChartLineScene.instance()
 
 # Rename node
-func rename_node(old, new):
-	current_layer.rename_node(old, new)
+func rename_node(layer, old, new):
+	layer.rename_node(old, new)
 
 # Connect two nodes with a line
-func connect_node(from, to, line=null):
+func connect_node(layer, from, to, line=null):
 	if not line:
 		line = create_line_instance()
 	line.name = "%s>%s" % [from, to] # "From>To"
-	current_layer.connect_node(line, from, to, interconnection_offset)
-	_on_node_connected(from, to)
+	layer.connect_node(line, from, to, interconnection_offset)
+	_on_node_connected(layer, from, to)
 	emit_signal("connection", from, to, line)
 
 # Break a connection between two node
-func disconnect_node(from, to):
-	var line = current_layer.disconnect_node(from, to)
+func disconnect_node(layer, from, to):
+	var line = layer.disconnect_node(from, to)
 	deselect(line) # Since line is selectable as well
-	_on_node_disconnected(from, to)
+	_on_node_disconnected(layer, from, to)
 	emit_signal("disconnection", from, to)
 	return line
 
 # Clear all connections
-func clear_connections():
-	current_layer.clear_connections()
+func clear_connections(layer=current_layer):
+	layer.clear_connections()
 
 # Select a node(can be a line)
 func select(node):
@@ -594,7 +594,7 @@ func clear_selection():
 	_selection.clear()
 
 # Duplicate given nodes in editor
-func duplicate_nodes(nodes):
+func duplicate_nodes(layer, nodes):
 	clear_selection()
 	var new_nodes = []
 	for i in nodes.size():
@@ -605,7 +605,7 @@ func duplicate_nodes(nodes):
 		var offset = content_position(get_local_mouse_position()) - content_position(_drag_end_pos)
 		new_node.rect_position = new_node.rect_position + offset
 		new_nodes.append(new_node)
-		add_node(new_node)
+		add_node(layer, new_node)
 		select(new_node)
 	# Duplicate connection within selection
 	for i in nodes.size():
@@ -615,8 +615,8 @@ func duplicate_nodes(nodes):
 				for j in nodes.size():
 					var to_node = nodes[j]
 					if to_node.name == connection_pair.to:
-						connect_node(new_nodes[i].name, new_nodes[j].name)
-	_on_duplicated(nodes, new_nodes)
+						connect_node(layer, new_nodes[i].name, new_nodes[j].name)
+	_on_duplicated(layer, nodes, new_nodes)
 
 # Called after layer selected(current_layer changed)
 func _on_layer_selected(layer):
@@ -626,45 +626,45 @@ func _on_layer_deselected(layer):
 	pass
 
 # Called after a node added
-func _on_node_added(node):
+func _on_node_added(layer, node):
 	pass
 
 # Called after a node removed
-func _on_node_removed(node):
+func _on_node_removed(layer, node):
 	pass
 
 # Called when a node dragged
-func _on_node_dragged(node, dragged):
+func _on_node_dragged(layer, node, dragged):
 	pass
 
 # Called when connection established between two nodes
-func _on_node_connected(from, to):
+func _on_node_connected(layer, from, to):
 	pass
 
 # Called when connection broken
-func _on_node_disconnected(from, to):
+func _on_node_disconnected(layer, from, to):
 	pass
 
-func _on_node_connect_failed(from):
+func _on_node_connect_failed(layer, from):
 	pass
 
-func _on_node_reconnect_begin(from, to):
+func _on_node_reconnect_begin(layer, from, to):
 	pass
 
-func _on_node_reconnect_end(from, to):
+func _on_node_reconnect_end(layer, from, to):
 	pass
 
-func _on_node_reconnect_failed(from, to):
+func _on_node_reconnect_failed(layer, from, to):
 	pass
 
-func _request_connect_from(from):
+func _request_connect_from(layer, from):
 	return true
 
-func _request_connect_to(to):
+func _request_connect_to(layer, to):
 	return true
 
 # Called when nodes duplicated
-func _on_duplicated(old_nodes, new_nodes):
+func _on_duplicated(layer, old_nodes, new_nodes):
 	pass
 
 # Convert position in FlowChart space to content(takes translation/scale of content into account)
@@ -672,5 +672,5 @@ func content_position(pos):
 	return (pos - content.rect_position - content.rect_pivot_offset * (Vector2.ONE - content.rect_scale)) * 1.0/content.rect_scale
 
 # Return array of dictionary of connection as such [{"from1": "to1"}, {"from2": "to2"}]
-func get_connection_list():
-	return current_layer.get_connection_list()
+func get_connection_list(layer=current_layer):
+	return layer.get_connection_list()

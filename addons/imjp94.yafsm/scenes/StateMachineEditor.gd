@@ -180,7 +180,7 @@ func _on_context_menu_index_pressed(index):
 				return
 			new_node.name = State.EXIT_STATE
 	new_node.rect_position = content_position(get_local_mouse_position())
-	add_node(new_node)
+	add_node(current_layer, new_node)
 
 func _on_state_node_context_menu_index_pressed(index):
 	if not _context_node:
@@ -191,7 +191,7 @@ func _on_state_node_context_menu_index_pressed(index):
 			_copying_nodes = [_context_node]
 			_context_node = null
 		1: # Duplicate
-			duplicate_nodes([_context_node])
+			duplicate_nodes(current_layer, [_context_node])
 			_context_node = null
 		2: # Separator
 			_context_node = null
@@ -260,18 +260,18 @@ func _on_state_machine_changed(new_state_machine):
 	var root_layer = get_layer("root")
 	path_viewer.select_dir("root") # Before select_layer, so path_viewer will be updated in _on_layer_selected
 	select_layer(root_layer)
-	clear_graph()
+	clear_graph(root_layer)
 	# Reset layers & path viewer
 	for child in root_layer.get_children():
 		if child is FlowChartLayer:
 			root_layer.remove_child(child)
 			child.queue_free()
 	if new_state_machine:
-		current_layer.state_machine = state_machine
+		root_layer.state_machine = state_machine
 		var validated = StateMachine.validate(new_state_machine)
 		if validated:
 			print("gd-YAFSM: Corrupted StateMachine Resource fixed, save to apply the fix.")
-		draw_graph()
+		draw_graph(root_layer)
 		check_has_entry()
 
 func _gui_input(event):
@@ -423,32 +423,32 @@ func save():
 	ResourceSaver.save(state_machine.resource_path, state_machine)
 
 # Clear editor
-func clear_graph():
+func clear_graph(layer):
 	clear_connections()
-	for child in current_layer.content_nodes.get_children():
+	for child in layer.content_nodes.get_children():
 		if child is StateNodeScript:
-			current_layer.content_nodes.remove_child(child)
+			layer.content_nodes.remove_child(child)
 			child.queue_free()
 	unsaved_indicator.text = "" # Clear graph is not action by user
 
 # Intialize editor with current editing StateMachine
-func draw_graph():
-	for state_key in current_layer.state_machine.states.keys():
-		var state = current_layer.state_machine.states[state_key]
+func draw_graph(layer):
+	for state_key in layer.state_machine.states.keys():
+		var state = layer.state_machine.states[state_key]
 		var new_node = StateNode.instance()
 		new_node.theme.get_stylebox("focus", "FlowChartNode").border_color = editor_accent_color
 		new_node.name = state_key # Set before add_node to let engine handle duplicate name
-		add_node(new_node)
+		add_node(layer, new_node)
 		# Set after add_node to make sure UIs are initialized
 		new_node.state = state
 		new_node.state.name = state_key
 		new_node.rect_position = state.graph_offset
-	for state_key in current_layer.state_machine.states.keys():
-		var from_transitions = current_layer.state_machine.transitions.get(state_key)
+	for state_key in layer.state_machine.states.keys():
+		var from_transitions = layer.state_machine.transitions.get(state_key)
 		if from_transitions:
 			for transition in from_transitions.values():
-				connect_node(transition.from, transition.to)
-				current_layer._connections[transition.from][transition.to].line.transition = transition
+				connect_node(layer, transition.from, transition.to)
+				layer._connections[transition.from][transition.to].line.transition = transition
 	update()
 	unsaved_indicator.text = "" # Draw graph is not action by user
 
@@ -505,83 +505,83 @@ func _on_layer_deselected(layer):
 	if layer:
 		layer.hide_content()
 
-func _on_node_dragged(node, dragged):
+func _on_node_dragged(layer, node, dragged):
 	node.state.graph_offset = node.rect_position
 	_on_edited()
 
-func _on_node_added(new_node):
+func _on_node_added(layer, new_node):
 	new_node.undo_redo = undo_redo
 	new_node.state.name = new_node.name
 	new_node.state.graph_offset = new_node.rect_position
 	new_node.connect("name_edit_entered", self, "_on_node_name_edit_entered", [new_node])
 	new_node.connect("gui_input", self, "_on_state_node_gui_input", [new_node])
-	current_layer.state_machine.add_state(new_node.state)
+	layer.state_machine.add_state(new_node.state)
 	check_has_entry()
 	check_has_exit()
 	_on_edited()
 
-func _on_node_removed(node_name):
+func _on_node_removed(layer, node_name):
 	var path = str(path_viewer.get_cwd(), "/", node_name)
-	var layer = get_layer(path)
-	if layer:
+	var layer_to_remove = get_layer(path)
+	if layer_to_remove:
 		# Remove root's direct children layers
 		layer.queue_free()
-	var result = current_layer.state_machine.remove_state(node_name)
+	var result = layer.state_machine.remove_state(node_name)
 	check_has_entry()
 	check_has_exit()
 	_on_edited()
 	return result
 
-func _on_node_connected(from, to):
+func _on_node_connected(layer, from, to):
 	if _reconnecting_connection:
 		# Reconnection will trigger _on_node_connected after _on_node_reconnect_end/_on_node_reconnect_failed
 		if _reconnecting_connection.from_node.name == from and _reconnecting_connection.to_node.name == to:
 			_reconnecting_connection = null
 			return
-	if current_layer.state_machine.transitions.has(from):
-		if current_layer.state_machine.transitions[from].has(to):
+	if layer.state_machine.transitions.has(from):
+		if layer.state_machine.transitions[from].has(to):
 			return # Already existed as it is loaded from file
 
-	var line = current_layer._connections[from][to].line
+	var line = layer._connections[from][to].line
 	var new_transition = Transition.new(from, to)
 	line.transition = new_transition
-	current_layer.state_machine.add_transition(new_transition)
+	layer.state_machine.add_transition(new_transition)
 	clear_selection()
 	select(line)
 	_on_edited()
 
-func _on_node_disconnected(from, to):
-	current_layer.state_machine.remove_transition(from, to)
+func _on_node_disconnected(layer, from, to):
+	layer.state_machine.remove_transition(from, to)
 	_on_edited()
 
-func _on_node_reconnect_begin(from, to):
-	_reconnecting_connection = current_layer._connections[from][to]
-	current_layer.state_machine.remove_transition(from, to)
+func _on_node_reconnect_begin(layer, from, to):
+	_reconnecting_connection = layer._connections[from][to]
+	layer.state_machine.remove_transition(from, to)
 
-func _on_node_reconnect_end(from, to):
+func _on_node_reconnect_end(layer, from, to):
 	var transition = _reconnecting_connection.line.transition
 	transition.to = to
-	current_layer.state_machine.add_transition(transition)
+	layer.state_machine.add_transition(transition)
 	clear_selection()
 	select(_reconnecting_connection.line)
 
-func _on_node_reconnect_failed(from, to):
+func _on_node_reconnect_failed(layer, from, to):
 	var transition = _reconnecting_connection.line.transition
-	current_layer.state_machine.add_transition(transition)
+	layer.state_machine.add_transition(transition)
 	clear_selection()
 	select(_reconnecting_connection.line)
 
-func _request_connect_from(from):
+func _request_connect_from(layer, from):
 	if from == State.EXIT_STATE:
 		return false
 	return true
 
-func _request_connect_to(to):
+func _request_connect_to(layer, to):
 	if to == State.ENTRY_STATE:
 		return false
 	return true
 
-func _on_duplicated(old_nodes, new_nodes):
+func _on_duplicated(layer, old_nodes, new_nodes):
 	# Duplicate condition as well
 	for i in old_nodes.size():
 		var from_node = old_nodes[i]
@@ -590,8 +590,8 @@ func _on_duplicated(old_nodes, new_nodes):
 				for j in old_nodes.size():
 					var to_node = old_nodes[j]
 					if to_node.name == connection_pair.to:
-						var old_connection = current_layer._connections[connection_pair.from][connection_pair.to]
-						var new_connection = current_layer._connections[new_nodes[i].name][new_nodes[j].name]
+						var old_connection = layer._connections[connection_pair.from][connection_pair.to]
+						var new_connection = layer._connections[new_nodes[i].name][new_nodes[j].name]
 						for condition in old_connection.line.transition.conditions.values():
 							new_connection.line.transition.add_condition(condition.duplicate())
 	_on_edited()
