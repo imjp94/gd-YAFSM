@@ -73,11 +73,13 @@ custom_constants/margin_bottom = 8
 
 [node name="NameEdit" type="LineEdit" parent="MarginContainer"]
 margin_left = 8.0
-margin_top = 8.0
+margin_top = 13.0
 margin_right = 56.0
-margin_bottom = 32.0
+margin_bottom = 27.0
 mouse_filter = 2
 mouse_default_cursor_shape = 0
+size_flags_horizontal = 4
+size_flags_vertical = 4
 custom_styles/read_only = SubResource( 6 )
 custom_styles/focus = SubResource( 6 )
 custom_styles/normal = SubResource( 6 )
