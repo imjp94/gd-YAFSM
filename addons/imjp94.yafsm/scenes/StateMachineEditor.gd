@@ -524,8 +524,8 @@ func _on_node_removed(layer, node_name):
 	var path = str(path_viewer.get_cwd(), "/", node_name)
 	var layer_to_remove = get_layer(path)
 	if layer_to_remove:
-		# Remove root's direct children layers
-		layer.queue_free()
+		layer_to_remove.get_parent().remove_child(layer_to_remove)
+		layer_to_remove.queue_free()
 	var result = layer.state_machine.remove_state(node_name)
 	check_has_entry()
 	check_has_exit()
