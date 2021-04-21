@@ -46,6 +46,10 @@ func _draw():
 func update_label():
 	if transition:
 		var template_var = {"condition_name": "", "condition_comparation": "", "condition_value": null}
+		for label in vbox.get_children():
+			if not (label.name in transition.conditions.keys()):
+				vbox.remove_child(label)
+				label.queue_free()
 		for condition in transition.conditions.values():
 			var label = vbox.get_node_or_null(condition.name)
 			if not label:
