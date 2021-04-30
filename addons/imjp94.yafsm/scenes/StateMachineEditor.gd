@@ -154,11 +154,12 @@ func _on_path_viewer_dir_pressed(dir, index):
 		var end_state_parent_path = StateMachinePlayer.path_backward(_last_path)
 		var end_state_name = StateMachinePlayer.path_end_dir(_last_path)
 		var layer = content.get_node_or_null(end_state_parent_path)
-		var node = layer.content_nodes.get_node_or_null(end_state_name)
-		if layer and node:
-			if not node.state.states:
-				# Convert state machine node back to state node
-				convert_to_state(layer, node)
+		if layer:
+			var node = layer.content_nodes.get_node_or_null(end_state_name)
+			if node:
+				if not node.state.states:
+					# Convert state machine node back to state node
+					convert_to_state(layer, node)
 
 	_last_index = index
 	_last_path = path
