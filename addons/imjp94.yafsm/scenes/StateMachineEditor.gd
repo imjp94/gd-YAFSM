@@ -98,7 +98,7 @@ func _process(delta):
 	if not debug_mode:
 		set_process(false)
 		return
-	if not state_machine_player:
+	if not is_instance_valid(state_machine_player):
 		set_process(false)
 		set_debug_mode(false)
 		return
