@@ -103,6 +103,11 @@ func _process(delta):
 		set_debug_mode(false)
 		return
 	var stack = state_machine_player.get("Members/StackPlayer.gd/stack")
+	if not stack:
+		set_process(false)
+		set_debug_mode(false)
+		return
+
 	if stack.size() == 1:
 		set_current_state(state_machine_player.get("Members/StackPlayer.gd/current"))
 	else:
