@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.1
+
+- Bugfixes:
+  - Fix sometime StateMachineEditor crash after switching between nested state machine
+  - Fix conditions' label in graph doesn't sync with inspector as it is removed
+  - Fix output flooded by null exception when stopping scene in remote debug
+  - Fix switching between local/remote StateMachinePlayer node when playing scene cause null exception
+
 ## 0.5.0
 
 - Breaking changes:
