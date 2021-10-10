@@ -19,6 +19,7 @@ export(bool) var active = true setget set_active # Activeness of player
 export(bool) var autostart = true # Automatically enter Entry state on ready if true
 export(ProcessMode) var process_mode = ProcessMode.IDLE setget set_process_mode # ProcessMode of player
 
+var _is_started = false
 var _parameters # Parameters to be passed to condition
 var _local_parameters
 var _is_update_locked = true
@@ -46,6 +47,8 @@ func _ready():
 	if Engine.editor_hint:
 		return
 
+	set_process(false)
+	set_physics_process(false)
 	call_deferred("_initiate") # Make sure connection of signals can be done in _ready to receive all signal callback
 
 func _initiate():
@@ -147,8 +150,6 @@ func _on_active_changed():
 		return
 
 	if active:
-		_flush_trigger(_parameters)
-		_flush_trigger(_local_parameters, true)
 		_on_process_mode_changed()
 		_transit()
 	else:
@@ -172,7 +173,9 @@ func reset(to=-1, event=ResetEventTrigger.LAST_TO_DEST):
 # Manually start the player, automatically called if autostart is true
 func start():
 	push(State.ENTRY_STATE)
+	emit_signal("entered", "")
 	_was_transited = true
+	_is_started = true
 
 # Restart player
 func restart(is_active=true, preserve_params=false):
@@ -204,7 +207,7 @@ func update(delta=get_physics_process_delta_time()):
 # automatically call update() if process_mode set to MANUAL and auto_update true
 # Nested trigger can be accessed through path "path/to/param_name", for example, "App/Game/is_playing"
 func set_trigger(name, auto_update=true):
-	set_param(name, null)
+	set_param(name, null, auto_update)
 
 func set_nested_trigger(path, name, auto_update=true):
 	set_nested_param(path, name, null, auto_update)
@@ -267,7 +270,7 @@ func clear_param(path="", auto_update=true):
 # Called when param edited, automatically call update() if process_mode set to MANUAL and auto_update true
 func _on_param_edited(auto_update=true):
 	_is_param_edited = true
-	if process_mode == ProcessMode.MANUAL and auto_update:
+	if process_mode == ProcessMode.MANUAL and auto_update and _is_started:
 		update()
 
 # Get value of param
