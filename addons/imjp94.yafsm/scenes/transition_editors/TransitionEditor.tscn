@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://addons/imjp94.yafsm/assets/icons/add-white-18dp.svg" type="Texture" id=1]
 [ext_resource path="res://addons/imjp94.yafsm/assets/icons/subdirectory_arrow_right-white-18dp.svg" type="Texture" id=2]
@@ -6,6 +6,21 @@
 [ext_resource path="res://addons/imjp94.yafsm/assets/icons/compare_arrows-white-18dp.svg" type="Texture" id=4]
 
 [sub_resource type="StyleBoxTexture" id=1]
+
+[sub_resource type="Image" id=4]
+data = {
+"data": PoolByteArray( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ),
+"format": "LumAlpha8",
+"height": 16,
+"mipmaps": false,
+"width": 16
+}
+
+[sub_resource type="ImageTexture" id=3]
+flags = 4
+flags = 4
+image = SubResource( 4 )
+size = Vector2( 16, 16 )
 
 [node name="TransitionEditor" type="VBoxContainer"]
 margin_left = 4.0
@@ -18,7 +33,7 @@ __meta__ = {
 }
 
 [node name="HeaderContainer" type="MarginContainer" parent="."]
-margin_right = 180.0
+margin_right = 286.0
 margin_bottom = 32.0
 custom_constants/margin_right = 4
 custom_constants/margin_top = 4
@@ -28,13 +43,13 @@ custom_constants/margin_bottom = 4
 [node name="Panel" type="Panel" parent="HeaderContainer"]
 margin_left = 4.0
 margin_top = 4.0
-margin_right = 176.0
+margin_right = 282.0
 margin_bottom = 28.0
 
 [node name="Header" type="HBoxContainer" parent="HeaderContainer"]
 margin_left = 4.0
 margin_top = 4.0
-margin_right = 176.0
+margin_right = 282.0
 margin_bottom = 28.0
 
 [node name="Title" type="HBoxContainer" parent="HeaderContainer/Header"]
@@ -97,9 +112,36 @@ margin_left = 134.0
 margin_right = 138.0
 margin_bottom = 24.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HeaderContainer/Header"]
+[node name="Priority" type="HBoxContainer" parent="HeaderContainer/Header"]
 margin_left = 142.0
-margin_right = 172.0
+margin_right = 236.0
+margin_bottom = 24.0
+hint_tooltip = "Priority"
+
+[node name="Icon" type="TextureRect" parent="HeaderContainer/Header/Priority"]
+margin_top = 4.0
+margin_right = 16.0
+margin_bottom = 20.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = SubResource( 3 )
+
+[node name="SpinBox" type="SpinBox" parent="HeaderContainer/Header/Priority"]
+margin_left = 20.0
+margin_right = 94.0
+margin_bottom = 24.0
+max_value = 10.0
+rounded = true
+allow_greater = true
+
+[node name="VSeparator3" type="VSeparator" parent="HeaderContainer/Header"]
+margin_left = 240.0
+margin_right = 244.0
+margin_bottom = 24.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HeaderContainer/Header"]
+margin_left = 248.0
+margin_right = 278.0
 margin_bottom = 24.0
 size_flags_horizontal = 10
 
@@ -120,7 +162,7 @@ __meta__ = {
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 margin_top = 36.0
-margin_right = 180.0
+margin_right = 286.0
 margin_bottom = 44.0
 custom_constants/margin_right = 4
 custom_constants/margin_top = 4
@@ -130,7 +172,7 @@ custom_constants/margin_bottom = 4
 [node name="Panel" type="Panel" parent="MarginContainer"]
 margin_left = 16.0
 margin_top = 4.0
-margin_right = 176.0
+margin_right = 282.0
 margin_bottom = 4.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -138,5 +180,5 @@ size_flags_vertical = 3
 [node name="Conditions" type="VBoxContainer" parent="MarginContainer"]
 margin_left = 16.0
 margin_top = 4.0
-margin_right = 176.0
+margin_right = 282.0
 margin_bottom = 4.0

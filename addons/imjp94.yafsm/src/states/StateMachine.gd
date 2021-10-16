@@ -1,6 +1,7 @@
 tool
 extends "State.gd"
 const State = preload("State.gd")
+const Transition = preload("../transitions/Transition.gd")
 
 signal transition_added(transition) # Transition added
 signal transition_removed(to_state) # Transition removed
@@ -48,7 +49,10 @@ func transit(current_state, params={}, local_params={}):
 	# Transit with current running nested state machine
 	var from_transitions = end_state_machine.transitions.get(nested_states[nested_states.size()-1])
 	if from_transitions:
-		for transition in from_transitions.values():
+		var from_transitions_array = from_transitions.values()
+		from_transitions_array.sort_custom(Transition, "sort")
+		
+		for transition in from_transitions_array:
 			var next_state = transition.transit(params, local_params)
 			if next_state:
 				if "states" in end_state_machine.states[next_state]:
@@ -211,4 +215,3 @@ static func validate(state_machine):
 				push_warning("gd-YAFSM ValidationError: Self connecting transition(%s -> %s)" % [to_transition.from, to_transition.to])
 				from_transition.erase(to_key)
 	return validated
-

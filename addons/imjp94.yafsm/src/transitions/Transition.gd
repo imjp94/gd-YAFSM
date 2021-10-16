@@ -7,6 +7,7 @@ signal condition_removed(condition)
 export(String) var from # Name of state transiting from
 export(String) var to # Name of state transiting to
 export(Dictionary) var conditions setget ,get_conditions # Conditions to transit successfuly, keyed by Condition.name
+export(int) var priority = 0 # Higher the number, higher the priority
 
 
 func _init(p_from="", p_to="", p_conditions={}):
@@ -82,3 +83,8 @@ func equals(obj):
 # Get duplicate of conditions dictionary
 func get_conditions():
 	return conditions.duplicate()
+
+static func sort(a, b):
+	if a.priority > b.priority:
+		return true
+	return false

@@ -20,6 +20,8 @@ onready var from = $HeaderContainer/Header/Title/From
 onready var to = $HeaderContainer/Header/Title/To
 onready var condition_count_icon = $HeaderContainer/Header/ConditionCount/Icon
 onready var condition_count_label = $HeaderContainer/Header/ConditionCount/Label
+onready var priority_icon = $HeaderContainer/Header/Priority/Icon
+onready var priority_spinbox = $HeaderContainer/Header/Priority/SpinBox
 onready var add = $HeaderContainer/Header/HBoxContainer/Add
 onready var add_popup_menu = $HeaderContainer/Header/HBoxContainer/Add/PopupMenu
 onready var content_container = $MarginContainer
@@ -37,8 +39,11 @@ func _init():
 
 func _ready():
 	header.connect("gui_input", self, "_on_header_gui_input")
+	priority_spinbox.connect("value_changed", self, "_on_priority_spinbox_value_changed")
 	add.connect("pressed", self, "_on_add_pressed")
 	add_popup_menu.connect("index_pressed", self, "_on_add_popup_menu_index_pressed")
+	
+	priority_icon.texture = get_icon("AnimationTrackList", "EditorIcons")
 
 func _exit_tree():
 	free_node_from_undo_redo() # Managed by EditorInspector
@@ -47,6 +52,9 @@ func _on_header_gui_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed:
 			toggle_conditions()
+
+func _on_priority_spinbox_value_changed(val: int) -> void:
+	set_priority(val)
 
 func _on_add_pressed():
 	Utils.popup_on_target(add_popup_menu, add)
@@ -82,6 +90,7 @@ func _on_transition_changed(new_transition):
 		add_condition_editor(editor, condition)
 	update_title()
 	update_condition_count()
+	update_priority_spinbox_value()
 
 func _on_condition_editor_added(editor):
 	editor.undo_redo = undo_redo
@@ -112,6 +121,13 @@ func update_condition_count():
 		hide_conditions()
 	else:
 		show_conditions()
+
+func update_priority_spinbox_value():
+	priority_spinbox.value = transition.priority
+	priority_spinbox.apply()
+	
+func set_priority(value):
+	transition.priority = value
 
 func show_conditions():
 	content_container.visible = true
