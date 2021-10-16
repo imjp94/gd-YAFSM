@@ -23,6 +23,8 @@ func parse_property(object, type, path, hint, hint_text, usage):
 			add_custom_control(transition_editor)
 			transition_editor.connect("ready", self, "_on_transition_editor_tree_entered", [transition_editor, object])
 			return true
+		"priority":
+			return true
 	return false
 
 func _on_transition_editor_tree_entered(editor, transition):
