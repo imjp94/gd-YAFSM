@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.2
+
+- Features:
+  - Add transition property
+- Bugfixes:
+  - Fix "entered" signal is not emitted when StateMachinePlayer started
+  - Fix trigger is flushed when StateMachinePlayer started
+
 ## 0.5.1
 
 - Bugfixes:
