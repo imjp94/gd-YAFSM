@@ -11,30 +11,30 @@ func execute(params = {}, local_params = {}):
 	for local_param_key in local_params.keys():
 		execute_params[local_param_key] = local_params[local_param_key]
 	
-	var trigger_variable = TriggerVariable.new(execute_params)
+	var trigger_instance = TriggerInstance.new(execute_params)
 	
 	var expression_input_names = execute_params.keys()
-	expression_input_names.append("trigger")
-	
 	var expression_input_values = execute_params.values()
-	expression_input_values.append(trigger_variable)
 	
 	var error = expression.parse(name, expression_input_names)
 	if error != OK:
 		print(expression.get_error_text())
 		return false
 	
-	var result = expression.execute(expression_input_values, null, true)
+	var result = expression.execute(expression_input_values, trigger_instance, true)
 	if not expression.has_execute_failed():
 		return result
 	else:
 		return false
 
-class TriggerVariable:
+class TriggerInstance:
 	var execute_params
 	
 	func _init(execute_params = {}):
 		self.execute_params = execute_params.duplicate()
 	
-	func _get(property):
+	func trigger(property):
 		return property in execute_params
+	
+	func t(property):
+		return trigger(property)
