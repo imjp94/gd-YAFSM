@@ -7,7 +7,7 @@
 
 [sub_resource type="StyleBoxTexture" id=1]
 
-[sub_resource type="Image" id=4]
+[sub_resource type="Image" id=3]
 data = {
 "data": PoolByteArray( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ),
 "format": "LumAlpha8",
@@ -16,10 +16,10 @@ data = {
 "width": 16
 }
 
-[sub_resource type="ImageTexture" id=3]
+[sub_resource type="ImageTexture" id=2]
 flags = 4
 flags = 4
-image = SubResource( 4 )
+image = SubResource( 3 )
 size = Vector2( 16, 16 )
 
 [node name="TransitionEditor" type="VBoxContainer"]
@@ -124,7 +124,7 @@ margin_right = 16.0
 margin_bottom = 20.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
-texture = SubResource( 3 )
+texture = SubResource( 2 )
 
 [node name="SpinBox" type="SpinBox" parent="HeaderContainer/Header/Priority"]
 margin_left = 20.0
@@ -155,7 +155,7 @@ flat = true
 [node name="PopupMenu" type="PopupMenu" parent="HeaderContainer/Header/HBoxContainer/Add"]
 margin_right = 20.0
 margin_bottom = 20.0
-items = [ "Trigger", null, 0, false, false, 0, 0, null, "", false, "Boolean", null, 0, false, false, 1, 0, null, "", false, "Integer", null, 0, false, false, 2, 0, null, "", false, "Float", null, 0, false, false, 3, 0, null, "", false, "String", null, 0, false, false, 4, 0, null, "", false ]
+items = [ "Trigger", null, 0, false, false, 0, 0, null, "", false, "Boolean", null, 0, false, false, 1, 0, null, "", false, "Integer", null, 0, false, false, 2, 0, null, "", false, "Float", null, 0, false, false, 3, 0, null, "", false, "String", null, 0, false, false, 4, 0, null, "", false, "Expression", null, 0, false, false, 5, 0, null, "", false ]
 __meta__ = {
 "_edit_use_anchors_": false
 }
