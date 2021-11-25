@@ -1,7 +1,6 @@
 tool
 extends HBoxContainer
 
-onready var fx_indicator = $FxIndicator
 onready var name_edit = $Name
 onready var remove = $Remove
 
@@ -11,7 +10,7 @@ var condition setget set_condition
 
 
 func _ready():
-	fx_indicator.texture = get_icon("VisualScriptExpression", "EditorIcons")
+	name_edit.add_font_override("font", get_font("expression", "EditorFonts"))
 	
 	name_edit.connect("text_entered", self, "_on_name_edit_text_entered")
 	name_edit.connect("focus_entered", self, "_on_name_edit_focus_entered")
