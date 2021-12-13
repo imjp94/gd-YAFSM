@@ -581,7 +581,8 @@ func select(node):
 # Deselect a node
 func deselect(node):
 	_selection.erase(node)
-	node.selected = false
+	if is_instance_valid(node):
+		node.selected = false
 	_drag_origins.pop_back()
 	emit_signal("node_deselected", node)
 
