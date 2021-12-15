@@ -1,0 +1,32 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/imjp94.yafsm/scenes/condition_editors/ExpressionConditionEditor.gd" type="Script" id=1]
+[ext_resource path="res://addons/imjp94.yafsm/assets/icons/close-white-18dp.svg" type="Texture" id=2]
+
+[node name="ConditionEditor" type="HBoxContainer"]
+anchor_right = 1.0
+margin_bottom = 50.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Name" type="TextEdit" parent="."]
+margin_right = 126.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 0, 50 )
+size_flags_horizontal = 3
+size_flags_vertical = 4
+text = "Param"
+syntax_highlighting = true
+wrap_enabled = true
+caret_blink = true
+caret_blink_speed = 0.5
+
+[node name="Remove" type="Button" parent="."]
+margin_left = 130.0
+margin_right = 160.0
+margin_bottom = 50.0
+size_flags_horizontal = 9
+icon = ExtResource( 2 )
+flat = true
