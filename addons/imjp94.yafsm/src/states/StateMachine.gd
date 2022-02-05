@@ -16,7 +16,7 @@ func _init(p_name="", p_transitions={}, p_states={}):
 	states = p_states
 
 # Attempt to transit with global/local parameters, where local_params override params
-func transit(current_state, params={}, local_params={}):
+func transit(current_state, params={}, local_params={}, time_in_state=0.0):
 	var nested_states = current_state.split("/")
 	var is_nested = nested_states.size() > 1
 	var end_state_machine = self
@@ -40,7 +40,7 @@ func transit(current_state, params={}, local_params={}):
 				end_state_machine_parent_path = join_path(end_state_machine_parent_path, [nested_states[i]])
 			var end_state_machine_parent = get_state(end_state_machine_parent_path)
 			var normalized_current_state = end_state_machine.name
-			var next_state = end_state_machine_parent.transit(normalized_current_state, params)
+			var next_state = end_state_machine_parent.transit(normalized_current_state, params, time_in_state)
 			if next_state:
 				# Construct next state into absolute path
 				next_state = join_path(end_state_machine_parent_path, [next_state])
@@ -53,7 +53,7 @@ func transit(current_state, params={}, local_params={}):
 		from_transitions_array.sort_custom(Transition, "sort")
 		
 		for transition in from_transitions_array:
-			var next_state = transition.transit(params, local_params)
+			var next_state = transition.transit(params, local_params, time_in_state)
 			if next_state:
 				if "states" in end_state_machine.states[next_state]:
 					# Next state is a StateMachine, return entry state of the state machine in absolute path

@@ -16,21 +16,24 @@ func _init(p_from="", p_to="", p_conditions={}):
 	conditions = p_conditions
 
 # Attempt to transit with parameters given, return name of next state if succeeded else null
-func transit(params={}, local_params={}):
+func transit(params={}, local_params={}, time_in_state=0.0):
 	var can_transit = conditions.size() > 0
 	for condition in conditions.values():
-		var has_param = params.has(condition.name)
-		var has_local_param = local_params.has(condition.name)
-		if has_param or has_local_param:
-			# local_params > params
-			var value = local_params.get(condition.name) if has_local_param else params.get(condition.name)
-			if value == null: # null value is treated as trigger
-				can_transit = can_transit and true
-			else:
-				if "value" in condition:
-					can_transit = can_transit and condition.compare(value)
+		if condition.has_method("has_timed_out"):
+			can_transit = can_transit and condition.has_timed_out(time_in_state)
 		else:
-			can_transit = false
+			var has_param = params.has(condition.name)
+			var has_local_param = local_params.has(condition.name)
+			if has_param or has_local_param:
+				# local_params > params
+				var value = local_params.get(condition.name) if has_local_param else params.get(condition.name)
+				if value == null: # null value is treated as trigger
+					can_transit = can_transit and true
+				else:
+					if "value" in condition:
+						can_transit = can_transit and condition.compare(value)
+			else:
+				can_transit = false
 	if can_transit or conditions.size() == 0:
 		return to
 	return null
