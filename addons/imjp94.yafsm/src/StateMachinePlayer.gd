@@ -25,6 +25,7 @@ var _local_parameters
 var _is_update_locked = true
 var _was_transited = false # If last transition was successful
 var _is_param_edited = false
+var _time_in_state = 0.0
 
 
 func _init():
@@ -83,7 +84,7 @@ func _transit():
 
 	var from = get_current()
 	var local_params = _local_parameters.get(path_backward(from), {})
-	var next_state = state_machine.transit(get_current(), _parameters, local_params)
+	var next_state = state_machine.transit(get_current(), _parameters, local_params, _time_in_state)
 	if next_state:
 		if stack.has(next_state):
 			reset(stack.find(next_state))
@@ -116,6 +117,7 @@ func _on_state_changed(from, to):
 		clear_param(state, false) # Clearing params internally, do not update
 		emit_signal("exited", state)
 
+	_time_in_state = 0.0
 	emit_signal("transited", from, to)
 
 # Called internally if process_mode is PHYSICS/IDLE to unlock update()
@@ -194,6 +196,7 @@ func update(delta=get_physics_process_delta_time()):
 	if process_mode != ProcessMode.MANUAL:
 		assert(not _is_update_locked, "Attempting to update manually with ProcessMode.%s" % ProcessMode.keys()[process_mode])
 
+	_time_in_state += delta
 	_transit()
 	var current_state = get_current()
 	_on_updated(current_state, delta)

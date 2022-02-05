@@ -65,6 +65,8 @@ func update_label():
 				var override_template_var = _template_var.get(condition.name)
 				if override_template_var:
 					label.text = label.text.format(override_template_var)
+			elif "timeout" in condition:
+				label.text = condition.display_string()
 			else:
 				label.text = condition.name
 	update()

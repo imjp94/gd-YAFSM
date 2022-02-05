@@ -1,0 +1,39 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/imjp94.yafsm/scenes/condition_editors/TimeoutConditionEditor.gd" type="Script" id=1]
+[ext_resource path="res://addons/imjp94.yafsm/assets/icons/close-white-18dp.svg" type="Texture" id=2]
+
+[node name="TimeoutConditionEditor" type="HBoxContainer"]
+margin_right = 58.0
+margin_bottom = 24.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_top = 5.0
+margin_right = 53.0
+margin_bottom = 19.0
+text = "Timeout"
+
+[node name="Timeout" type="SpinBox" parent="."]
+margin_left = 57.0
+margin_right = 131.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+step = 0.01
+allow_greater = true
+align = 2
+suffix = "s"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Remove" type="Button" parent="."]
+margin_left = 135.0
+margin_right = 165.0
+margin_bottom = 24.0
+size_flags_horizontal = 9
+icon = ExtResource( 2 )
+flat = true
