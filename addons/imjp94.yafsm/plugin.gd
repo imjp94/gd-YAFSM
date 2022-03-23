@@ -66,7 +66,7 @@ func _exit_tree():
 	if state_machine_editor:
 		state_machine_editor.queue_free()
 
-func handles(object):
+func _handles(object):
 	if object is StateMachine:
 		return true
 	if object is StateMachinePlayer:
@@ -74,10 +74,9 @@ func handles(object):
 			set_focused_object(object)
 			state_machine_editor.debug_mode = true
 			return false
-	set_focused_object(null)
 	return false
 
-func edit(object):
+func _edit(object):
 	set_focused_object(object)
 
 func show_state_machine_editor():
