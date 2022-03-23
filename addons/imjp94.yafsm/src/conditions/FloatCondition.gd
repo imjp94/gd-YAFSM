@@ -1,7 +1,9 @@
-tool
+@tool
 extends "ValueCondition.gd"
 
-export(float) var value setget set_value, get_value
+@export var value: float:
+	set = set_value,
+	get = get_value
 
 
 func set_value(v):
@@ -14,9 +16,9 @@ func get_value():
 	return value
 
 func get_value_string():
-	return str(stepify(value, 0.01)).pad_decimals(2)
+	return str(snapped(value, 0.01)).pad_decimals(2)
 
 func compare(v):
-	if typeof(v) != TYPE_REAL:
+	if typeof(v) != TYPE_FLOAT:
 		return false
-	return .compare(v)
+	return super.compare(v)

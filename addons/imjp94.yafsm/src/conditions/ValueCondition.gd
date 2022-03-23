@@ -1,4 +1,4 @@
-tool
+@tool
 extends "Condition.gd"
 
 signal comparation_changed(new_comparation) # Comparation hanged
@@ -7,7 +7,7 @@ signal value_changed(new_value) # Value changed
 # Enum to define how to compare value
 enum Comparation {
 	EQUAL,
-	INEQUAL
+	INEQUAL,
 	GREATER,
 	LESSER,
 	GREATER_OR_EQUAL,
@@ -23,10 +23,11 @@ const COMPARATION_SYMBOLS = [
 	"≤"
 ]
 
-export(Comparation) var comparation = Comparation.EQUAL setget set_comparation
+@export var comparation: Comparation = Comparation.EQUAL:
+	set = set_comparation
 
 func _init(p_name="", p_comparation=Comparation.EQUAL):
-	._init(p_name)
+	super._init(p_name)
 	comparation = p_comparation
 
 func set_comparation(c):
@@ -68,4 +69,4 @@ func compare(v):
 
 # Return human readable display string, for example, "condition_name == True"
 func display_string():
-	return "%s %s %s" % [.display_string(), COMPARATION_SYMBOLS[comparation], get_value_string()]
+	return "%s %s %s" % [super.display_string(), COMPARATION_SYMBOLS[comparation], get_value_string()]
