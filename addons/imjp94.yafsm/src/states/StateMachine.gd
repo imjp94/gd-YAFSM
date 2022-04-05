@@ -7,9 +7,11 @@ signal transition_added(transition) # Transition added
 signal transition_removed(to_state) # Transition removed
 
 @export var states: Dictionary:  # States within this StateMachine, keyed by State.name
-	get = get_states
+	get = get_states,
+	set = set_states
 @export var transitions: Dictionary:  # Transitions from this state, keyed by Transition.to
-	get = get_transitions
+	get = get_transitions,
+	set = set_transitions
 
 var _states
 var _transitions
@@ -170,9 +172,17 @@ func has_exit():
 func get_states():
 	return _states.duplicate()
 
+func set_states(val):
+	states = val
+	_states = val
+
 # Get duplicate of transitions dictionary
 func get_transitions():
 	return _transitions.duplicate()
+
+func set_transitions(val):
+	transitions = val
+	_transitions = val
 
 static func join_path(base, dirs):
 	var path = base
