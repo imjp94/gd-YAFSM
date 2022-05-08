@@ -545,7 +545,7 @@ func create_layer_instance():
 
 # Return new line instance to use, called when connecting node
 func create_line_instance():
-	return FlowChartLineScene.instance()
+	return FlowChartLineScene.instantiate()
 
 # Rename node
 func rename_node(layer, old, new):
