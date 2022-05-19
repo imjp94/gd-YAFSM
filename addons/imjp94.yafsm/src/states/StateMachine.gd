@@ -52,7 +52,7 @@ func transit(current_state, params={}, local_params={}):
 				# Construct next state into absolute path
 				next_state = join_path(end_state_machine_parent_path, [next_state])
 			return next_state
-
+	
 	# Transit with current running nested state machine
 	var from_transitions = end_state_machine.transitions.get(nested_states[nested_states.size()-1])
 	if from_transitions:
@@ -173,7 +173,6 @@ func get_states():
 	return _states.duplicate()
 
 func set_states(val):
-	states = val
 	_states = val
 
 # Get duplicate of transitions dictionary
@@ -181,7 +180,6 @@ func get_transitions():
 	return _transitions.duplicate()
 
 func set_transitions(val):
-	transitions = val
 	_transitions = val
 
 static func join_path(base, dirs):

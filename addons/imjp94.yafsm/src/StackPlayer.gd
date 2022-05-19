@@ -13,8 +13,8 @@ enum ResetEventTrigger {
 var current:  # Current item on top of stack
 	get = get_current
 var stack:
-	set = set_stack,
-	get = get_stack
+	set = _set_stack,
+	get = _get_stack
 
 var _stack
 
@@ -48,8 +48,8 @@ func _on_popped(from, to):
 # Reset stack to given index, -1 to clear all item by default
 # Use ResetEventTrigger to define how _on_popped should be called
 func reset(to=-1, event=ResetEventTrigger.ALL):
-	assert(to > -2 and to < stack.size(), "Reset to index out of bounds")
-	var last_index = stack.size() - 1
+	assert(to > -2 and to < _stack.size(), "Reset to index out of bounds")
+	var last_index = _stack.size() - 1
 	var first_state = ""
 	var num_to_pop = last_index - to
 
@@ -58,27 +58,27 @@ func reset(to=-1, event=ResetEventTrigger.ALL):
 			first_state = get_current() if i == 0 else first_state
 			match event:
 				ResetEventTrigger.LAST_TO_DEST:
-					stack.pop_back()
+					_stack.pop_back()
 					if i == num_to_pop - 1:
-						stack.push_back(first_state)
+						_stack.push_back(first_state)
 						pop()
 				ResetEventTrigger.ALL:
 					pop()
 				_:
-					stack.pop_back()
+					_stack.pop_back()
 	elif num_to_pop == 0:
 		match event:
 			ResetEventTrigger.NONE:
-				stack.pop_back()
+				_stack.pop_back()
 			_:
 				pop()
 
-func set_stack(val):
+func _set_stack(val):
 	push_warning("Attempting to edit read-only state stack directly. " \
 		+ "Control state machine from setting parameters or call update() instead")
 
 # Get duplicate of the stack being played
-func get_stack():
+func _get_stack():
 	return _stack.duplicate()
 
 func get_current():
