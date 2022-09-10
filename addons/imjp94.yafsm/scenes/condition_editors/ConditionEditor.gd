@@ -25,12 +25,12 @@ func _input(event):
 				if not name_edit.get_rect().has_point(local_event.position):
 					name_edit.release_focus()
 
-func _on_name_edit_text_changed(new_text):
+func _on_name_edit_text_changed():
 	# name_edit.release_focus()
-	if condition.name == new_text: # Avoid infinite loop
+	if condition.name == name_edit.text: # Avoid infinite loop
 		return
 
-	rename_edit_action(new_text)
+	rename_edit_action(name_edit.text)
 
 func _on_name_edit_focus_entered():
 	set_process_input(true)

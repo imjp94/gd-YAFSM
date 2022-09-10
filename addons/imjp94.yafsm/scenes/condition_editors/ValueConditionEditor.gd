@@ -8,8 +8,6 @@ const Comparation = preload("../../src/conditions/ValueCondition.gd").Comparatio
 
 
 func _ready():
-	super._ready()
-	
 	comparation_button.pressed.connect(_on_comparation_button_pressed)
 	comparation_popup_menu.id_pressed.connect(_on_comparation_popup_menu_id_pressed)
 

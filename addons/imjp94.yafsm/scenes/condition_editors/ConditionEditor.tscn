@@ -1,16 +1,16 @@
 [gd_scene load_steps=3 format=3 uid="uid://cie8lb6ww58ck"]
 
 [ext_resource type="Script" path="res://addons/imjp94.yafsm/scenes/condition_editors/ConditionEditor.gd" id="1"]
-[ext_resource type="Texture2D" path="res://addons/imjp94.yafsm/assets/icons/close-white-18dp.svg" id="2"]
+[ext_resource type="Texture2D" uid="uid://l78bjwo7shm" path="res://addons/imjp94.yafsm/assets/icons/close-white-18dp.svg" id="2"]
 
 [node name="ConditionEditor" type="HBoxContainer"]
-script = ExtResource( "1" )
+script = ExtResource("1")
 
 [node name="Name" type="LineEdit" parent="."]
 offset_right = 67.0
 offset_bottom = 31.0
 size_flags_horizontal = 3
-size_flags_vertical = 4
+size_flags_vertical = 6
 text = "Param"
 
 [node name="Remove" type="Button" parent="."]
@@ -18,5 +18,5 @@ offset_left = 71.0
 offset_right = 97.0
 offset_bottom = 31.0
 size_flags_horizontal = 9
-icon = ExtResource( "2" )
+icon = ExtResource("2")
 flat = true

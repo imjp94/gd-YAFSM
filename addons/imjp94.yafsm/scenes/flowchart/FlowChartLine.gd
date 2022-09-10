@@ -7,10 +7,8 @@ var selected: = false:
 
 
 func _init():
-	super._init()
-	
-	focus_mode = FOCUS_CLICK
-	mouse_filter = MOUSE_FILTER_IGNORE
+	focus_mode = Control.FOCUS_CLICK
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func _draw():
 	pivot_at_line_start()
@@ -75,8 +73,8 @@ func join(from, to, offset=Vector2.ZERO, clip_rects=[]):
 
 	size.x = to.distance_to(from)
 	# size.y equals to the thickness of line
-	position = from
-	position.y -= size.y / 2.0
+	global_position = from
+	global_position.y -= size.y / 2.0
 	rotation = Vector2.RIGHT.angle_to(dir)
 	pivot_at_line_start()
 
@@ -86,7 +84,7 @@ func set_selected(v):
 		update()
 
 func get_from_pos():
-	return get_transform() * (position)
+	return get_global_transform() * (global_position)
 
 func get_to_pos():
-	return get_transform() * (position + size)
+	return get_global_transform() * (global_position + size)

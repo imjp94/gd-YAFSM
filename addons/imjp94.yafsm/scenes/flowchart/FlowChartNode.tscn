@@ -26,9 +26,9 @@ corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
 [sub_resource type="Theme" id="3"]
-FlowChartNode/styles/focus = SubResource( "1" )
-FlowChartNode/styles/normal = SubResource( "2" )
+FlowChartNode/styles/focus = SubResource("1")
+FlowChartNode/styles/normal = SubResource("2")
 
 [node name="FlowChartNode" type="Container"]
-theme = SubResource( "3" )
-script = ExtResource( "1" )
+theme = SubResource("3")
+script = ExtResource("1")

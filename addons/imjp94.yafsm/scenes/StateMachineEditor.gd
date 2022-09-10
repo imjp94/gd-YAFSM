@@ -65,7 +65,7 @@ var _last_stack = []
 func _init():
 	super._init()
 	
-	path_viewer.mouse_filter = MOUSE_FILTER_IGNORE
+	path_viewer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	path_viewer.set_script(PathViewer)
 	path_viewer.dir_pressed.connect(_on_path_viewer_dir_pressed)
 	top_bar.add_child(path_viewer)
@@ -239,7 +239,7 @@ func _on_debug_mode_changed(new_debug_mode):
 		param_panel.show()
 		add_message(DEBUG_MODE_MSG.key, DEBUG_MODE_MSG.text)
 		set_process(true)
-		# mouse_filter = MOUSE_FILTER_IGNORE
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
 		can_gui_select_node = false
 		can_gui_delete_node = false
 		can_gui_connect_node = false

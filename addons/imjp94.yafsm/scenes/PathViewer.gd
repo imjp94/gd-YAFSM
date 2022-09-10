@@ -5,7 +5,6 @@ signal dir_pressed(dir, index)
 
 
 func _init():
-	super._init()
 	add_dir("root")
 
 # Select parent dir & return its path

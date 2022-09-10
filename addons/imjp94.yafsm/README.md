@@ -19,8 +19,8 @@ const State = YAFSM.State
   - `current # Current item on top of stack`
   - `stack`
   - signals:
-    - `pushed(to) # When item pushed to stack`
-    - `popped(from) # When item popped from stack`
+	- `pushed(to) # When item pushed to stack`
+	- `popped(from) # When item popped from stack`
 - [StateMachinePlayer](src/StateMachinePlayer.gd)(extends StackPlayer) ![StateMachinePlayer icon](assets/icons/state_machine_player_icon.png)
   > Manage state based on `StateMachine` and parameters inputted
   - `state_machine # StateMachine being played`
@@ -28,10 +28,10 @@ const State = YAFSM.State
   - `autostart # Automatically enter Entry state on ready if true`
   - `process_mode # ProcessMode of player`
   - signals:
-    - `transited(from, to) # Transition of state`
-    - `entered(to) # Entry of state machine(including nested), empty string equals to root`
-    - `exited(from) # Exit of state machine(including nested, empty string equals to root`
-    - `updated(state, delta) # Time to update(based on process_mode), up to user to handle any logic, for example, update movement of KinematicBody`
+	- `transited(from, to) # Transition of state`
+	- `entered(to) # Entry of state machine(including nested), empty string equals to root`
+	- `exited(from) # Exit of state machine(including nested, empty string equals to root`
+	- `updated(state, delta) # Time to update(based on process_mode), up to user to handle any logic, for example, update movement of KinematicBody`
 
 ### Control
 

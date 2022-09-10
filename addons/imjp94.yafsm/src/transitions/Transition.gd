@@ -15,7 +15,6 @@ var _conditions
 
 
 func _init(p_from="", p_to="", p_conditions={}):
-	super._init()
 	from = p_from
 	to = p_to
 	_conditions = p_conditions
@@ -85,12 +84,12 @@ func equals(obj):
 
 	return from == obj.from and to == obj.to
 
+func set_conditions(val):
+	_conditions = val
+
 # Get duplicate of conditions dictionary
 func get_conditions():
 	return _conditions.duplicate()
-
-func set_conditions(val):
-	_conditions = val
 
 static func sort(a, b):
 	if a.priority > b.priority:

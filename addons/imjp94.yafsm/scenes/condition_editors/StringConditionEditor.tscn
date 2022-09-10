@@ -3,8 +3,8 @@
 [ext_resource type="PackedScene" uid="uid://blnscdhcxvpmk" path="res://addons/imjp94.yafsm/scenes/condition_editors/ValueConditionEditor.tscn" id="1"]
 [ext_resource type="Script" path="res://addons/imjp94.yafsm/scenes/condition_editors/StringConditionEditor.gd" id="2"]
 
-[node name="StringConditionEditor" instance=ExtResource( "1" )]
-script = ExtResource( "2" )
+[node name="StringConditionEditor" instance=ExtResource("1")]
+script = ExtResource("2")
 
 [node name="PopupMenu" parent="Comparation" index="0"]
 item_count = 2

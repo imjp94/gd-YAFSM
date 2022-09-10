@@ -7,8 +7,6 @@ var selected: = false:
 
 
 func _init():
-	super._init()
-	
 	focus_mode = FOCUS_NONE # Let FlowChart has the focus to handle gui_input
 	mouse_filter = MOUSE_FILTER_PASS
 

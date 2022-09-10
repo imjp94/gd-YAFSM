@@ -12,6 +12,8 @@ func _get_configuration_warning():
 	return ""
 
 func _ready():
+	super._ready()
+	
 	if Engine.is_editor_hint():
 		return
 

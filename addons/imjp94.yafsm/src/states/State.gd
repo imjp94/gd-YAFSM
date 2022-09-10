@@ -18,7 +18,6 @@ var graph_offset:  # Position in FlowChart stored as meta, for editor only
 
 
 func _init(p_name=""):
-	super._init()
 	name = p_name
 
 func is_entry():

@@ -3,20 +3,22 @@
 [ext_resource type="PackedScene" uid="uid://blnscdhcxvpmk" path="res://addons/imjp94.yafsm/scenes/condition_editors/ValueConditionEditor.tscn" id="1"]
 [ext_resource type="Script" path="res://addons/imjp94.yafsm/scenes/condition_editors/BoolConditionEditor.gd" id="2"]
 
-[node name="BoolConditionEditor" instance=ExtResource( "1" )]
-script = ExtResource( "2" )
+[node name="BoolConditionEditor" instance=ExtResource("1")]
+script = ExtResource("2")
 
 [node name="PopupMenu" parent="Comparation" index="0"]
 item_count = 2
 
 [node name="MarginContainer" parent="." index="2"]
+offset_top = 3.0
 offset_right = 146.0
+offset_bottom = 27.0
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
 [node name="BooleanValue" type="CheckButton" parent="MarginContainer" index="0"]
 offset_right = 44.0
-offset_bottom = 31.0
+offset_bottom = 24.0
 size_flags_horizontal = 6
 
 [node name="Remove" parent="." index="3"]

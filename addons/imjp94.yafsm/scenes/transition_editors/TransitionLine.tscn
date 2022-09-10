@@ -1,10 +1,10 @@
 [gd_scene load_steps=3 format=3 uid="uid://cwb2nrjai7fao"]
 
-[ext_resource type="PackedScene" path="res://addons/imjp94.yafsm/scenes/flowchart/FlowChartLine.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://c357dx8cq5r3o" path="res://addons/imjp94.yafsm/scenes/flowchart/FlowChartLine.tscn" id="1"]
 [ext_resource type="Script" path="res://addons/imjp94.yafsm/scenes/transition_editors/TransitionLine.gd" id="2"]
 
-[node name="TransitionLine" instance=ExtResource( "1" )]
-script = ExtResource( "2" )
+[node name="TransitionLine" instance=ExtResource("1")]
+script = ExtResource("2")
 upright_angle_range = 10.0
 
 [node name="MarginContainer" type="MarginContainer" parent="." index="0"]

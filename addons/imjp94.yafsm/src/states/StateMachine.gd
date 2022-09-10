@@ -7,11 +7,11 @@ signal transition_added(transition) # Transition added
 signal transition_removed(to_state) # Transition removed
 
 @export var states: Dictionary:  # States within this StateMachine, keyed by State.name
-	get = get_states,
-	set = set_states
+	get = _get_states,
+	set = _set_states
 @export var transitions: Dictionary:  # Transitions from this state, keyed by Transition.to
-	get = get_transitions,
-	set = set_transitions
+	get = _get_transitions,
+	set = _set_transitions
 
 var _states
 var _transitions
@@ -169,17 +169,17 @@ func has_exit():
 	return State.EXIT_STATE in _states
 
 # Get duplicate of states dictionary
-func get_states():
+func _get_states():
 	return _states.duplicate()
 
-func set_states(val):
+func _set_states(val):
 	_states = val
 
 # Get duplicate of transitions dictionary
-func get_transitions():
+func _get_transitions():
 	return _transitions.duplicate()
 
-func set_transitions(val):
+func _set_transitions(val):
 	_transitions = val
 
 static func join_path(base, dirs):
@@ -200,7 +200,7 @@ static func validate(state_machine):
 		if not (from_key in state_machine.states):
 			validated = true
 			push_warning("gd-YAFSM ValidationError: Non-existing state(%s) found in transition" % from_key)
-			state_machine.transitions.erase(from_key)
+			state_machine.remove_state(from_key)
 			continue
 
 		var from_transition = state_machine.transitions[from_key]

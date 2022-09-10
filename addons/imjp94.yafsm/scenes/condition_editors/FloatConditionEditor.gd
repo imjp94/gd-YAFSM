@@ -6,8 +6,6 @@ extends "ValueConditionEditor.gd"
 var _old_value = 0.0
 
 func _ready():
-	super._ready()
-	
 	float_value.text_submitted.connect(_on_float_value_text_submitted)
 	float_value.focus_entered.connect(_on_float_value_focus_entered)
 	float_value.focus_exited.connect(_on_float_value_focus_exited)

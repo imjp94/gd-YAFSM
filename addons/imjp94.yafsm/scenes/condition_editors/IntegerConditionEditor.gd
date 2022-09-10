@@ -7,8 +7,6 @@ var _old_value = 0
 
 
 func _ready():
-	super._ready()
-	
 	integer_value.text_submitted.connect(_on_integer_value_text_submitted)
 	integer_value.focus_entered.connect(_on_integer_value_focus_entered)
 	integer_value.focus_exited.connect(_on_integer_value_focus_exited)

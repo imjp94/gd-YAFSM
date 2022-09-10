@@ -3,8 +3,8 @@
 [ext_resource type="PackedScene" uid="uid://blnscdhcxvpmk" path="res://addons/imjp94.yafsm/scenes/condition_editors/ValueConditionEditor.tscn" id="1"]
 [ext_resource type="Script" path="res://addons/imjp94.yafsm/scenes/condition_editors/FloatConditionEditor.gd" id="2"]
 
-[node name="ValueConditionEditor" instance=ExtResource( "1" )]
-script = ExtResource( "2" )
+[node name="ValueConditionEditor" instance=ExtResource("1")]
+script = ExtResource("2")
 
 [node name="MarginContainer" parent="." index="2"]
 offset_right = 169.0

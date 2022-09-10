@@ -54,8 +54,8 @@ func enable_name_edit(v):
 		set_process_input(false)
 		name_edit.editable = false
 		name_edit.selecting_enabled = false
-		name_edit.mouse_filter = MOUSE_FILTER_IGNORE
-		mouse_default_cursor_shape = CURSOR_ARROW
+		name_edit.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		mouse_default_cursor_shape = Control.CURSOR_ARROW
 		name_edit.release_focus()
 
 func _on_state_name_changed(new_name):

@@ -8,8 +8,6 @@ var _old_value = 0
 
 
 func _ready():
-	super._ready()
-	
 	string_value.text_submitted.connect(_on_string_value_text_submitted)
 	string_value.focus_entered.connect(_on_string_value_focus_entered)
 	string_value.focus_exited.connect(_on_string_value_focus_exited)
