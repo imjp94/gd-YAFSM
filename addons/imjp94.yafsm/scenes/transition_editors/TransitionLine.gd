@@ -3,7 +3,7 @@ extends "res://addons/imjp94.yafsm/scenes/flowchart/FlowChartLine.gd"
 const Transition = preload("../../src/transitions/Transition.gd")
 const ValueCondition = preload("../../src/conditions/ValueCondition.gd")
 
-@export var upright_angle_range: = deg2rad(10.0)
+@export var upright_angle_range: = deg_to_rad(10.0)
 
 @onready var label_margin = $MarginContainer
 @onready var vbox = $MarginContainer/VBoxContainer
@@ -25,8 +25,8 @@ func _draw():
 	super._draw()
 
 	var abs_rotation = abs(rotation)
-	var is_flip = abs_rotation > deg2rad(90.0)
-	var is_upright = abs_rotation > deg2rad(90.0) - upright_angle_range and abs_rotation < deg2rad(90.0) + upright_angle_range
+	var is_flip = abs_rotation > deg_to_rad(90.0)
+	var is_upright = abs_rotation > deg_to_rad(90.0) - upright_angle_range and abs_rotation < deg_to_rad(90.0) + upright_angle_range
 	if is_upright:
 		var x_offset = label_margin.size.x / 2
 		var y_offset = -label_margin.size.y
@@ -39,10 +39,10 @@ func _draw():
 		var x_offset = label_margin.size.x
 		var y_offset = -label_margin.size.y
 		if is_flip:
-			label_margin.rotation = deg2rad(180)
+			label_margin.rotation = deg_to_rad(180)
 			label_margin.position = Vector2((size.x + x_offset) / 2, 0)
 		else:
-			label_margin.rotation = deg2rad(0)
+			label_margin.rotation = deg_to_rad(0)
 			label_margin.position = Vector2((size.x - x_offset) / 2, y_offset)
 
 # Update overlay text

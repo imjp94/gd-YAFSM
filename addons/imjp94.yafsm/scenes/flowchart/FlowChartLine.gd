@@ -36,7 +36,7 @@ func pivot_at_line_start():
 
 func join(from, to, offset=Vector2.ZERO, clip_rects=[]):
 	# Offset along perpendicular direction
-	var perp_dir = from.direction_to(to).rotated(deg2rad(90.0)).normalized()
+	var perp_dir = from.direction_to(to).rotated(deg_to_rad(90.0)).normalized()
 	from -= perp_dir * offset
 	to -= perp_dir * offset
 
