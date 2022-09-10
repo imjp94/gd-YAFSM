@@ -149,23 +149,23 @@ func set_zoom(v):
 
 func _on_zoom_minus_pressed():
 	set_zoom(zoom - 0.1)
-	update()
+	queue_redraw()
 
 func _on_zoom_reset_pressed():
 	set_zoom(1.0)
-	update()
+	queue_redraw()
 
 func _on_zoom_plus_pressed():
 	set_zoom(zoom + 0.1)
-	update()
+	queue_redraw()
 
 func _on_snap_button_pressed():
 	is_snapping = snap_button.button_pressed
-	update()
+	queue_redraw()
 
 func _on_snap_amount_value_changed(value):
 	snap = value
-	update()
+	queue_redraw()
 
 func _draw():
 	# Update scrolls
@@ -286,7 +286,7 @@ func _gui_input(event):
 				# Panning
 				h_scroll.value -= event.relative.x
 				v_scroll.value -= event.relative.y
-				update()
+				queue_redraw()
 			MOUSE_BUTTON_LEFT:
 				# Dragging
 				if _is_dragging:
@@ -328,7 +328,7 @@ func _gui_input(event):
 										var connection = current_layer._connections[from][to]
 										connection.join()
 					_drag_end_pos = get_global_mouse_position()
-					update()
+					queue_redraw()
 
 	if event is InputEventMouseButton:
 		match event.button_index:
@@ -336,15 +336,15 @@ func _gui_input(event):
 				# Reset zoom
 				if event.double_click:
 					set_zoom(1.0)
-					update()
+					queue_redraw()
 			MOUSE_BUTTON_WHEEL_UP:
 				# Zoom in
 				set_zoom(zoom + 0.01)
-				update()
+				queue_redraw()
 			MOUSE_BUTTON_WHEEL_DOWN:
 				# Zoom out
 				set_zoom(zoom - 0.01)
-				update()
+				queue_redraw()
 			MOUSE_BUTTON_LEFT:
 				# Hit detection
 				var hit_node
@@ -492,7 +492,7 @@ func _gui_input(event):
 								_drag_origins[i] = selected.global_position
 								selected.modulate.a = 1.0
 						_drag_start_pos = _drag_end_pos
-						update()
+						queue_redraw()
 
 # Get selection box rect
 func get_selection_box_rect():

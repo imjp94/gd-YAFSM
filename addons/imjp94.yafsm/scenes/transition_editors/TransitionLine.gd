@@ -70,7 +70,7 @@ func update_label():
 					label.text = label.text.format(override_template_var)
 			else:
 				label.text = condition.name
-	update()
+	queue_redraw()
 
 func _on_transition_changed(new_transition):
 	if not is_inside_tree():

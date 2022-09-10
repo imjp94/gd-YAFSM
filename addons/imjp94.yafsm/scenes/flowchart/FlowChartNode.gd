@@ -29,4 +29,4 @@ func _get_minimum_size():
 func set_selected(v):
 	if selected != v:
 		selected = v
-		update()
+		queue_redraw()

@@ -81,7 +81,7 @@ func join(from, to, offset=Vector2.ZERO, clip_rects=[]):
 func set_selected(v):
 	if selected != v:
 		selected = v
-		update()
+		queue_redraw()
 
 func get_from_pos():
 	return get_global_transform() * (global_position)

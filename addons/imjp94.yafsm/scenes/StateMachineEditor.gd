@@ -211,7 +211,7 @@ func _on_state_node_context_menu_index_pressed(index):
 
 func _on_convert_to_state_confirmation_confirmed():
 	convert_to_state(current_layer, _context_node)
-	_context_node.update() # Update outlook of node
+	_context_node.queue_redraw() # Update outlook of node
 	# Remove layer
 	var path = str(path_viewer.get_cwd(), "/", _context_node.name)
 	var layer = get_layer(path)
@@ -445,7 +445,7 @@ func clear_graph(layer):
 			layer.content_nodes.remove_child(child)
 			child.queue_free()
 	
-	update()
+	queue_redraw()
 	unsaved_indicator.text = "" # Clear graph is not action by user
 
 # Intialize editor with current editing StateMachine
@@ -466,7 +466,7 @@ func draw_graph(layer):
 			for transition in from_transitions.values():
 				connect_node(layer, transition.from, transition.to)
 				layer._connections[transition.from][transition.to].line.transition = transition
-	update()
+	queue_redraw()
 	unsaved_indicator.text = "" # Draw graph is not action by user
 
 # Add message to message_box(overlay text at bottom of editor)
