@@ -37,4 +37,4 @@ offset_bottom = 31.0
 [node name="Remove" parent="." index="3"]
 offset_left = 106.0
 offset_right = 132.0
-hint_tooltip = "Remove Condition"
+tooltip_text = "Remove Condition"

@@ -70,7 +70,7 @@ func _init():
 	path_viewer.dir_pressed.connect(_on_path_viewer_dir_pressed)
 	top_bar.add_child(path_viewer)
 
-	condition_visibility.hint_tooltip = "Hide/Show Conditions on Transition Line"
+	condition_visibility.tooltip_text = "Hide/Show Conditions on Transition Line"
 	condition_visibility.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 	condition_visibility.toggle_mode = true
 	condition_visibility.size_flags_vertical = SIZE_SHRINK_CENTER

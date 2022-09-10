@@ -90,26 +90,26 @@ func _init():
 	top_bar.add_child(gadget)
 
 	zoom_minus.flat = true
-	zoom_minus.hint_tooltip = "Zoom Out"
+	zoom_minus.tooltip_text = "Zoom Out"
 	zoom_minus.pressed.connect(_on_zoom_minus_pressed)
 	zoom_minus.focus_mode = Control.FOCUS_NONE
 	gadget.add_child(zoom_minus)
 
 	zoom_reset.flat = true
-	zoom_reset.hint_tooltip = "Zoom Reset"
+	zoom_reset.tooltip_text = "Zoom Reset"
 	zoom_reset.pressed.connect(_on_zoom_reset_pressed)
 	zoom_reset.focus_mode = Control.FOCUS_NONE
 	gadget.add_child(zoom_reset)
 
 	zoom_plus.flat = true
-	zoom_plus.hint_tooltip = "Zoom In"
+	zoom_plus.tooltip_text = "Zoom In"
 	zoom_plus.pressed.connect(_on_zoom_plus_pressed)
 	zoom_plus.focus_mode = Control.FOCUS_NONE
 	gadget.add_child(zoom_plus)
 
 	snap_button.flat = true
 	snap_button.toggle_mode = true
-	snap_button.hint_tooltip = "Enable snap and show grid"
+	snap_button.tooltip_text = "Enable snap and show grid"
 	snap_button.pressed.connect(_on_snap_button_pressed)
 	snap_button.button_pressed = true
 	snap_button.focus_mode = Control.FOCUS_NONE

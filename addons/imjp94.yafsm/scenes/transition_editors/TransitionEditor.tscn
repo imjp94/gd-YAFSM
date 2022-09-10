@@ -35,7 +35,7 @@ offset_bottom = 31.0
 [node name="Title" type="HBoxContainer" parent="HeaderContainer/Header"]
 offset_right = 86.0
 offset_bottom = 31.0
-hint_tooltip = "Next State"
+tooltip_text = "Next State"
 
 [node name="From" type="Label" parent="HeaderContainer/Header/Title"]
 offset_top = 2.0
@@ -68,7 +68,7 @@ offset_bottom = 31.0
 offset_left = 98.0
 offset_right = 147.0
 offset_bottom = 31.0
-hint_tooltip = "Number of Condition"
+tooltip_text = "Number of Condition"
 
 [node name="Icon" type="TextureRect" parent="HeaderContainer/Header/ConditionCount"]
 offset_top = 6.0
@@ -94,7 +94,7 @@ offset_bottom = 31.0
 offset_left = 159.0
 offset_right = 262.0
 offset_bottom = 31.0
-hint_tooltip = "Priority"
+tooltip_text = "Priority"
 
 [node name="Icon" type="TextureRect" parent="HeaderContainer/Header/Priority"]
 offset_top = 7.0
@@ -126,7 +126,7 @@ size_flags_horizontal = 10
 [node name="Add" type="Button" parent="HeaderContainer/Header/HBoxContainer"]
 offset_right = 26.0
 offset_bottom = 31.0
-hint_tooltip = "Add Condition"
+tooltip_text = "Add Condition"
 icon = ExtResource("1")
 flat = true
 
