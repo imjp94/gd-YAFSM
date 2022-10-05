@@ -1,21 +1,21 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=5 format=3 uid="uid://bar1eob74t82f"]
 
-[ext_resource path="res://addons/imjp94.yafsm/scenes/flowchart/FlowChartNode.gd" type="Script" id=1]
+[ext_resource type="Script" path="res://addons/imjp94.yafsm/scenes/flowchart/FlowChartNode.gd" id="1"]
 
-[sub_resource type="StyleBoxFlat" id=1]
-bg_color = Color( 0.164706, 0.164706, 0.164706, 1 )
+[sub_resource type="StyleBoxFlat" id="1"]
+bg_color = Color(0.164706, 0.164706, 0.164706, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color( 0.901961, 0.756863, 0.243137, 1 )
+border_color = Color(0.901961, 0.756863, 0.243137, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[sub_resource type="StyleBoxFlat" id=2]
-bg_color = Color( 0.164706, 0.164706, 0.164706, 1 )
+[sub_resource type="StyleBoxFlat" id="2"]
+bg_color = Color(0.164706, 0.164706, 0.164706, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -25,16 +25,10 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[sub_resource type="Theme" id=3]
-FlowChartNode/styles/focus = SubResource( 1 )
-FlowChartNode/styles/normal = SubResource( 2 )
+[sub_resource type="Theme" id="3"]
+FlowChartNode/styles/focus = SubResource("1")
+FlowChartNode/styles/normal = SubResource("2")
 
 [node name="FlowChartNode" type="Container"]
-margin_right = 40.0
-margin_bottom = 40.0
-mouse_filter = 1
-theme = SubResource( 3 )
-script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+theme = SubResource("3")
+script = ExtResource("1")

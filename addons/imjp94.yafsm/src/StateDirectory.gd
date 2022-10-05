@@ -1,18 +1,22 @@
-tool
-extends Reference
+@tool
+extends RefCounted
 
 const State = preload("states/State.gd")
 
 var path
-var current setget ,get_current
-var base setget ,get_base
-var end setget ,get_end
+var current:
+	get = get_current
+var base:
+	get = get_base
+var end:
+	get = get_end
 
 var _current_index = 0
 var _dirs = [""] # Empty string equals to root
 
 
 func _init(p):
+	super._init()
 	path = p
 	_dirs += Array(p.split("/"))
 
@@ -48,7 +52,10 @@ func has_back():
 
 # Get current full path
 func get_current():
-	return PoolStringArray(_dirs.slice(get_base_index(), _current_index)).join("/")
+	# In Godot 4.x the end parameter of Array.slice() is EXCLUSIVE!
+	# https://docs.godotengine.org/en/latest/classes/class_array.html#class-array-method-slice
+	var packed_string_array: PackedStringArray = PackedStringArray(_dirs.slice(get_base_index(), _current_index+1))
+	return "/".join(packed_string_array)
 
 # Get current end state name of path
 func get_current_end():

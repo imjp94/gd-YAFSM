@@ -1,7 +1,9 @@
-tool
+@tool
 extends "ValueCondition.gd"
 
-export(String) var value setget set_value, get_value
+@export var value: String:
+	set = set_value,
+	get = get_value
 
 
 func set_value(v):
@@ -19,4 +21,4 @@ func get_value_string():
 func compare(v):
 	if typeof(v) != TYPE_STRING:
 		return false
-	return .compare(v)
+	return super.compare(v)

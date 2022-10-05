@@ -6,21 +6,20 @@
 ;   [section] ; section goes between []
 ;   param=value ; assign values to parameters
 
-config_version=4
+config_version=5
 
-_global_script_classes=[  ]
-_global_script_class_icons={
-
-}
+_global_script_classes=[]
+_global_script_class_icons={}
 
 [application]
 
 config/name="YAFSM"
+config/features=PackedStringArray("4.0")
 config/icon="res://icon.png"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "imjp94.yafsm" )
+enabled=PackedStringArray("res://addons/imjp94.yafsm/plugin.cfg")
 
 [rendering]
 

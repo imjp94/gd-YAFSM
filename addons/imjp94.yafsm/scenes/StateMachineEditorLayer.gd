@@ -1,4 +1,4 @@
-tool
+@tool
 extends "res://addons/imjp94.yafsm/scenes/flowchart/FlowChartLayer.gd"
 
 const Utils = preload("res://addons/imjp94.yafsm/scripts/Utils.gd")
@@ -6,21 +6,18 @@ const StateNode = preload("res://addons/imjp94.yafsm/scenes/state_nodes/StateNod
 const StateNodeScript = preload("res://addons/imjp94.yafsm/scenes/state_nodes/StateNode.gd")
 const StateDirectory = preload("../src/StateDirectory.gd")
 
-var editor_accent_color = Color.white setget set_editor_accent_color
-var editor_complementary_color = Color.white
+var editor_accent_color: = Color.WHITE:
+	set = set_editor_accent_color
+var editor_complementary_color = Color.WHITE
 
 var state_machine
-var tween = Tween.new()
+var tween_lines
+var tween_labels
+var tween_nodes
 
-
-func _init():
-	add_child(tween)
-	tween.connect("tree_entered", self, "_on_tween_tree_entered")
-
-func _on_tween_tree_entered():
-	tween.start()
 
 func debug_update(current_state, parameters, local_parameters):
+	_init_tweens()
 	if not state_machine:
 		return
 	var current_dir = StateDirectory.new(current_state)
@@ -28,98 +25,125 @@ func debug_update(current_state, parameters, local_parameters):
 	if current_dir.is_nested():
 		transitions = state_machine.transitions.get(current_dir.get_end(), {})
 	for transition in transitions.values():
-		var line = content_lines.get_node_or_null("%s>%s" % [transition.from, transition.to])
+		# Check all possible transitions from current state, update labels, color them accordingly
+		var line = content_lines.get_node_or_null(NodePath("%s>%s" % [transition.from, transition.to]))
 		if line:
 			# Blinking alpha of TransitionLine
-			var color1 = Color.white
+			var color1 = Color.WHITE
 			color1.a = 0.1
-			var color2 = Color.white
+			var color2 = Color.WHITE
 			color2.a = 0.5
 			if line.self_modulate == color1:
-				tween.interpolate_property(line, "self_modulate", null, color2, 1)
+				tween_lines.tween_property(line, "self_modulate", color2, 0.5)
 			elif line.self_modulate == color2:
-				tween.interpolate_property(line, "self_modulate", null, color1, 1)
-			elif line.self_modulate == Color.white:
-				tween.interpolate_property(line, "self_modulate", null, color2, 1)
+				tween_lines.tween_property(line, "self_modulate", color1, 0.5)
+			elif line.self_modulate == Color.WHITE:
+				tween_lines.tween_property(line, "self_modulate", color2, 0.5)
 			# Update TransitionLine condition labels
 			for condition in transition.conditions.values():
 				if not ("value" in condition): # Ignore trigger
 					continue
-				var value = parameters.get(condition.name)
+				var value = parameters.get(str(condition.name))
 				value = str(value) if value != null else "?"
-				var label = line.vbox.get_node_or_null(condition.name)
-				var override_template_var = line._template_var.get(condition.name)
+				var label = line.vbox.get_node_or_null(NodePath(str(condition.name)))
+				var override_template_var = line._template_var.get(str(condition.name))
 				if override_template_var == null:
 					override_template_var = {}
-					line._template_var[condition.name] = override_template_var
+					line._template_var[str(condition.name)] = override_template_var
 				override_template_var["value"] = str(value)
 				line.update_label()
 				# Condition label color based on comparation
-				if condition.compare(parameters.get(condition.name)) or condition.compare(local_parameters.get(condition.name)):
-					if label.self_modulate != Color.green:
-						tween.interpolate_property(label, "self_modulate", null, Color.green.lightened(0.5), 0.1)
+				var cond_1: bool = condition.compare(parameters.get(str(condition.name)))
+				var cond_2: bool = condition.compare(local_parameters.get(str(condition.name)))
+				if cond_1 or cond_2:
+					tween_labels.tween_property(label, "self_modulate", Color.GREEN.lightened(0.5), 0.01)
 				else:
-					if label.self_modulate != Color.red:
-						tween.interpolate_property(label, "self_modulate", null, Color.red.lightened(0.5), 0.1)
-	tween.start()
+					tween_labels.tween_property(label, "self_modulate", Color.RED.lightened(0.5), 0.01)
+	_start_tweens()
 
 func debug_transit_out(from, to):
+	_init_tweens()
 	var from_dir = StateDirectory.new(from)
 	var to_dir = StateDirectory.new(to)
-	var from_node = content_nodes.get_node_or_null(from_dir.get_end())
-	if from_node:
-		from_node.self_modulate = editor_complementary_color
-		tween.interpolate_property(from_node, "self_modulate", null, Color.white, 0.5)
+	var from_node = content_nodes.get_node_or_null(NodePath(from_dir.get_end()))
+	if from_node != null:
+		tween_nodes.tween_property(from_node, "self_modulate", editor_complementary_color, 0.01)
+		tween_nodes.tween_property(from_node, "self_modulate", Color.WHITE, 1)
 	var transitions = state_machine.transitions.get(from, {})
 	if from_dir.is_nested():
 		transitions = state_machine.transitions.get(from_dir.get_end(), {})
 	# Fade out color of StateNode
 	for transition in transitions.values():
-		var line = content_lines.get_node_or_null("%s>%s" % [transition.from, transition.to])
+		var line = content_lines.get_node_or_null(NodePath("%s>%s" % [transition.from, transition.to]))
 		if line:
 			line.template = "{condition_name} {condition_comparation} {condition_value}"
 			line.update_label()
-			tween.remove(line, "self_modulate")
 			if transition.to == to_dir.get_end():
-				line.self_modulate = editor_complementary_color
-				tween.interpolate_property(line, "self_modulate", null, Color.white, 2, Tween.TRANS_EXPO, Tween.EASE_IN)
+				tween_lines.tween_property(line, "self_modulate", editor_complementary_color, 0.01)
+				tween_lines.tween_property(line, "self_modulate", Color.WHITE, 1).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN)
+				# Highlight all the conditions of the transition that just happened
+				for condition in transition.conditions.values():
+					if not ("value" in condition): # Ignore trigger
+						continue
+					var label = line.vbox.get_node_or_null(NodePath(condition.name))
+					tween_labels.tween_property(label, "self_modulate", editor_complementary_color, 0.01)
+					tween_labels.tween_property(label, "self_modulate", Color.WHITE, 1)
 			else:
-				tween.interpolate_property(line, "self_modulate", null, Color.white, 0.1)
-			# Revert color of TransitionLine condition labels
-			for condition in transition.conditions.values():
-				if not ("value" in condition): # Ignore trigger
-					continue
-				var label = line.vbox.get_node_or_null(condition.name)
-				if label.self_modulate != Color.white:
-					tween.interpolate_property(label, "self_modulate", null, Color.white, 0.5)
+				tween_lines.tween_property(line, "self_modulate", Color.WHITE, 0.1)
+				# Revert color of TransitionLine condition labels
+				for condition in transition.conditions.values():
+					if not ("value" in condition): # Ignore trigger
+						continue
+					var label = line.vbox.get_node_or_null(NodePath(condition.name))
+					if label.self_modulate != Color.WHITE:
+						tween_labels.tween_property(label, "self_modulate", Color.WHITE, 0.5)
 	if from_dir.is_nested() and from_dir.is_exit():
 		# Transition from nested state
 		transitions = state_machine.transitions.get(from_dir.get_base(), {})
+		tween_lines.set_parallel(true)
 		for transition in transitions.values():
-			var line = content_lines.get_node_or_null("%s>%s" % [transition.from, transition.to])
+			var line = content_lines.get_node_or_null(NodePath("%s>%s" % [transition.from, transition.to]))
 			if line:
-				tween.interpolate_property(line, "self_modulate", null, editor_complementary_color.lightened(0.5), 0.5)
-		yield(tween, "tween_completed")
+				tween_lines.tween_property(line, "self_modulate", editor_complementary_color.lightened(0.5), 0.1)
 		for transition in transitions.values():
-			var line = content_lines.get_node_or_null("%s>%s" % [transition.from, transition.to])
+			var line = content_lines.get_node_or_null(NodePath("%s>%s" % [transition.from, transition.to]))
 			if line:
-				tween.interpolate_property(line, "self_modulate", null, Color.white, 0.5)
-	tween.start()
+				tween_lines.tween_property(line, "self_modulate", Color.WHITE, 0.1)
+	_start_tweens()
 
 func debug_transit_in(from, to):
+	_init_tweens()
 	var to_dir = StateDirectory.new(to)
-	var to_node = content_nodes.get_node_or_null(to_dir.get_end())
+	var to_node = content_nodes.get_node_or_null(NodePath(to_dir.get_end()))
 	if to_node:
-		tween.interpolate_property(to_node, "self_modulate", null, editor_complementary_color, 0.5)
+		tween_nodes.tween_property(to_node, "self_modulate", editor_complementary_color, 0.5)
 	var transitions = state_machine.transitions.get(to, {})
 	if to_dir.is_nested():
 		transitions = state_machine.transitions.get(to_dir.get_end(), {})
 	# Change string template for current TransitionLines
 	for transition in transitions.values():
-		var line = content_lines.get_node_or_null("%s>%s" % [transition.from, transition.to])
+		var line = content_lines.get_node_or_null(NodePath("%s>%s" % [transition.from, transition.to]))
 		line.template = "{condition_name} {condition_comparation} {condition_value}({value})"
-	tween.start()
+	_start_tweens()
 
 func set_editor_accent_color(color):
 	editor_accent_color = color
 	editor_complementary_color = Utils.get_complementary_color(color)
+
+
+func _init_tweens():
+	tween_lines = get_tree().create_tween()
+	tween_lines.stop()
+	tween_labels = get_tree().create_tween()
+	tween_labels.stop()
+	tween_nodes = get_tree().create_tween()
+	tween_nodes.stop()
+
+
+func _start_tweens():
+	tween_lines.tween_interval(0.001)
+	tween_lines.play()
+	tween_labels.tween_interval(0.001)
+	tween_labels.play()
+	tween_nodes.tween_interval(0.001)
+	tween_nodes.play()

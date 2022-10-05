@@ -1,4 +1,4 @@
-tool
+@tool
 extends Control
 const FlowChartNode = preload("res://addons/imjp94.yafsm/scenes/flowchart/FlowChartNode.gd")
 
@@ -8,6 +8,8 @@ var content_nodes = Control.new() # Node that hold all flowchart nodes
 var _connections = {}
 
 func _init():
+	super._init()
+	
 	name = "FlowChartLayer"
 	mouse_filter = MOUSE_FILTER_IGNORE
 
@@ -78,8 +80,8 @@ func connect_node(line, from, to, interconnection_offset=0):
 	if connections_from:
 		if to in connections_from:
 			return # Connection existed
-	var connection = Connection.new(line, content_nodes.get_node(from), content_nodes.get_node(to))
-	if not connections_from:
+	var connection = Connection.new(line, content_nodes.get_node(NodePath(from)), content_nodes.get_node(NodePath(to)))
+	if connections_from == null:
 		connections_from = {}
 		_connections[from] = connections_from
 	connections_from[to] = connection
@@ -99,7 +101,7 @@ func connect_node(line, from, to, interconnection_offset=0):
 func disconnect_node(from, to):
 	var connections_from = _connections.get(from)
 	var connection = connections_from.get(to)
-	if not connection:
+	if connection == null:
 		return
 
 	_disconnect_node(connection)
@@ -148,8 +150,8 @@ class Connection:
 
 	# Return start position of line
 	func get_from_pos():
-		return from_node.rect_position + from_node.rect_size / 2
+		return from_node.position + from_node.size / 2
 
 	# Return destination position of line
 	func get_to_pos():
-		return to_node.rect_position + to_node.rect_size / 2 if to_node else line.rect_position
+		return to_node.position + to_node.size / 2 if to_node else line.position

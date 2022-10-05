@@ -1,31 +1,42 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=3 format=3 uid="uid://blnscdhcxvpmk"]
 
-[ext_resource path="res://addons/imjp94.yafsm/scenes/condition_editors/ConditionEditor.tscn" type="PackedScene" id=1]
-[ext_resource path="res://addons/imjp94.yafsm/scenes/condition_editors/ValueConditionEditor.gd" type="Script" id=2]
+[ext_resource type="PackedScene" uid="uid://cie8lb6ww58ck" path="res://addons/imjp94.yafsm/scenes/condition_editors/ConditionEditor.tscn" id="1"]
+[ext_resource type="Script" path="res://addons/imjp94.yafsm/scenes/condition_editors/ValueConditionEditor.gd" id="2"]
 
-[node name="ValueConditionEditor" instance=ExtResource( 1 )]
-script = ExtResource( 2 )
+[node name="ValueConditionEditor" instance=ExtResource("1")]
+script = ExtResource("2")
 
 [node name="Comparation" type="Button" parent="." index="1"]
-margin_left = 62.0
-margin_top = 2.0
-margin_right = 90.0
-margin_bottom = 22.0
+layout_mode = 2
+offset_left = 71.0
+offset_right = 98.0
+offset_bottom = 31.0
 size_flags_horizontal = 5
 size_flags_vertical = 4
 text = "=="
 
 [node name="PopupMenu" type="PopupMenu" parent="Comparation" index="0"]
-margin_right = 20.0
-margin_bottom = 20.0
-items = [ "==", null, 0, false, false, 0, 0, null, "", false, "!=", null, 0, false, false, 1, 0, null, "", false, ">", null, 0, false, false, 2, 0, null, "", false, "<", null, 0, false, false, 3, 0, null, "", false, "≥", null, 0, false, false, 4, 0, null, "", false, "≤", null, 0, false, false, 5, 0, null, "", false ]
+item_count = 6
+item_0/text = "=="
+item_0/id = 0
+item_1/text = "!="
+item_1/id = 1
+item_2/text = ">"
+item_2/id = 2
+item_3/text = "<"
+item_3/id = 3
+item_4/text = "≥"
+item_4/id = 4
+item_5/text = "≤"
+item_5/id = 5
 
 [node name="MarginContainer" type="MarginContainer" parent="." index="2"]
-margin_left = 94.0
-margin_right = 94.0
-margin_bottom = 24.0
+layout_mode = 2
+offset_left = 102.0
+offset_right = 102.0
+offset_bottom = 31.0
 
 [node name="Remove" parent="." index="3"]
-margin_left = 98.0
-margin_right = 128.0
-hint_tooltip = "Remove Condition"
+offset_left = 106.0
+offset_right = 132.0
+tooltip_text = "Remove Condition"

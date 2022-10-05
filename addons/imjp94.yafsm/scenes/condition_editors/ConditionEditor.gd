@@ -1,31 +1,32 @@
-tool
+@tool
 extends HBoxContainer
 
-onready var name_edit = $Name
-onready var remove = $Remove
+@onready var name_edit = $Name
+@onready var remove = $Remove
 
 var undo_redo
 
-var condition setget set_condition
+var condition:
+	set = set_condition
 
 
 func _ready():
-	name_edit.connect("text_entered", self, "_on_name_edit_text_entered")
-	name_edit.connect("focus_entered", self, "_on_name_edit_focus_entered")
-	name_edit.connect("focus_exited", self, "_on_name_edit_focus_exited")
-	name_edit.connect("text_changed", self, "_on_name_edit_text_changed")
+	name_edit.text_submitted.connect(_on_name_edit_text_submitted)
+	name_edit.focus_entered.connect(_on_name_edit_focus_entered)
+	name_edit.focus_exited.connect(_on_name_edit_focus_exited)
+	name_edit.text_changed.connect(_on_name_edit_text_changed)
 	set_process_input(false)
 
 func _input(event):
 	if event is InputEventMouseButton:
 		if event.pressed:
-			if get_focus_owner() == name_edit:
+			if get_viewport().gui_get_focus_owner() == name_edit:
 				var local_event = name_edit.make_input_local(event)
 				if not name_edit.get_rect().has_point(local_event.position):
 					name_edit.release_focus()
 
-func _on_name_edit_text_entered(new_text):
-	name_edit.release_focus()
+func _on_name_edit_text_changed(new_text):
+	# name_edit.release_focus()
 	if condition.name == new_text: # Avoid infinite loop
 		return
 
@@ -41,8 +42,8 @@ func _on_name_edit_focus_exited():
 
 	rename_edit_action(name_edit.text)
 
-func _on_name_edit_text_changed(new_text):
-	name_edit.hint_tooltip = new_text
+func _on_name_edit_text_submitted(new_text):
+	name_edit.tooltip_text = new_text
 
 func change_name_edit(from, to):
 	var transition = get_parent().get_parent().get_parent().transition # TODO: Better way to get Transition object
@@ -63,7 +64,7 @@ func rename_edit_action(new_name_edit):
 func _on_condition_changed(new_condition):
 	if new_condition:
 		name_edit.text = new_condition.name
-		name_edit.hint_tooltip = name_edit.text
+		name_edit.tooltip_text = name_edit.text
 
 func set_condition(c):
 	if condition != c:

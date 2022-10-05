@@ -10,24 +10,30 @@ enum ResetEventTrigger {
 	LAST_TO_DEST = 1 # Only last state and destination will emit event
 }
 
-var current setget ,get_current # Current item on top of stack
-var stack setget set_stack, get_stack
+var current:  # Current item on top of stack
+	get = get_current
+var stack:
+	set = _set_stack,
+	get = _get_stack
+
+var _stack
 
 
 func _init():
-	stack = []
+	super._init()
+	_stack = []
 
 # Push an item to the top of stack
 func push(to):
 	var from = get_current()
-	stack.push_back(to)
+	_stack.push_back(to)
 	_on_pushed(from, to)
 	emit_signal("pushed", to)
 
 # Remove the current item on top of stack
 func pop():
 	var to = get_previous()
-	var from = stack.pop_back()
+	var from = _stack.pop_back()
 	_on_popped(from, to)
 	emit_signal("popped", from)
 
@@ -42,8 +48,8 @@ func _on_popped(from, to):
 # Reset stack to given index, -1 to clear all item by default
 # Use ResetEventTrigger to define how _on_popped should be called
 func reset(to=-1, event=ResetEventTrigger.ALL):
-	assert(to > -2 and to < stack.size(), "Reset to index(%d) out of bounds(%d)" % [to, stack.size()])
-	var last_index = stack.size() - 1
+	assert(to > -2 and to < _stack.size(), "Reset to index out of bounds")
+	var last_index = _stack.size() - 1
 	var first_state = ""
 	var num_to_pop = last_index - to
 
@@ -52,31 +58,31 @@ func reset(to=-1, event=ResetEventTrigger.ALL):
 			first_state = get_current() if i == 0 else first_state
 			match event:
 				ResetEventTrigger.LAST_TO_DEST:
-					stack.pop_back()
+					_stack.pop_back()
 					if i == num_to_pop - 1:
-						stack.push_back(first_state)
+						_stack.push_back(first_state)
 						pop()
 				ResetEventTrigger.ALL:
 					pop()
 				_:
-					stack.pop_back()
+					_stack.pop_back()
 	elif num_to_pop == 0:
 		match event:
 			ResetEventTrigger.NONE:
-				stack.pop_back()
+				_stack.pop_back()
 			_:
 				pop()
 
-func set_stack(stack):
+func _set_stack(val):
 	push_warning("Attempting to edit read-only state stack directly. " \
 		+ "Control state machine from setting parameters or call update() instead")
 
 # Get duplicate of the stack being played
-func get_stack():
-	return stack.duplicate()
+func _get_stack():
+	return _stack.duplicate()
 
 func get_current():
-	return stack.back() if not stack.empty() else null
+	return _stack.back() if not _stack.is_empty() else null
 
 func get_previous():
-	return stack[stack.size() - 2] if stack.size() > 1 else null
+	return _stack[_stack.size() - 2] if _stack.size() > 1 else null
