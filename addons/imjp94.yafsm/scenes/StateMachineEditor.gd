@@ -434,7 +434,7 @@ func save():
 		return
 	
 	unsaved_indicator.text = ""
-	ResourceSaver.save(state_machine.resource_path, state_machine)
+	ResourceSaver.save(state_machine, state_machine.resource_path)
 
 # Clear editor
 func clear_graph(layer):
