@@ -1,7 +1,7 @@
 @tool
-extends "State.gd"
-const State = preload("State.gd")
-const Transition = preload("../transitions/Transition.gd")
+extends State
+class_name StateMachine
+@icon("../../assets/icons/state_machine_icon.png")
 
 signal transition_added(transition) # Transition added
 signal transition_removed(to_state) # Transition removed

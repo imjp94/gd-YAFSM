@@ -1,6 +1,5 @@
 @tool
-extends "StackPlayer.gd"
-const State = preload("states/State.gd")
+extends StackPlayer
 
 signal transited(from, to) # Transition of state
 signal entered(to) # Entry of state machine(including nested), empty string equals to root
@@ -14,7 +13,7 @@ enum UpdateProcessMode {
 	MANUAL
 }
 
-@export var state_machine: Resource # StateMachine being played 
+@export var state_machine: StateMachine # StateMachine being played 
 @export var active: = true:  # Activeness of player
 	set = set_active
 @export var autostart: = true # Automatically enter Entry state on ready if true

@@ -1,5 +1,6 @@
 @tool
 extends Resource
+class_name Transition
 
 signal condition_added(condition)
 signal condition_removed(condition)

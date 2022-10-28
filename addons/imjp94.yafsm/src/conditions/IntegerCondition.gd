@@ -1,5 +1,7 @@
 @tool
-extends "ValueCondition.gd"
+extends ValueCondition
+class_name IntegerCondition
+
 
 @export var value: int:
 	set = set_value,

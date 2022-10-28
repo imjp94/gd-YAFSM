@@ -1,5 +1,6 @@
 @tool
-extends "Condition.gd"
+extends Condition
+class_name ValueCondition
 
 signal comparation_changed(new_comparation) # Comparation hanged
 signal value_changed(new_value) # Value changed

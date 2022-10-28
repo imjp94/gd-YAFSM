@@ -3,8 +3,6 @@ extends EditorPlugin
 const YAFSM = preload("YAFSM.gd")
 const StackPlayer = YAFSM.StackPlayer
 const StateMachinePlayer = YAFSM.StateMachinePlayer
-const StateMachine = YAFSM.StateMachine
-const State = YAFSM.State
 
 const StateMachineEditor = preload("scenes/StateMachineEditor.tscn")
 const TransitionInspector = preload("scenes/transition_editors/TransitionInspector.gd")
@@ -12,7 +10,6 @@ const StateInspector = preload("scenes/state_nodes/StateInspector.gd")
 
 const StackPlayerIcon = preload("assets/icons/stack_player_icon.png")
 const StateMachinePlayerIcon = preload("assets/icons/state_machine_player_icon.png")
-const StateMachineIcon = preload("assets/icons/state_machine_icon.png")
 
 var state_machine_editor = StateMachineEditor.instantiate()
 var transition_inspector = TransitionInspector.new()
@@ -29,8 +26,7 @@ func _enter_tree():
 	var editor_base_control = get_editor_interface().get_base_control()
 	add_custom_type("StackPlayer", "Node", StackPlayer, StackPlayerIcon)
 	add_custom_type("StateMachinePlayer", "Node", StateMachinePlayer, StateMachinePlayerIcon)
-	add_custom_type("StateMachine", "Resource", StateMachine, StateMachineIcon)
-
+	
 	state_machine_editor.selection_stylebox.bg_color = editor_base_control.get_theme_color("box_selection_fill_color", "Editor")
 	state_machine_editor.selection_stylebox.border_color = editor_base_control.get_theme_color("box_selection_stroke_color", "Editor")
 	state_machine_editor.zoom_minus.icon = editor_base_control.get_theme_icon("ZoomLess", "EditorIcons")
@@ -58,7 +54,6 @@ func _enter_tree():
 func _exit_tree():
 	remove_custom_type("StackPlayer")
 	remove_custom_type("StateMachinePlayer")
-	remove_custom_type("StateMachine")
 
 	remove_inspector_plugin(transition_inspector)
 	remove_inspector_plugin(state_inspector)
