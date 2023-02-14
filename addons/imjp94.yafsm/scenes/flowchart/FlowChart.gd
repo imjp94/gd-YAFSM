@@ -8,6 +8,7 @@ const FlowChartNodeScene = preload("FlowChartNode.tscn")
 const FlowChartLine = preload("FlowChartLine.gd")
 const FlowChartLineScene = preload("FlowChartLine.tscn")
 const FlowChartLayer = preload("FlowChartLayer.gd")
+const FlowChartGrid = preload("FlowChartGrid.gd")
 const Connection = FlowChartLayer.Connection
 
 signal connection(from, to, line) # When a connection established
@@ -17,7 +18,7 @@ signal node_deselected(node) # When a node deselected
 signal dragged(node, distance) # When a node dragged
 
 # Margin of content from edge of FlowChart
-@export var scroll_margin: = 100 
+@export var scroll_margin: = 50
 # Offset between two line that interconnecting
 @export var interconnection_offset: = 10
 # Snap amount
@@ -25,7 +26,11 @@ signal dragged(node, distance) # When a node dragged
 # Zoom amount
 @export var zoom: = 1.0:
 	set = set_zoom
+@export var zoom_step: = 0.2
+@export var max_zoom: = 2.0
+@export var min_zoom: = 0.5
 
+var grid = FlowChartGrid.new() # Grid
 var content = Control.new() # Root node that hold anything drawn in the flowchart
 var current_layer
 var h_scroll = HScrollBar.new()
@@ -54,8 +59,8 @@ var _selection = []
 var _copying_nodes = []
 
 var selection_stylebox = StyleBoxFlat.new()
-var grid_major_color = Color(1, 1, 1, 0.15)
-var grid_minor_color = Color(1, 1, 1, 0.07)
+var grid_major_color = Color(1, 1, 1, 0.2)
+var grid_minor_color = Color(1, 1, 1, 0.05)
 	
 
 func _init():
@@ -65,8 +70,15 @@ func _init():
 	selection_stylebox.bg_color = Color(0, 0, 0, 0.3)
 	selection_stylebox.set_border_width_all(1)
 
+	self.z_index = 0
+
 	content.mouse_filter = MOUSE_FILTER_IGNORE
 	add_child(content)
+	content.z_index = 1
+
+	grid.mouse_filter = MOUSE_FILTER_IGNORE
+	content.add_child.call_deferred(grid)
+	grid.z_index = -1
 
 	add_child(h_scroll)
 	h_scroll.set_anchors_and_offsets_preset(PRESET_BOTTOM_WIDE)
@@ -80,6 +92,9 @@ func _init():
 
 	h_scroll.offset_right = -v_scroll.size.x
 	v_scroll.offset_bottom = -h_scroll.size.y
+
+	h_scroll.min_value = 0
+	v_scroll.max_value = 0
 
 	add_layer_to(content)
 	select_layer_at(0)
@@ -146,11 +161,13 @@ func _on_v_scroll_changed(value):
 	content.position.y = -value
 
 func set_zoom(v):
-	zoom = v
+	zoom = clampf(v, min_zoom, max_zoom)
 	content.scale = Vector2.ONE * zoom
+	queue_redraw()
+	grid.queue_redraw()
 
 func _on_zoom_minus_pressed():
-	set_zoom(zoom - 0.1)
+	set_zoom(zoom - zoom_step)
 	queue_redraw()
 
 func _on_zoom_reset_pressed():
@@ -158,7 +175,7 @@ func _on_zoom_reset_pressed():
 	queue_redraw()
 
 func _on_zoom_plus_pressed():
-	set_zoom(zoom + 0.1)
+	set_zoom(zoom + zoom_step)
 	queue_redraw()
 
 func _on_snap_button_pressed():
@@ -171,13 +188,19 @@ func _on_snap_amount_value_changed(value):
 
 func _draw():
 	# Update scrolls
-	var content_rect = get_scroll_rect()
-	content.pivot_offset = get_scroll_rect().size / 2.0 # Scale from center
-	if not get_rect().encloses(content_rect):
-		var h_min = content_rect.position.x
-		var h_max = content_rect.size.x + content_rect.position.x - size.x
-		var v_min = content_rect.position.y
-		var v_max = content_rect.size.y + content_rect.position.y - size.y
+	var content_rect: Rect2 = get_scroll_rect(current_layer, 0)
+	content.pivot_offset = content_rect.size / 2.0 # Scale from center
+	var flowchart_rect: Rect2 = get_rect()
+	# ENCLOSE CONDITIONS
+	var is_content_enclosed = (flowchart_rect.size.x >= content_rect.size.x)
+	is_content_enclosed = is_content_enclosed and (flowchart_rect.size.y >= content_rect.size.y)
+	is_content_enclosed = is_content_enclosed and (flowchart_rect.position.x <= content_rect.position.x)
+	is_content_enclosed = is_content_enclosed and (flowchart_rect.position.y >= content_rect.position.y)
+	if not is_content_enclosed or (h_scroll.min_value==h_scroll.max_value) or (v_scroll.min_value==v_scroll.max_value):
+		var h_min = 0 # content_rect.position.x - scroll_margin/2 - content_rect.get_center().x/2
+		var h_max = content_rect.size.x - content_rect.position.x - size.x + scroll_margin + content_rect.get_center().x
+		var v_min = 0 # content_rect.position.y - scroll_margin/2 - content_rect.get_center().y/2
+		var v_max = content_rect.size.y - content_rect.position.y - size.y + scroll_margin + content_rect.get_center().y
 		if h_min == h_max: # Otherwise scroll bar will complain no ratio
 			h_min -= 0.1
 			h_max += 0.1
@@ -196,42 +219,11 @@ func _draw():
 		var selection_box_rect = get_selection_box_rect()
 		draw_style_box(selection_stylebox, selection_box_rect)
 
-	# Draw grid
-	# Refer GraphEdit(https://github.com/godotengine/godot/blob/6019dab0b45e1291e556e6d9e01b625b5076cc3c/scene/gui/graph_edit.cpp#L442)
 	if is_snapping:
-		var scroll_offset = Vector2(h_scroll.get_value(), v_scroll.get_value());
-		var offset = scroll_offset / zoom
-		var size_over_zoom = size / zoom
-
-		var from = (offset / float(snap)).floor()
-		var l = (size / float(snap)).floor() + Vector2(1, 1)
-
-		var grid_minor = grid_minor_color
-		var grid_major = grid_major_color
-
-		# for (int i = from.x; i < from.x + len.x; i++) {
-		for i in range(from.x, from.x + l.x):
-			var color
-
-			if (int(abs(i)) % 10 == 0):
-				color = grid_major
-			else:
-				color = grid_minor
-
-			var base_ofs = i * snap * zoom - offset.x * zoom
-			draw_line(Vector2(base_ofs, 0), Vector2(base_ofs, size.y), color)
-
-		# for (int i = from.y; i < from.y + len.y; i++) {
-		for i in range(from.y, from.y + l.y):
-			var color;
-
-			if (int(abs(i)) % 10 == 0):
-				color = grid_major
-			else:
-				color = grid_minor
-
-			var base_ofs = i * snap * zoom - offset.y * zoom
-			draw_line(Vector2(0, base_ofs), Vector2(size.x, base_ofs), color)
+		grid.visible = true
+		grid.queue_redraw()
+	else:
+		grid.visible = false
 
 	# Debug draw
 	# for node in content_nodes.get_children():
@@ -341,11 +333,11 @@ func _gui_input(event):
 					queue_redraw()
 			MOUSE_BUTTON_WHEEL_UP:
 				# Zoom in
-				set_zoom(zoom + 0.01)
+				set_zoom(zoom + zoom_step/10)
 				queue_redraw()
 			MOUSE_BUTTON_WHEEL_DOWN:
 				# Zoom out
-				set_zoom(zoom - 0.01)
+				set_zoom(zoom - zoom_step/10)
 				queue_redraw()
 			MOUSE_BUTTON_LEFT:
 				# Hit detection
@@ -496,8 +488,11 @@ func get_selection_box_rect():
 	return Rect2(pos, size)
 
 # Get required scroll rect base on content
-func get_scroll_rect(layer=current_layer):
-	return layer.get_scroll_rect(scroll_margin)
+func get_scroll_rect(layer=current_layer, force_scroll_margin=null):
+	var _scroll_margin = scroll_margin
+	if force_scroll_margin!=null:
+		_scroll_margin = force_scroll_margin
+	return layer.get_scroll_rect(_scroll_margin)
 
 func add_layer_to(target):
 	var layer = create_layer_instance()

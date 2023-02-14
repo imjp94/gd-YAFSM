@@ -1,7 +1,7 @@
 # Position Popup near to its target while within window, solution from ColorPickerButton source code(https://github.com/godotengine/godot/blob/6d8c14f849376905e1577f9fc3f9512bcffb1e3c/scene/gui/color_picker.cpp#L878)
 static func popup_on_target(popup, target):
 	popup.reset_size()
-	var usable_rect = Rect2(Vector2.ZERO, DisplayServer.window_get_real_size())
+	var usable_rect = Rect2(Vector2.ZERO, DisplayServer.window_get_size_with_decorations())
 	var cp_rect = Rect2(Vector2.ZERO, popup.get_size())
 	for i in 4:
 		if i > 1:

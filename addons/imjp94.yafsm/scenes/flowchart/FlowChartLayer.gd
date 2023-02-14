@@ -34,6 +34,7 @@ func show_content():
 func get_scroll_rect(scroll_margin=0):
 	var rect = Rect2()
 	for child in content_nodes.get_children():
+		# Every child is a state/statemachine node
 		var child_rect = child.get_rect()
 		rect = rect.merge(child_rect)
 	return rect.grow(scroll_margin)

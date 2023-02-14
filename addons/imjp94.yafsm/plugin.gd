@@ -19,6 +19,7 @@ var focused_object:  # Can be StateMachine/StateMachinePlayer
 	set = set_focused_object
 var editor_selection
 
+var _handled_and_ready_to_edit = false  # forces _handles => _edit flow
 
 func _enter_tree():
 	editor_selection = get_editor_interface().get_selection()
@@ -63,7 +64,8 @@ func _exit_tree():
 
 func _handles(object):
 	if object is StateMachine:
-		return true
+		_handled_and_ready_to_edit = true  # this should not be necessary, but it seemingly is (Godot 4.0-rc1)
+		return true  # when return true from _handles, _edit can proceed.
 	if object is StateMachinePlayer:
 		if object.get_class() == "EditorDebuggerRemoteObject":
 			set_focused_object(object)
@@ -72,7 +74,9 @@ func _handles(object):
 	return false
 
 func _edit(object):
-	set_focused_object(object)
+	if _handled_and_ready_to_edit:  # Forces _handles => _edit flow. This should not be necessary, but it seemingly is (Godot 4.0-rc1)
+		_handled_and_ready_to_edit = false
+		set_focused_object(object)
 
 func show_state_machine_editor():
 	if focused_object and state_machine_editor:
@@ -130,6 +134,7 @@ func _on_StateMachineEditor_node_selected(node):
 	get_editor_interface().inspect_object(to_inspect)
 
 func _on_StateMachineEditor_node_deselected(node):
+	# editor_selection.remove_node(node)
 	get_editor_interface().inspect_object(state_machine_editor.state_machine)
 
 func _on_StateMachineEditor_debug_mode_changed(new_debug_mode):
