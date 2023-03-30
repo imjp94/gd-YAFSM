@@ -35,7 +35,7 @@ func _draw():
             color = grid_minor
 
         var base_ofs = i * snap
-        draw_line(Vector2(base_ofs, offset.y), Vector2(base_ofs, corrected_size.y), color, -1, true)
+        draw_line(Vector2(base_ofs, offset.y), Vector2(base_ofs, corrected_size.y), color, -1, false)
 
     # for (int i = from.y; i < from.y + len.y; i++) {
     for i in range(from.y, from.y + l.y):
@@ -47,4 +47,4 @@ func _draw():
             color = grid_minor
 
         var base_ofs = i * snap
-        draw_line(Vector2(offset.x, base_ofs), Vector2(corrected_size.x, base_ofs), color, -1, true)
+        draw_line(Vector2(offset.x, base_ofs), Vector2(corrected_size.x, base_ofs), color, -1, false)
