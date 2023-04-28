@@ -18,6 +18,10 @@ config/icon="res://icon.png"
 
 enabled=PackedStringArray("res://addons/imjp94.yafsm/plugin.cfg")
 
+[filesystem]
+
+import/blender/enabled=false
+
 [rendering]
 
 environment/default_environment="res://default_env.tres"
