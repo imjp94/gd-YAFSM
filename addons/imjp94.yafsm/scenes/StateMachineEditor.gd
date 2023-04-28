@@ -179,7 +179,17 @@ func _on_context_menu_index_pressed(index):
 	new_node.theme.get_stylebox("focus", "FlowChartNode").border_color = editor_accent_color
 	match index:
 		0: # Add State
-			new_node.name = "State"
+			## Handle state name duplication (4.x changed how duplicates are
+			## automatically handled and gave a random index instead of
+			## a progressive one)
+			var default_new_state_name = "State"
+			var state_dup_index = 0
+			var new_name = default_new_state_name
+			for state_name in current_layer.state_machine.states:
+				if (state_name == new_name):
+					state_dup_index += 1
+					new_name = "%s%s" % [default_new_state_name, state_dup_index]
+			new_node.name = new_name
 		1: # Add Entry
 			if State.ENTRY_STATE in current_layer.state_machine.states:
 				push_warning("Entry node already exist")

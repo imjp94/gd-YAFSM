@@ -16,10 +16,9 @@ var state:
 func _init():
 	super._init()
 	
-	set_state(State.new("State"))
+	set_state(State.new())
 
 func _ready():
-	name_edit.text = "State"
 	name_edit.focus_exited.connect(_on_NameEdit_focus_exited)
 	name_edit.text_submitted.connect(_on_NameEdit_text_submitted)
 	set_process_input(false) # _input only required when name_edit enabled to check mouse click outside
