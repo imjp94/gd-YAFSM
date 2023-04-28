@@ -167,7 +167,7 @@ func _on_path_viewer_dir_pressed(dir, index):
 		if layer:
 			var node = layer.content_nodes.get_node_or_null(NodePath(end_state_name))
 			if node:
-				if not node.state.has("states"):
+				if (not ("states" in node.state) or (node.state.states=={})):
 					# Convert state machine node back to state node
 					convert_to_state(layer, node)
 
