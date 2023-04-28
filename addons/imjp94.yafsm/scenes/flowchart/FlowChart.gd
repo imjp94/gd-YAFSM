@@ -412,6 +412,10 @@ func _gui_input(event):
 					if not _is_dragging:
 						# Drag start
 						_is_dragging = true
+						for i in _selection.size():
+							var selected = _selection[i]
+							_drag_origins[i] = selected.position
+							selected.modulate.a = 1.0
 						_drag_start_pos = event.position
 						_drag_end_pos = event.position
 				else:
