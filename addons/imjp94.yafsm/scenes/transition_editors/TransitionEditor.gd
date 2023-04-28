@@ -59,15 +59,15 @@ func _on_add_popup_menu_index_pressed(index):
 	var condition
 	match index:
 		0: # Trigger
-			condition = Condition.new()
+			condition = Condition.new("Condition")
 		1: # Boolean
-			condition = BooleanCondition.new()
+			condition = BooleanCondition.new("BooleanCondition")
 		2: # Integer
-			condition = IntegerCondition.new()
+			condition = IntegerCondition.new("IntegerCondition")
 		3: # Float
-			condition = FloatCondition.new()
+			condition = FloatCondition.new("FloatCondition")
 		4: # String
-			condition = StringCondition.new()
+			condition = StringCondition.new("StringCondition")
 		_:
 			push_error("Unexpected index(%d) from PopupMenu" % index)
 	var editor = create_condition_editor(condition)
