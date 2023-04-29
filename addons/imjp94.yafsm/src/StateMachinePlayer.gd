@@ -366,4 +366,7 @@ static func path_backward(path):
 
 # Return end directory of path, "path/to/state" returns "state"
 static func path_end_dir(path):
-	return path.right(path.rfind("/") + 1)
+	# In Godot 4.x the old behaviour of String.right() can be achieved with
+	# a negative length. Check the docs:
+	# https://docs.godotengine.org/en/stable/classes/class_string.html#class-string-method-right
+	return path.right(-(path.rfind("/") + 1))

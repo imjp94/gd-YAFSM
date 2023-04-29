@@ -167,7 +167,13 @@ func _on_path_viewer_dir_pressed(dir, index):
 		if layer:
 			var node = layer.content_nodes.get_node_or_null(NodePath(end_state_name))
 			if node:
-				if (not ("states" in node.state) or (node.state.states=={})):
+				var cond_1 = (not ("states" in node.state)) or (node.state.states=={})  # states property not defined or empty
+				# Now check if, for some reason, there are an Entry and/or an Exit node inside this node
+				# not registered in the states variable above.
+				var nested_layer = content.get_node_or_null(NodePath(_last_path))
+				var cond_2 = (nested_layer.content_nodes.get_node_or_null(NodePath(State.ENTRY_STATE)) == null)  # there is no entry state in the node
+				var cond_3 = (nested_layer.content_nodes.get_node_or_null(NodePath(State.EXIT_STATE)) == null)  # there is no exit state in the node
+				if (cond_1 and cond_2 and cond_3):
 					# Convert state machine node back to state node
 					convert_to_state(layer, node)
 
@@ -221,7 +227,7 @@ func _on_state_node_context_menu_index_pressed(index):
 
 func _on_convert_to_state_confirmation_confirmed():
 	convert_to_state(current_layer, _context_node)
-	_context_node.update() # Update outlook of node
+	_context_node.queue_redraw() # Update outlook of node
 	# Remove layer
 	var path = str(path_viewer.get_cwd(), "/", _context_node.name)
 	var layer = get_layer(path)
