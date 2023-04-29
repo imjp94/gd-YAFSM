@@ -56,18 +56,28 @@ func _on_add_pressed():
 	Utils.popup_on_target(add_popup_menu, add)
 
 func _on_add_popup_menu_index_pressed(index):
+	## Handle condition name duplication (4.x changed how duplicates are
+	## automatically handled and gave a random index instead of a progressive one)
+	var default_new_condition_name = "Param"
+	var condition_dup_index = 0
+	var new_name = default_new_condition_name
+	for condition_editor in condition_list.get_children():
+		var condition_name = condition_editor.condition.name
+		if (condition_name == new_name):
+			condition_dup_index += 1
+			new_name = "%s%s" % [default_new_condition_name, condition_dup_index]
 	var condition
 	match index:
 		0: # Trigger
-			condition = Condition.new("Condition")
+			condition = Condition.new(new_name)
 		1: # Boolean
-			condition = BooleanCondition.new("BooleanCondition")
+			condition = BooleanCondition.new(new_name)
 		2: # Integer
-			condition = IntegerCondition.new("IntegerCondition")
+			condition = IntegerCondition.new(new_name)
 		3: # Float
-			condition = FloatCondition.new("FloatCondition")
+			condition = FloatCondition.new(new_name)
 		4: # String
-			condition = StringCondition.new("StringCondition")
+			condition = StringCondition.new(new_name)
 		_:
 			push_error("Unexpected index(%d) from PopupMenu" % index)
 	var editor = create_condition_editor(condition)
