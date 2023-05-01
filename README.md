@@ -2,9 +2,7 @@
 
 Designer-friendly Finite State Machine implemented in "Godotic" way
 
-⚠️ **Warning**
-> It is not recommended to be used in production yet, as api might be changed before v1.0.
-> Testing & reporting bugs are greatly appreciated.
+> This version is only compatible with **Godot 4.x**, check out [godot3](https://github.com/imjp94/gd-YAFSM/tree/godot3) branch for older version
 
 ## Content
 
@@ -54,6 +52,14 @@ or
 1. Download this respository, move `addons/imjp94.yafsm` to your `{project_dir}`
 
 2. Enable it from Project -> Settings -> Plugins
+
+or
+
+1. Install with [gd-plug](https://github.com/imjp94/gd-plug)
+
+```gdscript
+plug("imjp94/gd-YAFSM")
+```
 
 ## Getting Started
 
