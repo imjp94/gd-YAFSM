@@ -1,135 +1,101 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=5 format=3 uid="uid://bp2f3rs2sgn8g"]
 
-[ext_resource path="res://addons/imjp94.yafsm/scenes/StateNodeContextMenu.tscn" type="PackedScene" id=1]
-[ext_resource path="res://addons/imjp94.yafsm/scenes/StateMachineEditor.gd" type="Script" id=2]
-[ext_resource path="res://addons/imjp94.yafsm/scenes/ContextMenu.tscn" type="PackedScene" id=3]
-[ext_resource path="res://addons/imjp94.yafsm/scenes/ParametersPanel.gd" type="Script" id=4]
-
-[sub_resource type="StyleBoxFlat" id=1]
-bg_color = Color( 0, 0, 0, 0.203922 )
-
-[sub_resource type="StyleBoxFlat" id=2]
-bg_color = Color( 0, 0, 0, 0.243137 )
+[ext_resource type="PackedScene" uid="uid://ccv81pntbud75" path="res://addons/imjp94.yafsm/scenes/StateNodeContextMenu.tscn" id="1"]
+[ext_resource type="Script" path="res://addons/imjp94.yafsm/scenes/StateMachineEditor.gd" id="2"]
+[ext_resource type="PackedScene" uid="uid://cflltb00e10be" path="res://addons/imjp94.yafsm/scenes/ContextMenu.tscn" id="3"]
+[ext_resource type="Script" path="res://addons/imjp94.yafsm/scenes/ParametersPanel.gd" id="4"]
 
 [node name="StateMachineEditor" type="Control"]
+visible = false
+clip_contents = true
+custom_minimum_size = Vector2i(0, 200)
+layout_mode = 3
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-rect_min_size = Vector2( 500, 200 )
-rect_clip_content = true
-focus_mode = 2
-mouse_filter = 1
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-script = ExtResource( 2 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-interconnection_offset = 15
+focus_mode = 2
+mouse_filter = 1
+script = ExtResource("2")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 visible = false
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Panel" type="Panel" parent="MarginContainer"]
-margin_right = 1024.0
-margin_bottom = 600.0
-custom_styles/panel = SubResource( 1 )
+layout_mode = 2
+offset_right = 1152.0
+offset_bottom = 648.0
 
 [node name="CreateNewStateMachine" type="Button" parent="MarginContainer"]
-margin_left = 425.0
-margin_top = 290.0
-margin_right = 598.0
-margin_bottom = 310.0
+layout_mode = 2
+offset_left = 473.0
+offset_top = 308.0
+offset_right = 679.0
+offset_bottom = 339.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.87451, 0.87451, 0.87451, 1)
 text = "Create new StateMachine"
 
-[node name="ContextMenu" parent="." instance=ExtResource( 3 )]
-items = [ "Add State", null, 0, false, false, 0, 0, null, "", false, "Add Entry", null, 0, false, false, 1, 0, null, "", false, "Add Exit", null, 0, false, false, 2, 0, null, "", false ]
+[node name="ContextMenu" parent="." instance=ExtResource("3")]
+visible = false
 
-[node name="StateNodeContextMenu" parent="." instance=ExtResource( 1 )]
-items = [ "Copy", null, 0, false, false, 0, 0, null, "", false, "Duplicate", null, 0, false, false, 1, 0, null, "", false, "", null, 0, false, false, 2, 0, null, "", true, "Convert to State", null, 0, false, false, 3, 0, null, "", false ]
+[node name="StateNodeContextMenu" parent="." instance=ExtResource("1")]
+visible = false
 
 [node name="SaveDialog" type="ConfirmationDialog" parent="."]
-margin_right = 200.0
-margin_bottom = 70.0
 
 [node name="ConvertToStateConfirmation" type="ConfirmationDialog" parent="."]
-margin_right = 200.0
-margin_bottom = 70.0
-window_title = "Convert StateMachine to State"
 dialog_text = "All nested states beneath it will be lost, are you sure about that?"
 dialog_autowrap = true
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="ParametersPanel" type="MarginContainer" parent="."]
 visible = false
+layout_mode = 1
+anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -32.0
-margin_top = -32.0
 grow_horizontal = 0
 grow_vertical = 0
-custom_constants/margin_right = 8
-custom_constants/margin_top = 8
-custom_constants/margin_left = 8
-custom_constants/margin_bottom = 8
-script = ExtResource( 4 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+script = ExtResource("4")
 
 [node name="PanelContainer" type="PanelContainer" parent="ParametersPanel"]
-margin_left = 8.0
-margin_top = 8.0
-margin_right = 42.0
-margin_bottom = 48.0
-custom_styles/panel = SubResource( 2 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+layout_mode = 2
+offset_right = 113.0
+offset_bottom = 31.0
 
 [node name="MarginContainer" type="MarginContainer" parent="ParametersPanel/PanelContainer"]
-margin_right = 34.0
-margin_bottom = 40.0
-custom_constants/margin_right = 8
-custom_constants/margin_top = 8
-custom_constants/margin_left = 8
-custom_constants/margin_bottom = 8
+layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ParametersPanel/PanelContainer/MarginContainer"]
-margin_left = 8.0
-margin_top = 8.0
-margin_right = 26.0
-margin_bottom = 32.0
+layout_mode = 2
+offset_right = 113.0
+offset_bottom = 31.0
 
 [node name="MarginContainer" type="MarginContainer" parent="ParametersPanel/PanelContainer/MarginContainer/VBoxContainer"]
-margin_right = 18.0
-margin_bottom = 20.0
+layout_mode = 2
 
 [node name="Button" type="Button" parent="ParametersPanel/PanelContainer/MarginContainer/VBoxContainer/MarginContainer"]
-margin_right = 18.0
-margin_bottom = 20.0
+layout_mode = 2
+offset_right = 113.0
+offset_bottom = 31.0
 size_flags_horizontal = 10
-text = "_"
+text = "Show Params"
 
 [node name="GridContainer" type="GridContainer" parent="ParametersPanel/PanelContainer/MarginContainer/VBoxContainer"]
-margin_top = 24.0
-margin_right = 18.0
-margin_bottom = 24.0
-custom_constants/vseparation = 8
-custom_constants/hseparation = 16
+visible = false
+layout_mode = 2
 columns = 4
-__meta__ = {
-"_edit_use_anchors_": false
-}

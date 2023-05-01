@@ -1,19 +1,26 @@
-tool
-extends "State.gd"
-const State = preload("State.gd")
-const Transition = preload("../transitions/Transition.gd")
+@tool
+@icon("../../assets/icons/state_machine_icon.png")
+extends State
+class_name StateMachine
 
 signal transition_added(transition) # Transition added
 signal transition_removed(to_state) # Transition removed
 
-export(Dictionary) var states setget ,get_states # States within this StateMachine, keyed by State.name
-export(Dictionary) var transitions setget ,get_transitions # Transitions from this state, keyed by Transition.to
+@export var states: Dictionary:  # States within this StateMachine, keyed by State.name
+	get = get_states,
+	set = set_states
+@export var transitions: Dictionary:  # Transitions from this state, keyed by Transition.to
+	get = get_transitions,
+	set = set_transitions
+
+var _states
+var _transitions
 
 
 func _init(p_name="", p_transitions={}, p_states={}):
-	._init(p_name)
-	transitions = p_transitions
-	states = p_states
+	super._init(p_name)
+	_transitions = p_transitions
+	_states = p_states
 
 # Attempt to transit with global/local parameters, where local_params override params
 func transit(current_state, params={}, local_params={}):
@@ -28,7 +35,7 @@ func transit(current_state, params={}, local_params={}):
 		if end_state_machine != self:
 			end_state_machine = end_state_machine.states[state]
 		else:
-			end_state_machine = states[state] # First level state
+			end_state_machine = _states[state] # First level state
 
 	# Nested StateMachine in Exit state
 	if is_nested:
@@ -45,12 +52,12 @@ func transit(current_state, params={}, local_params={}):
 				# Construct next state into absolute path
 				next_state = join_path(end_state_machine_parent_path, [next_state])
 			return next_state
-
+	
 	# Transit with current running nested state machine
 	var from_transitions = end_state_machine.transitions.get(nested_states[nested_states.size()-1])
 	if from_transitions:
 		var from_transitions_array = from_transitions.values()
-		from_transitions_array.sort_custom(Transition, "sort")
+		from_transitions_array.sort_custom(func(a, b): Transition.sort(a, b))
 		
 		for transition in from_transitions_array:
 			var next_state = transition.transit(params, local_params)
@@ -68,7 +75,7 @@ func transit(current_state, params={}, local_params={}):
 # *It is impossible to get parent state machine with path like "../sibling", as StateMachine is not structed as a Tree
 func get_state(path):
 	var state
-	if path.empty():
+	if path.is_empty():
 		state = self
 	else:
 		var nested_states = path.split("/")
@@ -77,40 +84,40 @@ func get_state(path):
 			if state:
 				state = state.states[dir]
 			else:
-				state = states[dir] # First level state
+				state = _states[dir] # First level state
 	return state
 
-# Add state, state name must be unique within this StateMachine, return state added if succeed else reutrn null
+# Add state, state name must be unique within this StateMachine, return state added if succeed else return null
 func add_state(state):
 	if not state:
 		return null
-	if state.name in states:
+	if state.name in _states:
 		return null
 
-	states[state.name] = state
+	_states[state.name] = state
 	return state
 
 # Remove state by its name
 func remove_state(state):
-	return states.erase(state)
+	return _states.erase(state)
 
 # Change existing state key in states(Dictionary), return true if success
 func change_state_name(from, to):
-	if not (from in states) or to in states:
+	if not (from in _states) or to in _states:
 		return false
 
-	for state_key in states.keys():
-		var state = states[state_key]
+	for state_key in _states.keys():
+		var state = _states[state_key]
 		var is_name_changing_state = state_key == from
 		if is_name_changing_state:
 			state.name = to
-			states[to] = state
-			states.erase(from)
-		for from_key in transitions.keys():
-			var from_transitions = transitions[from_key]
+			_states[to] = state
+			_states.erase(from)
+		for from_key in _transitions.keys():
+			var from_transitions = _transitions[from_key]
 			if from_key == from:
-				transitions.erase(from)
-				transitions[to] = from_transitions
+				_transitions.erase(from)
+				_transitions[to] = from_transitions
 			for to_key in from_transitions.keys():
 				var transition = from_transitions[to_key]
 				if transition.from == from:
@@ -125,54 +132,60 @@ func change_state_name(from, to):
 
 # Add transition, Transition.from must be equal to this state's name and Transition.to not added yet
 func add_transition(transition):
-	if not (transition.from or transition.to):
+	if transition.from == "" or transition.to == "":
 		push_warning("Transition missing from/to (%s/%s)" % [transition.from, transition.to])
 		return
 
 	var from_transitions
-	if transition.from in transitions:
-		from_transitions = transitions[transition.from]
+	if transition.from in _transitions:
+		from_transitions = _transitions[transition.from]
 	else:
 		from_transitions = {}
-		transitions[transition.from] = from_transitions
+		_transitions[transition.from] = from_transitions
 
 	from_transitions[transition.to] = transition
 	emit_signal("transition_added", transition)
 
 # Remove transition with Transition.to(name of state transiting to)
 func remove_transition(from_state, to_state):
-	var from_transitions = transitions.get(from_state)
+	var from_transitions = _transitions.get(from_state)
 	if from_transitions:
 		if to_state in from_transitions:
 			from_transitions.erase(to_state)
-			if from_transitions.empty():
-				transitions.erase(from_state)
+			if from_transitions.is_empty():
+				_transitions.erase(from_state)
 			emit_signal("transition_removed", from_state, to_state)
 
 func get_entries():
-	return transitions[State.ENTRY_STATE].values()
+	return _transitions[State.ENTRY_STATE].values()
 	
 func get_exits():
-	return transitions[State.EXIT_STATE].values()
+	return _transitions[State.EXIT_STATE].values()
 
 func has_entry():
-	return State.ENTRY_STATE in states
+	return State.ENTRY_STATE in _states
 
 func has_exit():
-	return State.EXIT_STATE in states
+	return State.EXIT_STATE in _states
 
 # Get duplicate of states dictionary
 func get_states():
-	return states.duplicate()
+	return _states.duplicate()
+
+func set_states(val):
+	_states = val
 
 # Get duplicate of transitions dictionary
 func get_transitions():
-	return transitions.duplicate()
+	return _transitions.duplicate()
+
+func set_transitions(val):
+	_transitions = val
 
 static func join_path(base, dirs):
 	var path = base
 	for dir in dirs:
-		if path.empty():
+		if path.is_empty():
 			path = dir
 		else:
 			path = str(path, "/", dir)

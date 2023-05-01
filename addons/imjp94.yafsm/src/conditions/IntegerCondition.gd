@@ -1,7 +1,11 @@
-tool
-extends "ValueCondition.gd"
+@tool
+extends ValueCondition
+class_name IntegerCondition
 
-export(int) var value setget set_value, get_value
+
+@export var value: int:
+	set = set_value,
+	get = get_value
 
 
 func set_value(v):
@@ -16,4 +20,4 @@ func get_value():
 func compare(v):
 	if typeof(v) != TYPE_INT:
 		return false
-	return .compare(v)
+	return super.compare(v)

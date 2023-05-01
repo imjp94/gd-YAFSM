@@ -1,6 +1,5 @@
-tool
+@tool
 extends "StackPlayer.gd"
-const State = preload("states/State.gd")
 
 signal transited(from, to) # Transition of state
 signal entered(to) # Entry of state machine(including nested), empty string equals to root
@@ -8,16 +7,18 @@ signal exited(from) # Exit of state machine(including nested, empty string equal
 signal updated(state, delta) # Time to update(based on process_mode), up to user to handle any logic, for example, update movement of KinematicBody
 
 # Enum to define how state machine should be updated
-enum ProcessMode {
+enum UpdateProcessMode {
 	PHYSICS,
 	IDLE,
 	MANUAL
 }
 
-export(Resource) var state_machine # StateMachine being played 
-export(bool) var active = true setget set_active # Activeness of player
-export(bool) var autostart = true # Automatically enter Entry state on ready if true
-export(ProcessMode) var process_mode = ProcessMode.IDLE setget set_process_mode # ProcessMode of player
+@export var state_machine: StateMachine # StateMachine being played 
+@export var active: = true:  # Activeness of player
+	set = set_active
+@export var autostart: = true # Automatically enter Entry state on ready if true
+@export var update_process_mode: UpdateProcessMode = UpdateProcessMode.IDLE:  # ProcessMode of player
+	set = set_update_process_mode
 
 var _is_started = false
 var _parameters # Parameters to be passed to condition
@@ -28,7 +29,9 @@ var _is_param_edited = false
 
 
 func _init():
-	if Engine.editor_hint:
+	super._init()
+	
+	if Engine.is_editor_hint():
 		return
 
 	_parameters = {}
@@ -44,7 +47,7 @@ func _get_configuration_warning():
 	return ""
 
 func _ready():
-	if Engine.editor_hint:
+	if Engine.is_editor_hint():
 		return
 
 	set_process(false)
@@ -55,10 +58,10 @@ func _initiate():
 	if autostart:
 		start()
 	_on_active_changed()
-	_on_process_mode_changed()
+	_on_update_process_mode_changed()
 
 func _process(delta):
-	if Engine.editor_hint:
+	if Engine.is_editor_hint():
 		return
 
 	_update_start()
@@ -66,7 +69,7 @@ func _process(delta):
 	_update_end()
 
 func _physics_process(delta):
-	if Engine.editor_hint:
+	if Engine.is_editor_hint():
 		return
 
 	_update_start()
@@ -90,7 +93,7 @@ func _transit():
 		else:
 			push(next_state)
 	var to = next_state
-	_was_transited = !!next_state
+	_was_transited = next_state != null and next_state != ""
 	_is_param_edited = false
 	_flush_trigger(_parameters)
 	_flush_trigger(_local_parameters, true)
@@ -130,27 +133,27 @@ func _update_end():
 func _on_updated(delta, state):
 	pass
 
-func _on_process_mode_changed():
+func _on_update_process_mode_changed():
 	if not active:
 		return
 
-	match process_mode:
-		ProcessMode.PHYSICS:
+	match update_process_mode:
+		UpdateProcessMode.PHYSICS:
 			set_physics_process(true)
 			set_process(false)
-		ProcessMode.IDLE:
+		UpdateProcessMode.IDLE:
 			set_physics_process(false)
 			set_process(true)
-		ProcessMode.MANUAL:
+		UpdateProcessMode.MANUAL:
 			set_physics_process(false)
 			set_process(false)
 
 func _on_active_changed():
-	if Engine.editor_hint:
+	if Engine.is_editor_hint():
 		return
 
 	if active:
-		_on_process_mode_changed()
+		_on_update_process_mode_changed()
 		_transit()
 	else:
 		set_physics_process(false)
@@ -167,7 +170,7 @@ func _flush_trigger(params, nested=false):
 			params.erase(param_key)
 
 func reset(to=-1, event=ResetEventTrigger.LAST_TO_DEST):
-	.reset(to, event)
+	super.reset(to, event)
 	_was_transited = true # Make sure to call _transit on next update
 
 # Manually start the player, automatically called if autostart is true
@@ -191,14 +194,14 @@ func restart(is_active=true, preserve_params=false):
 func update(delta=get_physics_process_delta_time()):
 	if not active:
 		return
-	if process_mode != ProcessMode.MANUAL:
-		assert(not _is_update_locked, "Attempting to update manually with ProcessMode.%s" % ProcessMode.keys()[process_mode])
+	if update_process_mode != UpdateProcessMode.MANUAL:
+		assert(not _is_update_locked, "Attempting to update manually with ProcessMode.")
 
 	_transit()
 	var current_state = get_current()
 	_on_updated(current_state, delta)
 	emit_signal("updated", current_state, delta)
-	if process_mode == ProcessMode.MANUAL:
+	if update_process_mode == UpdateProcessMode.MANUAL:
 		# Make sure to auto advance even in MANUAL mode
 		if _was_transited:
 			call_deferred("update")
@@ -223,7 +226,7 @@ func set_param(name, value, auto_update=true):
 	set_nested_param(path, name, value, auto_update)
 
 func set_nested_param(path, name, value, auto_update=true):
-	if path.empty():
+	if path.is_empty():
 		_parameters[name] = value
 	else:
 		var local_params = _local_parameters.get(path)
@@ -247,7 +250,7 @@ func erase_param(name, auto_update=true):
 
 func erase_nested_param(path, name, auto_update=true):
 	var result = false
-	if path.empty():
+	if path.is_empty():
 		result = _parameters.erase(name)
 	else:
 		result = _local_parameters.get(path, {}).erase(name)
@@ -258,7 +261,7 @@ func erase_nested_param(path, name, auto_update=true):
 # automatically call update() if process_mode set to MANUAL and auto_update true
 # Nested param can be accessed through path "path/to/param_name", for example, "App/Game/is_playing"
 func clear_param(path="", auto_update=true):
-	if path.empty():
+	if path.is_empty():
 		_parameters.clear()
 	else:
 		_local_parameters.get(path, {}).clear()
@@ -270,7 +273,7 @@ func clear_param(path="", auto_update=true):
 # Called when param edited, automatically call update() if process_mode set to MANUAL and auto_update true
 func _on_param_edited(auto_update=true):
 	_is_param_edited = true
-	if process_mode == ProcessMode.MANUAL and auto_update and _is_started:
+	if update_process_mode == UpdateProcessMode.MANUAL and auto_update and _is_started:
 		update()
 
 # Get value of param
@@ -283,7 +286,7 @@ func get_param(name, default=null):
 	return get_nested_param(path, name, default)
 
 func get_nested_param(path, name, default=null):
-	if path.empty():
+	if path.is_empty():
 		return _parameters.get(name, default)
 	else:
 		var local_params = _local_parameters.get(path, {})
@@ -303,7 +306,7 @@ func has_param(name):
 	return has_nested_param(path, name)
 
 func has_nested_param(path, name):
-	if path.empty():
+	if path.is_empty():
 		return name in _parameters
 	else:
 		var local_params = _local_parameters.get(path, {})
@@ -326,17 +329,17 @@ func set_active(v):
 		active = v
 		_on_active_changed()
 
-func set_process_mode(mode):
-	if process_mode != mode:
-		process_mode = mode
-		_on_process_mode_changed()
+func set_update_process_mode(mode):
+	if update_process_mode != mode:
+		update_process_mode = mode
+		_on_update_process_mode_changed()
 
 func get_current():
-	var v = .get_current()
+	var v = super.get_current()
 	return v if v else ""
 
 func get_previous():
-	var v = .get_previous()
+	var v = super.get_previous()
 	return v if v else ""
 
 # Convert node path to state path that can be used to query state with StateMachine.get_state.
@@ -351,7 +354,7 @@ static func node_path_to_state_path(node_path):
 # State path, "path/to/state", equals to Node path, "root/path/to/state"
 static func state_path_to_node_path(state_path):
 	var path = state_path
-	if path.empty():
+	if path.is_empty():
 		path = "root"
 	else:
 		path = str("root/", path)
@@ -363,4 +366,7 @@ static func path_backward(path):
 
 # Return end directory of path, "path/to/state" returns "state"
 static func path_end_dir(path):
-	return path.right(path.rfind("/") + 1)
+	# In Godot 4.x the old behaviour of String.right() can be achieved with
+	# a negative length. Check the docs:
+	# https://docs.godotengine.org/en/stable/classes/class_string.html#class-string-method-right
+	return path.right(-(path.rfind("/") + 1))

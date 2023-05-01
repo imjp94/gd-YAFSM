@@ -1,13 +1,13 @@
-tool
+@tool
 extends MarginContainer
 
 
-onready var grid = $PanelContainer/MarginContainer/VBoxContainer/GridContainer
-onready var button = $PanelContainer/MarginContainer/VBoxContainer/MarginContainer/Button
+@onready var grid = $PanelContainer/MarginContainer/VBoxContainer/GridContainer
+@onready var button = $PanelContainer/MarginContainer/VBoxContainer/MarginContainer/Button
 
 
 func _ready():
-	button.connect("pressed", self, "_on_button_pressed")
+	button.pressed.connect(_on_button_pressed)
 
 func update_params(params, local_params):
 	# Remove erased parameters from param panel
@@ -33,7 +33,7 @@ func update_params(params, local_params):
 			set_param(str(param, "/", nested_param), str(value))
 
 func set_param(param, value):
-	var label = grid.get_node_or_null(param)
+	var label = grid.get_node_or_null(NodePath(param))
 	if not label:
 		label = Label.new()
 		label.name = param
@@ -42,7 +42,7 @@ func set_param(param, value):
 	label.text = "%s = %s" % [param, value]
 
 func remove_param(param):
-	var label = grid.get_node_or_null(param)
+	var label = grid.get_node_or_null(NodePath(param))
 	if label:
 		grid.remove_child(label)
 		label.queue_free()
@@ -55,5 +55,9 @@ func clear_params():
 
 func _on_button_pressed():
 	grid.visible = !grid.visible
+	if grid.visible:
+		button.text = "Hide params"
+	else:
+		button.text = "Show params"
 	
 	set_anchors_preset(PRESET_BOTTOM_RIGHT)

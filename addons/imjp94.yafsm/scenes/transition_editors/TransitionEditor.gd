@@ -1,56 +1,52 @@
-tool
+@tool
 extends VBoxContainer
-const Condition = preload("../../src/conditions/Condition.gd")
 const Utils = preload("../../scripts/Utils.gd")
-const ValueCondition = preload("../../src/conditions/ValueCondition.gd")
-const BooleanCondition = preload("../../src/conditions/BooleanCondition.gd")
-const IntegerCondition = preload("../../src/conditions/IntegerCondition.gd")
-const FloatCondition = preload("../../src/conditions/FloatCondition.gd")
-const StringCondition = preload("../../src/conditions/StringCondition.gd")
 const ConditionEditor = preload("../condition_editors/ConditionEditor.tscn")
 const BoolConditionEditor = preload("../condition_editors/BoolConditionEditor.tscn")
 const IntegerConditionEditor = preload("../condition_editors/IntegerConditionEditor.tscn")
 const FloatConditionEditor = preload("../condition_editors/FloatConditionEditor.tscn")
 const StringConditionEditor = preload("../condition_editors/StringConditionEditor.tscn")
 
-onready var header = $HeaderContainer/Header
-onready var title = $HeaderContainer/Header/Title
-onready var title_icon = $HeaderContainer/Header/Title/Icon
-onready var from = $HeaderContainer/Header/Title/From
-onready var to = $HeaderContainer/Header/Title/To
-onready var condition_count_icon = $HeaderContainer/Header/ConditionCount/Icon
-onready var condition_count_label = $HeaderContainer/Header/ConditionCount/Label
-onready var priority_icon = $HeaderContainer/Header/Priority/Icon
-onready var priority_spinbox = $HeaderContainer/Header/Priority/SpinBox
-onready var add = $HeaderContainer/Header/HBoxContainer/Add
-onready var add_popup_menu = $HeaderContainer/Header/HBoxContainer/Add/PopupMenu
-onready var content_container = $MarginContainer
-onready var condition_list = $MarginContainer/Conditions
+@onready var header = $HeaderContainer/Header
+@onready var title = $HeaderContainer/Header/Title
+@onready var title_icon = $HeaderContainer/Header/Title/Icon
+@onready var from = $HeaderContainer/Header/Title/From
+@onready var to = $HeaderContainer/Header/Title/To
+@onready var condition_count_icon = $HeaderContainer/Header/ConditionCount/Icon
+@onready var condition_count_label = $HeaderContainer/Header/ConditionCount/Label
+@onready var priority_icon = $HeaderContainer/Header/Priority/Icon
+@onready var priority_spinbox = $HeaderContainer/Header/Priority/SpinBox
+@onready var add = $HeaderContainer/Header/HBoxContainer/Add
+@onready var add_popup_menu = $HeaderContainer/Header/HBoxContainer/Add/PopupMenu
+@onready var content_container = $MarginContainer
+@onready var condition_list = $MarginContainer/Conditions
 
 var undo_redo
 
-var transition setget set_transition
+var transition:
+	set = set_transition
 
 var _to_free
 
 
 func _init():
+	super._init()
 	_to_free = []
 
 func _ready():
-	header.connect("gui_input", self, "_on_header_gui_input")
-	priority_spinbox.connect("value_changed", self, "_on_priority_spinbox_value_changed")
-	add.connect("pressed", self, "_on_add_pressed")
-	add_popup_menu.connect("index_pressed", self, "_on_add_popup_menu_index_pressed")
+	header.gui_input.connect(_on_header_gui_input)
+	priority_spinbox.value_changed.connect(_on_priority_spinbox_value_changed)
+	add.pressed.connect(_on_add_pressed)
+	add_popup_menu.index_pressed.connect(_on_add_popup_menu_index_pressed)
 	
-	priority_icon.texture = get_icon("AnimationTrackList", "EditorIcons")
+	priority_icon.texture = get_theme_icon("AnimationTrackList", "EditorIcons")
 
 func _exit_tree():
 	free_node_from_undo_redo() # Managed by EditorInspector
 
 func _on_header_gui_input(event):
 	if event is InputEventMouseButton:
-		if event.button_index == BUTTON_LEFT and event.pressed:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			toggle_conditions()
 
 func _on_priority_spinbox_value_changed(val: int) -> void:
@@ -60,22 +56,31 @@ func _on_add_pressed():
 	Utils.popup_on_target(add_popup_menu, add)
 
 func _on_add_popup_menu_index_pressed(index):
+	## Handle condition name duplication (4.x changed how duplicates are
+	## automatically handled and gave a random index instead of a progressive one)
+	var default_new_condition_name = "Param"
+	var condition_dup_index = 0
+	var new_name = default_new_condition_name
+	for condition_editor in condition_list.get_children():
+		var condition_name = condition_editor.condition.name
+		if (condition_name == new_name):
+			condition_dup_index += 1
+			new_name = "%s%s" % [default_new_condition_name, condition_dup_index]
 	var condition
 	match index:
 		0: # Trigger
-			condition = Condition.new()
+			condition = Condition.new(new_name)
 		1: # Boolean
-			condition = BooleanCondition.new()
+			condition = BooleanCondition.new(new_name)
 		2: # Integer
-			condition = IntegerCondition.new()
+			condition = IntegerCondition.new(new_name)
 		3: # Float
-			condition = FloatCondition.new()
+			condition = FloatCondition.new(new_name)
 		4: # String
-			condition = StringCondition.new()
+			condition = StringCondition.new(new_name)
 		_:
 			push_error("Unexpected index(%d) from PopupMenu" % index)
 	var editor = create_condition_editor(condition)
-	condition.name = transition.get_unique_name("Param")
 	add_condition_editor_action(editor, condition)
 
 func _on_ConditionEditorRemove_pressed(editor):
@@ -94,8 +99,8 @@ func _on_transition_changed(new_transition):
 
 func _on_condition_editor_added(editor):
 	editor.undo_redo = undo_redo
-	if not editor.remove.is_connected("pressed", self, "_on_ConditionEditorRemove_pressed"):
-		editor.remove.connect("pressed", self, "_on_ConditionEditorRemove_pressed", [editor])
+	if not editor.remove.pressed.is_connected(_on_ConditionEditorRemove_pressed):
+		editor.remove.pressed.connect(_on_ConditionEditorRemove_pressed.bind(editor))
 	transition.add_condition(editor.condition)
 	update_condition_count()
 
@@ -141,15 +146,15 @@ func toggle_conditions():
 func create_condition_editor(condition):
 	var editor
 	if condition is BooleanCondition:
-		editor = BoolConditionEditor.instance()
+		editor = BoolConditionEditor.instantiate()
 	elif condition is IntegerCondition:
-		editor = IntegerConditionEditor.instance()
+		editor = IntegerConditionEditor.instantiate()
 	elif condition is FloatCondition:
-		editor = FloatConditionEditor.instance()
+		editor = FloatConditionEditor.instantiate()
 	elif condition is StringCondition:
-		editor = StringConditionEditor.instance()
+		editor = StringConditionEditor.instantiate()
 	else:
-		editor = ConditionEditor.instance()
+		editor = ConditionEditor.instantiate()
 	return editor
 
 func add_condition_editor_action(editor, condition):
@@ -173,6 +178,8 @@ func set_transition(t):
 func free_node_from_undo_redo():
 	for node in _to_free:
 		if is_instance_valid(node):
+			var history_id = undo_redo.get_object_history_id(node)
+			undo_redo.get_history_undo_redo(history_id).clear_history(false) # TODO: Should be handled by plugin.gd (Temporary solution as only TransitionEditor support undo/redo)
 			node.queue_free()
+
 	_to_free.clear()
-	undo_redo.clear_history(false) # TODO: Should be handled by plugin.gd (Temporary solution as only TransitionEditor support undo/redo)

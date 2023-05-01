@@ -1,21 +1,21 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=7 format=3 uid="uid://l3mqbqjwjkc3"]
 
-[ext_resource path="res://addons/imjp94.yafsm/scenes/state_nodes/StateNode.gd" type="Script" id=2]
+[ext_resource type="Script" path="res://addons/imjp94.yafsm/scenes/state_nodes/StateNode.gd" id="2"]
 
-[sub_resource type="StyleBoxFlat" id=1]
-bg_color = Color( 0.164706, 0.164706, 0.164706, 1 )
+[sub_resource type="StyleBoxFlat" id="1"]
+bg_color = Color(0.164706, 0.164706, 0.164706, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color( 0.960784, 0.772549, 0.333333, 1 )
+border_color = Color(0.44, 0.73, 0.98, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[sub_resource type="StyleBoxFlat" id=2]
-bg_color = Color( 0.164706, 0.164706, 0.164706, 1 )
+[sub_resource type="StyleBoxFlat" id="2"]
+bg_color = Color(0.164706, 0.164706, 0.164706, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -26,66 +26,54 @@ corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 corner_detail = 2
 
-[sub_resource type="StyleBoxFlat" id=3]
-bg_color = Color( 0.164706, 0.164706, 0.164706, 1 )
+[sub_resource type="StyleBoxFlat" id="3"]
+bg_color = Color(0.164706, 0.164706, 0.164706, 1)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color( 0.960784, 0.772549, 0.333333, 1 )
+border_color = Color(0.960784, 0.772549, 0.333333, 1)
 shadow_size = 2
 
-[sub_resource type="StyleBoxFlat" id=4]
-bg_color = Color( 0.164706, 0.164706, 0.164706, 1 )
+[sub_resource type="StyleBoxFlat" id="4"]
+bg_color = Color(0.164706, 0.164706, 0.164706, 1)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
 shadow_size = 2
 
-[sub_resource type="Theme" id=5]
-FlowChartNode/styles/focus = SubResource( 1 )
-FlowChartNode/styles/normal = SubResource( 2 )
-StateNode/styles/nested_focus = SubResource( 3 )
-StateNode/styles/nested_normal = SubResource( 4 )
-
-[sub_resource type="StyleBoxEmpty" id=6]
+[sub_resource type="Theme" id="5"]
+FlowChartNode/styles/focus = SubResource( "1" )
+FlowChartNode/styles/normal = SubResource( "2" )
+StateNode/styles/nested_focus = SubResource( "3" )
+StateNode/styles/nested_normal = SubResource( "4" )
 
 [node name="StateNode" type="HBoxContainer"]
-margin_right = 40.0
-margin_bottom = 40.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = SubResource( 5 )
-script = ExtResource( 2 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+theme = SubResource( "5" )
+script = ExtResource( "2" )
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-margin_right = 64.0
-margin_bottom = 40.0
+offset_right = 77.0
+offset_bottom = 41.0
 mouse_filter = 2
-custom_constants/margin_right = 8
-custom_constants/margin_top = 8
-custom_constants/margin_left = 8
-custom_constants/margin_bottom = 8
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_bottom = 5
 
 [node name="NameEdit" type="LineEdit" parent="MarginContainer"]
-margin_left = 8.0
-margin_top = 13.0
-margin_right = 56.0
-margin_bottom = 27.0
-mouse_filter = 2
-mouse_default_cursor_shape = 0
+offset_left = 4.0
+offset_top = 5.0
+offset_right = 71.0625
+offset_bottom = 36.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
-custom_styles/read_only = SubResource( 6 )
-custom_styles/focus = SubResource( 6 )
-custom_styles/normal = SubResource( 6 )
-custom_colors/font_color_uneditable = Color( 1, 1, 1, 1 )
+mouse_filter = 2
+mouse_default_cursor_shape = 0
 text = "State"
-align = 1
 editable = false
 expand_to_text_length = true
 selecting_enabled = false
