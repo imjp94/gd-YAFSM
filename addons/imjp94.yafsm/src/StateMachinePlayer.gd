@@ -130,7 +130,7 @@ func _update_end():
 	_is_update_locked = true
 
 # Called after update() which is dependant on process_mode, override to process current state
-func _on_updated(delta, state):
+func _on_updated(state, delta):
 	pass
 
 func _on_update_process_mode_changed():
