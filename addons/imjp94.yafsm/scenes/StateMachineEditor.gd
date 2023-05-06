@@ -220,9 +220,15 @@ func _on_state_node_context_menu_index_pressed(index):
 		1: # Duplicate
 			duplicate_nodes(current_layer, [_context_node])
 			_context_node = null
-		2: # Separator
+		2: # Delete
+			remove_node(current_layer, _context_node.name)
+			for connection_pair in current_layer.get_connection_list():
+				if connection_pair.from == _context_node.name or connection_pair.to == _context_node.name:
+					disconnect_node(current_layer, connection_pair.from, connection_pair.to).queue_free()
 			_context_node = null
-		3: # Convert
+		3: # Separator
+			_context_node = null
+		4: # Convert
 			convert_to_state_confirmation.popup_centered()
 
 func _on_convert_to_state_confirmation_confirmed():

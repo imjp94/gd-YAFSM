@@ -1,15 +1,17 @@
 [gd_scene format=3 uid="uid://ccv81pntbud75"]
 
 [node name="StateNodeContextMenu" type="PopupMenu"]
-size = Vector2i(154, 100)
+size = Vector2i(154, 120)
 visible = true
-item_count = 4
+item_count = 5
 item_0/text = "Copy"
 item_0/id = 0
 item_1/text = "Duplicate"
 item_1/id = 1
-item_2/text = ""
-item_2/id = 2
-item_2/separator = true
-item_3/text = "Convert to State"
-item_3/id = 3
+item_2/text = "Delete"
+item_2/id = 4
+item_3/text = ""
+item_3/id = 2
+item_3/separator = true
+item_4/text = "Convert to State"
+item_4/id = 3
