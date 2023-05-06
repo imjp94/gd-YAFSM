@@ -310,7 +310,7 @@ func _gui_input(event):
 				if event.pressed and can_gui_context_menu:
 					context_menu.set_item_disabled(1, current_layer.state_machine.has_entry())
 					context_menu.set_item_disabled(2, current_layer.state_machine.has_exit())
-					context_menu.position = get_viewport().get_mouse_position()
+					context_menu.position = get_window().position + Vector2i(get_viewport().get_mouse_position())
 					context_menu.popup()
 
 func _input(event):
@@ -391,7 +391,7 @@ func _on_state_node_gui_input(event, node):
 				if event.pressed:
 					# State node context menu
 					_context_node = node
-					state_node_context_menu.position = get_viewport().get_mouse_position()
+					state_node_context_menu.position = get_window().position + Vector2i(get_viewport().get_mouse_position())
 					state_node_context_menu.popup()
 					state_node_context_menu.set_item_disabled(3, not (node.state is StateMachine))
 					accept_event()
