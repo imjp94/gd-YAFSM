@@ -399,7 +399,7 @@ func _on_state_node_gui_input(event, node):
 					_context_node = node
 					state_node_context_menu.position = get_window().position + Vector2i(get_viewport().get_mouse_position())
 					state_node_context_menu.popup()
-					state_node_context_menu.set_item_disabled(3, not (node.state is StateMachine))
+					state_node_context_menu.set_item_disabled(4, not (node.state is StateMachine))
 					accept_event()
 
 func convert_to_state_machine(layer, node):
