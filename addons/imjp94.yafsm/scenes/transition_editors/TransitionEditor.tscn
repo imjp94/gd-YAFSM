@@ -1,11 +1,18 @@
 [gd_scene load_steps=7 format=3 uid="uid://dw0ecw2wdeosi"]
 
 [ext_resource type="Texture2D" uid="uid://dg8cmn5ubq6r5" path="res://addons/imjp94.yafsm/assets/icons/add-white-18dp.svg" id="1"]
-[ext_resource type="Texture2D" uid="uid://b2coah58shtq1" path="res://addons/imjp94.yafsm/assets/icons/subdirectory_arrow_right-white-18dp.svg" id="2"]
 [ext_resource type="Script" path="res://addons/imjp94.yafsm/scenes/transition_editors/TransitionEditor.gd" id="3"]
-[ext_resource type="Texture2D" uid="uid://cnkaa2ky1f4jq" path="res://addons/imjp94.yafsm/assets/icons/compare_arrows-white-18dp.svg" id="4"]
 
-[sub_resource type="Image" id="Image_oefu4"]
+[sub_resource type="Gradient" id="Gradient_hw7k8"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ipxab"]
+gradient = SubResource("Gradient_hw7k8")
+width = 18
+height = 18
+
+[sub_resource type="Image" id="Image_o35y7"]
 data = {
 "data": PackedByteArray(255, 255, 255, 0, 255, 255, 255, 0, 255, 128, 128, 4, 255, 128, 128, 4, 255, 128, 128, 4, 255, 128, 128, 4, 255, 128, 128, 4, 255, 128, 128, 4, 255, 128, 128, 4, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 93, 93, 131, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 131, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 131, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 93, 93, 252, 255, 93, 93, 252, 255, 93, 93, 252, 255, 94, 94, 127, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 128, 128, 4, 255, 128, 128, 4, 255, 128, 128, 4, 255, 128, 128, 4, 255, 128, 128, 4, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 231, 255, 93, 93, 55, 255, 97, 97, 58, 255, 93, 93, 233, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 231, 255, 94, 94, 54, 255, 94, 94, 57, 255, 93, 93, 233, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 97, 97, 42, 255, 255, 255, 0, 255, 255, 255, 0, 255, 97, 97, 42, 255, 93, 93, 233, 255, 93, 93, 232, 255, 93, 93, 41, 255, 255, 255, 0, 255, 255, 255, 0, 255, 97, 97, 42, 255, 93, 93, 233, 255, 93, 93, 232, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 96, 96, 45, 255, 97, 97, 42, 255, 255, 255, 0, 255, 97, 97, 42, 255, 97, 97, 42, 255, 255, 255, 0, 255, 98, 98, 47, 255, 97, 97, 42, 255, 255, 255, 0, 255, 97, 97, 42, 255, 97, 97, 42, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 96, 96, 45, 255, 93, 93, 235, 255, 93, 93, 233, 255, 97, 97, 42, 255, 255, 255, 0, 255, 255, 255, 0, 255, 94, 94, 46, 255, 93, 93, 236, 255, 93, 93, 233, 255, 97, 97, 42, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 235, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 233, 255, 95, 95, 59, 255, 96, 96, 61, 255, 93, 93, 235, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 233, 255, 95, 95, 59, 255, 96, 96, 61, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 252, 255, 93, 93, 252, 255, 93, 93, 252, 255, 93, 93, 252, 255, 93, 93, 252, 255, 93, 93, 252, 255, 93, 93, 252, 255, 93, 93, 252, 255, 93, 93, 252, 255, 93, 93, 252, 255, 93, 93, 252, 255, 93, 93, 252, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0),
 "format": "RGBA8",
@@ -14,136 +21,89 @@ data = {
 "width": 16
 }
 
-[sub_resource type="ImageTexture" id="ImageTexture_fhm6b"]
-image = SubResource("Image_oefu4")
+[sub_resource type="ImageTexture" id="ImageTexture_v636r"]
+image = SubResource("Image_o35y7")
 
 [node name="TransitionEditor" type="VBoxContainer"]
 script = ExtResource("3")
 
 [node name="HeaderContainer" type="MarginContainer" parent="."]
 layout_mode = 2
-offset_right = 300.0
-offset_bottom = 31.0
 
 [node name="Panel" type="Panel" parent="HeaderContainer"]
 layout_mode = 2
-offset_right = 300.0
-offset_bottom = 31.0
 
 [node name="Header" type="HBoxContainer" parent="HeaderContainer"]
 layout_mode = 2
-offset_right = 300.0
-offset_bottom = 31.0
 
 [node name="Title" type="HBoxContainer" parent="HeaderContainer/Header"]
 layout_mode = 2
-offset_right = 86.0
-offset_bottom = 31.0
 tooltip_text = "Next State"
 
 [node name="From" type="Label" parent="HeaderContainer/Header/Title"]
 layout_mode = 2
-offset_top = 2.0
-offset_right = 41.0
-offset_bottom = 28.0
 size_flags_horizontal = 3
 text = "From"
 
 [node name="Icon" type="TextureRect" parent="HeaderContainer/Header/Title"]
+texture_filter = 1
 layout_mode = 2
-offset_left = 45.0
-offset_right = 63.0
-offset_bottom = 31.0
-texture = ExtResource("2")
-stretch_mode = 6
+texture = SubResource("GradientTexture2D_ipxab")
+expand_mode = 3
+stretch_mode = 3
 
 [node name="To" type="Label" parent="HeaderContainer/Header/Title"]
 layout_mode = 2
-offset_left = 67.0
-offset_top = 2.0
-offset_right = 86.0
-offset_bottom = 28.0
 size_flags_horizontal = 3
 text = "To"
 
 [node name="VSeparator" type="VSeparator" parent="HeaderContainer/Header"]
 layout_mode = 2
-offset_left = 90.0
-offset_right = 94.0
-offset_bottom = 31.0
 
 [node name="ConditionCount" type="HBoxContainer" parent="HeaderContainer/Header"]
 layout_mode = 2
-offset_left = 98.0
-offset_right = 147.0
-offset_bottom = 31.0
-tooltip_text = "Number of Condition"
+tooltip_text = "Number of Conditions"
 
 [node name="Icon" type="TextureRect" parent="HeaderContainer/Header/ConditionCount"]
+texture_filter = 1
 layout_mode = 2
-offset_top = 6.0
-offset_right = 18.0
-offset_bottom = 24.0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-texture = ExtResource("4")
+texture = SubResource("ImageTexture_v636r")
+expand_mode = 3
+stretch_mode = 3
 
 [node name="Label" type="Label" parent="HeaderContainer/Header/ConditionCount"]
 layout_mode = 2
-offset_left = 22.0
-offset_top = 2.0
-offset_right = 49.0
-offset_bottom = 28.0
 text = "No."
 
 [node name="VSeparator2" type="VSeparator" parent="HeaderContainer/Header"]
 layout_mode = 2
-offset_left = 151.0
-offset_right = 155.0
-offset_bottom = 31.0
 
 [node name="Priority" type="HBoxContainer" parent="HeaderContainer/Header"]
 layout_mode = 2
-offset_left = 159.0
-offset_right = 262.0
-offset_bottom = 31.0
 tooltip_text = "Priority"
 
 [node name="Icon" type="TextureRect" parent="HeaderContainer/Header/Priority"]
+texture_filter = 1
 layout_mode = 2
-offset_top = 7.0
-offset_right = 16.0
-offset_bottom = 23.0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-texture = SubResource("ImageTexture_fhm6b")
+texture = SubResource("ImageTexture_v636r")
+expand_mode = 3
+stretch_mode = 3
 
 [node name="SpinBox" type="SpinBox" parent="HeaderContainer/Header/Priority"]
 layout_mode = 2
-offset_left = 20.0
-offset_right = 103.0
-offset_bottom = 31.0
 max_value = 10.0
 rounded = true
 allow_greater = true
 
 [node name="VSeparator3" type="VSeparator" parent="HeaderContainer/Header"]
 layout_mode = 2
-offset_left = 266.0
-offset_right = 270.0
-offset_bottom = 31.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HeaderContainer/Header"]
 layout_mode = 2
-offset_left = 274.0
-offset_right = 300.0
-offset_bottom = 31.0
 size_flags_horizontal = 10
 
 [node name="Add" type="Button" parent="HeaderContainer/Header/HBoxContainer"]
 layout_mode = 2
-offset_right = 26.0
-offset_bottom = 31.0
 tooltip_text = "Add Condition"
 icon = ExtResource("1")
 flat = true
@@ -163,16 +123,11 @@ item_4/id = 4
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
-offset_top = 35.0
-offset_right = 300.0
-offset_bottom = 35.0
 
 [node name="Panel" type="Panel" parent="MarginContainer"]
 layout_mode = 2
-offset_right = 300.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="Conditions" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
-offset_right = 300.0

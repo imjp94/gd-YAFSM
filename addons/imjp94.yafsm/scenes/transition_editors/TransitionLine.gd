@@ -3,6 +3,8 @@ extends "res://addons/imjp94.yafsm/scenes/flowchart/FlowChartLine.gd"
 const Transition = preload("../../src/transitions/Transition.gd")
 const ValueCondition = preload("../../src/conditions/ValueCondition.gd")
 
+const hi_res_font: Font = preload("res://addons/imjp94.yafsm/assets/hi-res-font.tres")
+
 @export var upright_angle_range: = 5.0
 
 @onready var label_margin = $MarginContainer
@@ -55,6 +57,7 @@ func update_label():
 			if not label:
 				label = Label.new()
 				label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				label.add_theme_font_override("font", hi_res_font)
 				label.name = condition.name
 				vbox.add_child(label)
 			if "value" in condition:

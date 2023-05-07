@@ -38,8 +38,9 @@ func _ready():
 	priority_spinbox.value_changed.connect(_on_priority_spinbox_value_changed)
 	add.pressed.connect(_on_add_pressed)
 	add_popup_menu.index_pressed.connect(_on_add_popup_menu_index_pressed)
-	
-	priority_icon.texture = get_theme_icon("AnimationTrackList", "EditorIcons")
+
+	condition_count_icon.texture = get_theme_icon("MirrorX", "EditorIcons")
+	priority_icon.texture = get_theme_icon("AnimationTrackGroup", "EditorIcons")
 
 func _exit_tree():
 	free_node_from_undo_redo() # Managed by EditorInspector
