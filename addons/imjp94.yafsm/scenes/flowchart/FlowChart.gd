@@ -240,9 +240,11 @@ func _draw():
 	# 	draw_line(from_pos, to_pos, Color.yellow)
 
 func _gui_input(event):
+
+	var OS_KEY_DELETE = KEY_BACKSPACE if ( ["macOS", "OSX"].has(OS.get_name()) ) else KEY_DELETE
 	if event is InputEventKey:
 		match event.keycode:
-			KEY_DELETE:
+			OS_KEY_DELETE:
 				if event.pressed and can_gui_delete_node:
 					# Delete nodes
 					for node in _selection.duplicate():
