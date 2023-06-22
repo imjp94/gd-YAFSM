@@ -3,7 +3,7 @@ extends "res://addons/imjp94.yafsm/scenes/flowchart/FlowChartLine.gd"
 const Transition = preload("../../src/transitions/Transition.gd")
 const ValueCondition = preload("../../src/conditions/ValueCondition.gd")
 
-const hi_res_font: Font = preload("res://addons/imjp94.yafsm/assets/hi-res-font.tres")
+const hi_res_font: Font = preload("res://addons/imjp94.yafsm/assets/fonts/sans_serif.tres")
 
 @export var upright_angle_range: = 5.0
 
