@@ -580,7 +580,7 @@ func _on_node_connected(layer, from, to):
 		# Reconnection will trigger _on_node_connected after _on_node_reconnect_end/_on_node_reconnect_failed
 		if is_instance_valid(_reconnecting_connection.from_node) and \
 		_reconnecting_connection.from_node.name == from and \
-		is_instance_valid(_reconnecting_connection.from_node) and \
+		is_instance_valid(_reconnecting_connection.to_node) and \
 		_reconnecting_connection.to_node.name == to:
 			_reconnecting_connection = null
 			return
