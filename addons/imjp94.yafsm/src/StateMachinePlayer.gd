@@ -195,7 +195,7 @@ func update(delta=get_physics_process_delta_time()):
 	if not active:
 		return
 	if update_process_mode != UpdateProcessMode.MANUAL:
-		assert(not _is_update_locked, "Attempting to update manually with ProcessMode.")
+		assert(not _is_update_locked, "Attempting to update manually with ProcessMode %s" % UpdateProcessMode.keys()[update_process_mode])
 
 	_transit()
 	var current_state = get_current()
