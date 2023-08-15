@@ -43,7 +43,6 @@ func _draw():
         var base_ofs = i * snap
 
         multi_line_vector_array.append(Vector2(base_ofs, offset.y))
-        multi_line_color_array.append(color)
         multi_line_vector_array.append(Vector2(base_ofs, corrected_size.y))
         multi_line_color_array.append(color)
 
@@ -59,7 +58,6 @@ func _draw():
         var base_ofs = i * snap
 
         multi_line_vector_array.append(Vector2(offset.x, base_ofs))
-        multi_line_color_array.append(color)
         multi_line_vector_array.append(Vector2(corrected_size.x, base_ofs))
         multi_line_color_array.append(color)
 
