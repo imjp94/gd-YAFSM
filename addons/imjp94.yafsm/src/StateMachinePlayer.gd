@@ -369,4 +369,4 @@ static func path_end_dir(path):
 	# In Godot 4.x the old behaviour of String.right() can be achieved with
 	# a negative length. Check the docs:
 	# https://docs.godotengine.org/en/stable/classes/class_string.html#class-string-method-right
-	return path.right(path.length() - path.rfind("/")+1)
+	return path.right(path.length()-1 - path.rfind("/"))
