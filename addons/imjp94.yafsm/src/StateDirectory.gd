@@ -60,7 +60,7 @@ func get_current():
 # Get current end state name of path
 func get_current_end():
 	var current_path = get_current()
-	return current_path.right(current_path.length() - current_path.rfind("/")+1)
+	return current_path.right(current_path.length()-1 - current_path.rfind("/"))
 
 # Get index of base state
 func get_base_index():
