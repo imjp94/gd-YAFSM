@@ -8,7 +8,7 @@
 [node name="StateMachineEditor" type="Control"]
 visible = false
 clip_contents = true
-custom_minimum_size = Vector2i(0, 200)
+custom_minimum_size = Vector2(0, 200)
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -34,15 +34,9 @@ size_flags_vertical = 3
 
 [node name="Panel" type="Panel" parent="MarginContainer"]
 layout_mode = 2
-offset_right = 1152.0
-offset_bottom = 648.0
 
 [node name="CreateNewStateMachine" type="Button" parent="MarginContainer"]
 layout_mode = 2
-offset_left = 473.0
-offset_top = 308.0
-offset_right = 679.0
-offset_bottom = 339.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
 theme_override_colors/font_color = Color(0.87451, 0.87451, 0.87451, 1)
@@ -74,24 +68,18 @@ script = ExtResource("4")
 
 [node name="PanelContainer" type="PanelContainer" parent="ParametersPanel"]
 layout_mode = 2
-offset_right = 113.0
-offset_bottom = 31.0
 
 [node name="MarginContainer" type="MarginContainer" parent="ParametersPanel/PanelContainer"]
 layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ParametersPanel/PanelContainer/MarginContainer"]
 layout_mode = 2
-offset_right = 113.0
-offset_bottom = 31.0
 
 [node name="MarginContainer" type="MarginContainer" parent="ParametersPanel/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
 [node name="Button" type="Button" parent="ParametersPanel/PanelContainer/MarginContainer/VBoxContainer/MarginContainer"]
 layout_mode = 2
-offset_right = 113.0
-offset_bottom = 31.0
 size_flags_horizontal = 10
 text = "Show Params"
 

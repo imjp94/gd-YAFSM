@@ -16,7 +16,6 @@ var _conditions
 
 
 func _init(p_from="", p_to="", p_conditions={}):
-	super._init()
 	from = p_from
 	to = p_to
 	_conditions = p_conditions
