@@ -7,7 +7,6 @@ var selected: = false:
 
 
 func _init():
-	super._init()
 	
 	focus_mode = FOCUS_CLICK
 	mouse_filter = MOUSE_FILTER_IGNORE

@@ -10,7 +10,6 @@ signal display_string_changed(new)
 
 
 func _init(p_name=""):
-	super._init()
 	name = p_name
 
 func set_name(n):

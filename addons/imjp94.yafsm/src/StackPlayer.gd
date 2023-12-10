@@ -20,7 +20,6 @@ var _stack
 
 
 func _init():
-	super._init()
 	_stack = []
 
 # Push an item to the top of stack

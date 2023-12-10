@@ -8,7 +8,6 @@ var content_nodes = Control.new() # Node that hold all flowchart nodes
 var _connections = {}
 
 func _init():
-	super._init()
 	
 	name = "FlowChartLayer"
 	mouse_filter = MOUSE_FILTER_IGNORE

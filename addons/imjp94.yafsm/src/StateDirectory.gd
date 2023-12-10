@@ -16,7 +16,6 @@ var _dirs = [""] # Empty string equals to root
 
 
 func _init(p):
-	super._init()
 	path = p
 	_dirs += Array(p.split("/"))
 
