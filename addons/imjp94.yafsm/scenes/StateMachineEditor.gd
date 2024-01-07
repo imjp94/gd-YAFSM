@@ -42,7 +42,7 @@ var message_box = VBoxContainer.new()
 var editor_accent_color = Color.WHITE
 var transition_arrow_icon
 
-var undo_redo
+var undo_redo: EditorUndoRedoManager
 
 var debug_mode: = false:
 	set = set_debug_mode
@@ -246,11 +246,23 @@ func _on_save_dialog_confirmed():
 
 func _on_create_new_state_machine_pressed():
 	var new_state_machine = StateMachine.new()
-	state_machine_player.state_machine = new_state_machine
-	set_state_machine(new_state_machine)
-	create_new_state_machine_container.visible = false
-	check_has_entry()
-	emit_signal("inspector_changed", "state_machine")
+	
+	undo_redo.create_action("Create New StateMachine")
+	
+	undo_redo.add_do_reference(new_state_machine)
+	undo_redo.add_do_property(state_machine_player, "state_machine", new_state_machine)
+	undo_redo.add_do_method(self, "set_state_machine", new_state_machine)
+	undo_redo.add_do_property(create_new_state_machine_container, "visible", false)
+	undo_redo.add_do_method(self, "check_has_entry")
+	undo_redo.add_do_method(self, "emit_signal", "inspector_changed", "state_machine")
+	
+	undo_redo.add_undo_property(state_machine_player, "state_machine", null)
+	undo_redo.add_undo_method(self, "set_state_machine", null)
+	undo_redo.add_undo_property(create_new_state_machine_container, "visible", true)
+	undo_redo.add_undo_method(self, "check_has_entry")
+	undo_redo.add_undo_method(self, "emit_signal", "inspector_changed", "state_machine")
+	
+	undo_redo.commit_action()
 
 func _on_condition_visibility_pressed():
 	for line in current_layer.content_lines.get_children():
