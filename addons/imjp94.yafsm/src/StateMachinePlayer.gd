@@ -1,5 +1,5 @@
 @tool
-extends "StackPlayer.gd"
+class_name StateMachinePlayer extends "StackPlayer.gd"
 
 signal transited(from, to) # Transition of state
 signal entered(to) # Entry of state machine(including nested), empty string equals to root
