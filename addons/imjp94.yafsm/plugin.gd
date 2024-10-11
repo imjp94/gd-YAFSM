@@ -111,6 +111,8 @@ func _on_focused_object_changed(new_obj):
 		if focused_object is StateMachinePlayer:
 			if focused_object.get_class() == "EditorDebuggerRemoteObject":
 				state_machine = focused_object.get("Members/state_machine")
+				if state_machine == null:
+					state_machine = focused_object.get("Members/StateMachinePlayer.gd/state_machine")
 			else:
 				state_machine = focused_object.state_machine
 			state_machine_editor.state_machine_player = focused_object
