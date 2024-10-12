@@ -38,13 +38,16 @@ func _init():
 	_local_parameters = {}
 	_was_transited = true # Trigger _transit on _ready
 
-func _get_configuration_warning():
+func _get_configuration_warnings() -> PackedStringArray:
+	var _errors: Array[String] = []
+
 	if state_machine:
 		if not state_machine.has_entry():
-			return "State Machine will not function properly without Entry node"
+			_errors.append("State Machine will not start without an Entry node,")
 	else:
-		return "State Machine Player is not going anywhere without default State Machine"
-	return ""
+		_errors.append("Property 'state_machine' is required,")
+	
+	return PackedStringArray(_errors)
 
 func _ready():
 	if Engine.is_editor_hint():
@@ -175,6 +178,8 @@ func reset(to=-1, event=ResetEventTrigger.LAST_TO_DEST):
 
 # Manually start the player, automatically called if autostart is true
 func start():
+	assert(state_machine != null, "A 'state_machine' is needed to run.")
+	assert(state_machine.has_entry(), "Plase add an Entry block to the state machine.")
 	push(State.ENTRY_STATE)
 	emit_signal("entered", "")
 	_was_transited = true
