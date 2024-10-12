@@ -152,6 +152,9 @@ func _process(delta):
 	_last_stack = stack
 	var params = state_machine_player.get("Members/_parameters")
 	var local_params = state_machine_player.get("Members/_local_parameters")
+	if params == null:
+		params = state_machine_player.get("Members/StateMachinePlayer.gd/_parameters")
+		local_params = state_machine_player.get("Members/StateMachinePlayer.gd/_local_parameters")
 	param_panel.update_params(params, local_params)
 	get_focused_layer(_current_state).debug_update(_current_state, params, local_params)
 
