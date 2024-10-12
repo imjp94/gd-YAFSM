@@ -1,4 +1,5 @@
-extends Node
+@tool
+class_name StackPlayer extends Node
 
 signal pushed(to) # When item pushed to stack
 signal popped(from) # When item popped from stack

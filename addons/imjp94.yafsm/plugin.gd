@@ -1,8 +1,5 @@
 @tool
 extends EditorPlugin
-const YAFSM = preload("YAFSM.gd")
-const StackPlayer = YAFSM.StackPlayer
-const StateMachinePlayer = YAFSM.StateMachinePlayer
 
 const StateMachineEditor = preload("scenes/StateMachineEditor.tscn")
 const TransitionInspector = preload("scenes/transition_editors/TransitionInspector.gd")

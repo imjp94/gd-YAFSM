@@ -1,6 +1,6 @@
 @tool
 extends "res://addons/imjp94.yafsm/scenes/flowchart/FlowChart.gd"
-const StateMachinePlayer = preload("../src/StateMachinePlayer.gd")
+
 const StateMachine = preload("../src/states/StateMachine.gd")
 const Transition = preload("../src/transitions/Transition.gd")
 const State = preload("../src/states/State.gd")
