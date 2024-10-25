@@ -485,6 +485,17 @@ func _gui_input(event):
 								selected.modulate.a = 1.0
 						_drag_start_pos = _drag_end_pos
 						queue_redraw()
+	if event is InputEventMagnifyGesture:
+		var scale: float = 200.0
+		if event.factor > 1:
+			set_zoom(zoom + event.get_factor() / scale)
+		else:
+			set_zoom(zoom - event.get_factor() / scale)
+		queue_redraw()
+	if event is InputEventPanGesture:
+		var scale: float = 30
+		h_scroll.value += event.delta.x * scale
+		v_scroll.value += event.delta.y * scale
 
 # Get selection box rect
 func get_selection_box_rect():
