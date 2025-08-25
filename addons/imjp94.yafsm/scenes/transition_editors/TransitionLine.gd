@@ -69,7 +69,7 @@ func update_label():
 				if override_template_var:
 					label.text = label.text.format(override_template_var)
 			else:
-				label.text = condition.name
+				label.text = "→ %s" % condition.name
 	queue_redraw()
 
 func _on_transition_changed(new_transition):
