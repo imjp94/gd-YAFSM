@@ -19,6 +19,9 @@ func get_value():
 func get_value_string():
 	return str(snapped(value, 0.01)).pad_decimals(2)
 
+func get_formatted_value(value):
+	return str(snapped(value, 0.01)).pad_decimals(2)
+
 func compare(v):
 	if typeof(v) != TYPE_FLOAT:
 		return false

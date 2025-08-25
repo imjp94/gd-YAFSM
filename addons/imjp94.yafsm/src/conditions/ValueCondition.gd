@@ -49,6 +49,10 @@ func get_value():
 func get_value_string():
 	return get_value()
 
+# Can be used to format a provided value
+func get_formatted_value(value):
+	return value
+
 # Compare value against this condition, return true if succeeded
 func compare(v):
 	if v == null:
