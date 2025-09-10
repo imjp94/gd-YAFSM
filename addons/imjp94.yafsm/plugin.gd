@@ -66,7 +66,7 @@ func _handles(object):
 		_handled_and_ready_to_edit = true  # this should not be necessary, but it seemingly is (Godot 4.0-rc1)
 		return true  # when return true from _handles, _edit can proceed.
 	if object is StateMachinePlayer:
-		if object.get_class() == "EditorDebuggerRemoteObject":
+		if object.get_class() == "EditorDebuggerRemoteObjects":
 			set_focused_object(object)
 			state_machine_editor.debug_mode = true
 			return false
@@ -106,7 +106,7 @@ func _on_focused_object_changed(new_obj):
 		show_state_machine_editor()
 		var state_machine
 		if focused_object is StateMachinePlayer:
-			if focused_object.get_class() == "EditorDebuggerRemoteObject":
+			if focused_object.get_class() == "EditorDebuggerRemoteObjects":
 				state_machine = focused_object.get("Members/state_machine")
 				if state_machine == null:
 					state_machine = focused_object.get("Members/StateMachinePlayer.gd/state_machine")
