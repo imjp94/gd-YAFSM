@@ -296,7 +296,7 @@ func _on_debug_mode_changed(new_debug_mode):
 func _on_state_machine_player_changed(new_state_machine_player):
 	if not state_machine_player:
 		return
-	if new_state_machine_player.get_class() == "EditorDebuggerRemoteObject":
+	if new_state_machine_player.get_class() == "EditorDebuggerRemoteObjects":
 		return
 
 	if new_state_machine_player:
