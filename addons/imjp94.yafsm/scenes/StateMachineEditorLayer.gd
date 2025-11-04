@@ -44,7 +44,7 @@ func debug_update(current_state, parameters, local_parameters):
 				if not ("value" in condition): # Ignore trigger
 					continue
 				var value = parameters.get(str(condition.name))
-				value = str(value) if value != null else "?"
+				value = condition.get_formatted_value(value) if value != null else "?"
 				var label = line.vbox.get_node_or_null(NodePath(str(condition.name)))
 				var override_template_var = line._template_var.get(str(condition.name))
 				if override_template_var == null:
@@ -123,7 +123,7 @@ func debug_transit_in(from, to):
 	# Change string template for current TransitionLines
 	for transition in transitions.values():
 		var line = content_lines.get_node_or_null(NodePath("%s>%s" % [transition.from, transition.to]))
-		line.template = "{condition_name} {condition_comparation} {condition_value}({value})"
+		line.template = "{condition_name} {condition_comparation} {condition_value} ({value})"
 	_start_tweens()
 
 func set_editor_accent_color(color):
