@@ -3,6 +3,7 @@ extends "res://addons/imjp94.yafsm/scenes/flowchart/FlowChartLine.gd"
 const Transition = preload("../../src/transitions/Transition.gd")
 const ValueCondition = preload("../../src/conditions/ValueCondition.gd")
 
+const IDmanager := preload("res://addons/imjp94.yafsm/scripts/ID_manager.gd")
 const hi_res_font: Font = preload("res://addons/imjp94.yafsm/assets/fonts/sans_serif.tres")
 
 @export var upright_angle_range: = 5.0
@@ -10,6 +11,9 @@ const hi_res_font: Font = preload("res://addons/imjp94.yafsm/assets/fonts/sans_s
 @onready var label_margin = $MarginContainer
 @onready var vbox = $MarginContainer/VBoxContainer
 
+var IDmanage := IDmanager.new()
+var id_to_str := {}
+var str_to_id := {}
 var undo_redo
 
 var transition:
@@ -49,16 +53,23 @@ func update_label():
 	if transition:
 		var template_var = {"condition_name": "", "condition_comparation": "", "condition_value": null}
 		for label in vbox.get_children():
-			if not (str(label.name) in transition.conditions.keys()):  # Names of nodes are now of type StringName, not simple strings!
+			if not (id_to_str[label.name] in transition.conditions.keys()):  # Names of nodes are now of type StringName, not simple strings!
 				vbox.remove_child(label)
+				var id = label.name
+				str_to_id.erase(id_to_str[id])
+				id_to_str.erase(id)
+				IDmanage.remove_id(int(id))
 				label.queue_free()
 		for condition in transition.conditions.values():
-			var label = vbox.get_node_or_null(NodePath(condition.name))
+			var id = str_to_id.get(condition.name, "")
+			var label = vbox.get_node_or_null(NodePath(id))
 			if not label:
 				label = Label.new()
 				label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 				label.add_theme_font_override("font", hi_res_font)
-				label.name = condition.name
+				label.name = str(IDmanage.new_id())
+				id_to_str[label.name] = condition.name
+				str_to_id[condition.name] = label.name
 				vbox.add_child(label)
 			if "value" in condition:
 				template_var["condition_name"] = condition.name
@@ -95,9 +106,12 @@ func _on_transition_condition_removed(condition):
 	update_label()
 
 func _on_condition_name_changed(from, to):
-	var label = vbox.get_node_or_null(NodePath(from))
+	var id = str_to_id.get(from)
+	var label = vbox.get_node_or_null(NodePath(id))
 	if label:
-		label.name = to
+		str_to_id.erase(from)
+		str_to_id[to] = id
+		id_to_str[id] = to
 	update_label()
 
 func _on_condition_display_string_changed(display_string):
