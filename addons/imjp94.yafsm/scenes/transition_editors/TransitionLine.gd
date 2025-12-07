@@ -1,8 +1,8 @@
 @tool
 extends "res://addons/imjp94.yafsm/scenes/flowchart/FlowChartLine.gd"
+
 const Transition = preload("../../src/transitions/Transition.gd")
 const ValueCondition = preload("../../src/conditions/ValueCondition.gd")
-
 const IDmanager := preload("res://addons/imjp94.yafsm/scripts/ID_manager.gd")
 const hi_res_font: Font = preload("res://addons/imjp94.yafsm/assets/fonts/sans_serif.tres")
 
@@ -15,12 +15,11 @@ var IDmanage := IDmanager.new()
 var id_to_str := {}
 var str_to_id := {}
 var undo_redo
-
+var template = "{condition_name} {condition_comparation} {condition_value}"
+var _template_var = {}
 var transition:
 	set = set_transition
-var template = "{condition_name} {condition_comparation} {condition_value}"
 
-var _template_var = {}
 
 func _init():
 	super._init()
