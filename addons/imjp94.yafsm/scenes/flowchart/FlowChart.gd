@@ -79,17 +79,29 @@ func _init():
 	content.add_child.call_deferred(grid)
 	grid.z_index = -1
 
+	var scroll_minimum
+	match OS.get_name():
+		"Android", "iOS":
+			scroll_minimum = Vector2(30, 30)
+		_:
+			scroll_minimum = Vector2(5, 5)
+	
 	add_child(h_scroll)
+	h_scroll.custom_minimum_size = scroll_minimum
 	h_scroll.set_anchors_and_offsets_preset(PRESET_BOTTOM_WIDE)
 	h_scroll.value_changed.connect(_on_h_scroll_changed)
 	h_scroll.gui_input.connect(_on_h_scroll_gui_input)
-
+	
 	add_child(v_scroll)
+	v_scroll.custom_minimum_size = scroll_minimum
 	v_scroll.set_anchors_and_offsets_preset(PRESET_RIGHT_WIDE)
 	v_scroll.value_changed.connect(_on_v_scroll_changed)
 	v_scroll.gui_input.connect(_on_v_scroll_gui_input)
-
+	
+	h_scroll.offset_top -= h_scroll.custom_minimum_size.y + 5
 	h_scroll.offset_right = -v_scroll.size.x
+	
+	v_scroll.offset_left -= v_scroll.custom_minimum_size.x + 5
 	v_scroll.offset_bottom = -h_scroll.size.y
 
 	h_scroll.min_value = 0
