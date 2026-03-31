@@ -27,6 +27,7 @@ var transition:
 	set = set_transition
 
 var _to_free
+var _is_syncing_priority := false
 
 
 func _init():
@@ -50,6 +51,8 @@ func _on_header_gui_input(event):
 			toggle_conditions()
 
 func _on_priority_spinbox_value_changed(val: int) -> void:
+	if _is_syncing_priority:
+		return
 	set_priority(val)
 
 func _on_add_pressed():
@@ -128,8 +131,9 @@ func update_condition_count():
 		show_conditions()
 
 func update_priority_spinbox_value():
-	priority_spinbox.value = transition.priority
-	priority_spinbox.apply()
+	_is_syncing_priority = true
+	priority_spinbox.set_value_no_signal(transition.priority)
+	_is_syncing_priority = false
 	
 func set_priority(value):
 	transition.priority = value
