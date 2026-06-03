@@ -376,3 +376,6 @@ static func path_end_dir(path):
 	# a negative length. Check the docs:
 	# https://docs.godotengine.org/en/stable/classes/class_string.html#class-string-method-right
 	return path.right(path.length()-1 - path.rfind("/"))
+
+func get_local_params():
+	return _local_parameters.duplicate()
